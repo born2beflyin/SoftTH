@@ -5,7 +5,9 @@ Software TripleHead originally by Kegetys (www.kegetys.fi).  Updated and maintai
 
 Licensed under GNU GPL v3 (see LICENSE)
 
-SoftTH is a software-only triplehead solution (three monitors) for DirectX 8/9 games (and in the future DirectX 10/11 and OpenGL.  It uses DirectX DLL hooks to draw the scene entirely on the primary video card and copy the appropriate portions of the scene to the various monitors.  SoftTH can be configured to work with any combination of monitor sizes/resolutions.
+SoftTH is a software-only triplehead solution (three monitors) for DirectX 8/9 games (and in the future DirectX 10/11 and OpenGL games).  It uses DirectX DLL hooks to draw the scene entirely on the primary video card and copy the appropriate portions of the scene to the various monitors.  SoftTH can be configured to work with any combination of monitor sizes/resolutions.
+
+======
 
 From Kegetys on December 09, 2012: (http://www.kegetys.fi/forum/index.php?topic=3176.0)
 
