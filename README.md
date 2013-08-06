@@ -9,7 +9,7 @@ SoftTH is a software-only triplehead solution (three monitors) for DirectX 8/9 g
 
 ======
 
-From Kegetys on December 09, 2012: (http://www.kegetys.fi/forum/index.php?topic=3176.0)
+From Kegetys on December 09, 2012 - the initial source code release: (http://www.kegetys.fi/forum/index.php?topic=3176.0)
 
 "I wanted to write some notes of the source but I havent found the time to do it so it is here in a bit raw form. Its a VS 2005 project, see readme for requirements. The configurations are a bit broken, you need to select the matching configuration for the architecture (Release for Win32 and Release x64 for x64).
 
