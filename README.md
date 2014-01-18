@@ -1,11 +1,37 @@
 SoftTH
 ======
 
-Software TripleHead originally by Kegetys (www.kegetys.fi).  Updated and maintained by born2beflyin.
+Software TripleHead originally by Keijo "Kegetys" Ruotsalainen, http://www.kegetys.fi.
 
-Licensed under GNU GPL v3 (see LICENSE)
+Updated and maintained by born2beflyin, http://www.softth.net
 
-SoftTH is a software-only triplehead/multihead solution (three+ monitors) for DirectX 8/9 games (and in the future DirectX 10/11 and OpenGL games).  It uses DirectX DLL hooks to draw the scene entirely on the primary video card and copy the appropriate portions of the scene to the various monitors.  SoftTH can be configured to work with any combination of monitor sizes/resolutions/placement.
+Licensed under GNU GPL v3 (see LICENSE).
+
+SoftTH is an open source software triplehead/multihead gaming solution for the PC. It performs the same job as AMD Eyefinity, nVidia Surround, and Matrox2go, only it supports any number and/or combination of non-identical or identical screens at any resolution. No special hardware is needed. You simply need your monitors attached to PCI Express video cards. Only one card does all the rendering work, so the secondary+ card(s) can be low end; only Direct3D support is required.
+
+SoftTH works by rendering the whole scene on one display adapter, which then gets split into multiple parts to be displayed on each monitor. While it is technically possible to use it on an AGP/PCI card, only PCI Express has the required bandwidth to get good framerates.
+
+======
+
+(As of Jan. 2014)
+
+Compiles with Code::Blocks 13.12: http://www.codeblocks.org using the Microsoft VC++ 2010 compiler.
+
+Requires:
+(Static libs included with SoftTH)
+- distorm disassembler library: http://code.google.com/p/distorm/ (Currently linking to distorm v3.3)
+- zlib compression library: http://www.zlib.net/ (Currently linking to v1.2.7)
+(NOT included with SoftTH)
+- DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
+- Windows SDK v7.1: http://www.microsoft.com/en-us/download/details.aspx?id=8279
+(You will not need the following if you have MS Visual Studio 2010 Pro, but you will have to modify the include/lib search folders)
+- Windows DDK v7.1.0: http://www.microsoft.com/en-us/download/details.aspx?id=11800
+
+Modify the project include/lib search directories accordingly.
+
+If a project target isn't yet in the list, i.e. "Release DX11 Win x64", it's in the works.  It may take a while.
+
+SoftTH contains incomplete code for Direct3D 10 (DXGI) and Direct3D 10.1 support. For Direct3D 11, most functionality is missing, but is under development.
 
 ======
 

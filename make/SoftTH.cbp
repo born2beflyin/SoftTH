@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SoftTH" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug DX9 Win x86">
+				<Option platforms="Windows;" />
+				<Option output="../bin/win/x86/debug/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../obj/win/x86/debug/" />
+				<Option object_output="../obj/win/x86/debug/" />
+				<Option type="3" />
+				<Option compiler="msvc10" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/arch:SSE2" />
+					<Add option="/Gd" />
+					<Add option="/Gm" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/GS" />
+					<Add option="/Zc:wchar_t" />
+					<Add option="/Zc:forScope" />
+					<Add option="/Zi" />
+					<Add option="/DxUSE_NEW_CUDA" />
+					<Add option="/DxUSE_CUDA" />
+					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="/DWIN32" />
+					<Add option="/DDEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/DZLIB_WINAPI" />
+					<Add option="/D_WINDLL" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="../include" />
+					<Add directory="../include/distorm" />
+					<Add directory="../include/zlib" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
+					<Add directory="../include" />
+					<Add directory="../include/distorm" />
+					<Add directory="../include/zlib" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add option="/NODEFAULTLIB:libcmt" />
+					<Add option="/DEF:..\make\dll_x86.def" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add option="/MANIFEST:NO" />
+					<Add option="/SUBSYSTEM:WINDOWS" />
+					<Add option="/OPT:REF" />
+					<Add option="/OPT:ICF" />
+					<Add option="/LTCG" />
+					<Add option="/TLBID:1" />
+					<Add option="/DYNAMICBASE" />
+					<Add option="/NXCOMPAT" />
+					<Add option="/MACHINE:X86" />
+					<Add library="zlibstat.lib" />
+					<Add library="D3DX10.lib" />
+					<Add library="Dwmapi.lib" />
+					<Add library="Winmm.lib" />
+					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
+					<Add library="d3d10.lib" />
+					<Add library="DXGI.lib" />
+					<Add library="Advapi32.lib" />
+					<Add library="Gdi32.lib" />
+					<Add library="user32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="kernel32.lib" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
+					<Add directory="../lib/distorm/win/x86" />
+					<Add directory="../lib/zlib/win/x86" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\debug\d3d9.dll' />
+				</ExtraCommands>
+			</Target>
+			<Target title="Release DX9 Win x86">
+				<Option platforms="Windows;" />
+				<Option output="../bin/win/x86/release/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../obj/win/x86/release/" />
+				<Option object_output="../obj/win/x86/release/" />
+				<Option type="3" />
+				<Option compiler="msvc10" />
+				<Compiler>
+					<Add option="/MD" />
+					<Add option="/arch:SSE2" />
+					<Add option="/Gd" />
+					<Add option="/GL" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/GS" />
+					<Add option="/Oy" />
+					<Add option="/Oi" />
+					<Add option="/Ot" />
+					<Add option="/Ox" />
+					<Add option="/Zc:wchar_t" />
+					<Add option="/Zc:forScope" />
+					<Add option="/Ob2" />
+					<Add option="/DxUSE_NEW_CUDA" />
+					<Add option="/DxUSE_CUDA" />
+					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="/DWIN32" />
+					<Add option="/DNDEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/DZLIB_WINAPI" />
+					<Add option="/D_WINDLL" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="../include" />
+					<Add directory="../include/distorm" />
+					<Add directory="../include/zlib" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
+					<Add directory="../include" />
+					<Add directory="../include/distorm" />
+					<Add directory="../include/zlib" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="/NODEFAULTLIB:libcmt" />
+					<Add option="/DEF:..\make\dll_x86.def" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add option="/MANIFEST:NO" />
+					<Add option="/SUBSYSTEM:WINDOWS" />
+					<Add option="/OPT:REF" />
+					<Add option="/OPT:ICF" />
+					<Add option="/LTCG" />
+					<Add option="/TLBID:1" />
+					<Add option="/DYNAMICBASE" />
+					<Add option="/NXCOMPAT" />
+					<Add option="/MACHINE:X86" />
+					<Add library="zlibstat.lib" />
+					<Add library="D3DX10.lib" />
+					<Add library="Dwmapi.lib" />
+					<Add library="Winmm.lib" />
+					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
+					<Add library="d3d10.lib" />
+					<Add library="DXGI.lib" />
+					<Add library="Advapi32.lib" />
+					<Add library="Gdi32.lib" />
+					<Add library="user32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="kernel32.lib" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
+					<Add directory="../lib/distorm/win/x86" />
+					<Add directory="../lib/zlib/win/x86" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\release\d3d9.dll' />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Unit filename="../src/InputHandler.cpp" />
+		<Unit filename="../src/InputHandler.h" />
+		<Unit filename="../src/configFile.cpp" />
+		<Unit filename="../src/configFile.h" />
+		<Unit filename="../src/cudaTasks.cpp" />
+		<Unit filename="../src/cudaTasks.h" />
+		<Unit filename="../src/cudaif.cpp" />
+		<Unit filename="../src/cudaif.hpp" />
+		<Unit filename="../src/cudainterface.cpp" />
+		<Unit filename="../src/cudainterface.h" />
+		<Unit filename="../src/d3d.cpp" />
+		<Unit filename="../src/d3d.h" />
+		<Unit filename="../src/d3d9.h" />
+		<Unit filename="../src/d3dDrawing.cpp" />
+		<Unit filename="../src/d3dDrawing.h" />
+		<Unit filename="../src/d3dSoftTH.cpp" />
+		<Unit filename="../src/d3dSoftTH.h" />
+		<Unit filename="../src/d3dbuffer.cpp" />
+		<Unit filename="../src/d3dbuffer.h" />
+		<Unit filename="../src/d3dtexture.cpp" />
+		<Unit filename="../src/d3dtexture.h" />
+		<Unit filename="../src/dxgiAdapterOutput.cpp" />
+		<Unit filename="../src/dxgiAdapterOutput.h" />
+		<Unit filename="../src/dxgiFactory.cpp" />
+		<Unit filename="../src/dxgiFactory.h" />
+		<Unit filename="../src/dxgiSwapChain.cpp" />
+		<Unit filename="../src/dxgiSwapChain.h" />
+		<Unit filename="../src/globalHooker.cpp" />
+		<Unit filename="../src/globalHooker.h" />
+		<Unit filename="../src/helper.cpp" />
+		<Unit filename="../src/helper.h" />
+		<Unit filename="../src/hooksSoftTH.cpp" />
+		<Unit filename="../src/hooksSoftTH.h" />
+		<Unit filename="../src/logodata.h" />
+		<Unit filename="../src/main.cpp" />
+		<Unit filename="../src/main.h" />
+		<Unit filename="../src/outD3D10.cpp" />
+		<Unit filename="../src/outD3D10.h" />
+		<Unit filename="../src/outD3D9.cpp" />
+		<Unit filename="../src/outD3D9.h" />
+		<Unit filename="../src/overlay_interface.cpp" />
+		<Unit filename="../src/overlay_interface.h" />
+		<Unit filename="../src/resource.h" />
+		<Unit filename="../src/resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../src/shCopy.cpp" />
+		<Unit filename="../src/shCopy.h" />
+		<Unit filename="../src/version.h" />
+		<Unit filename="../src/win32.cpp" />
+		<Unit filename="../src/win32.h" />
+		<Unit filename="../src/win32hooks.cpp" />
+		<Unit filename="../src/win32hooks.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
