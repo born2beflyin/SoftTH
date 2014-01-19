@@ -21,9 +21,11 @@ Requires:
 (Static libs included with SoftTH)
 - distorm disassembler library: http://code.google.com/p/distorm/ (Currently linking to distorm v3.3)
 - zlib compression library: http://www.zlib.net/ (Currently linking to v1.2.7)
+
 (NOT included with SoftTH)
 - DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
 - Windows SDK v7.1: http://www.microsoft.com/en-us/download/details.aspx?id=8279
+
 (You will not need the following if you have MS Visual Studio 2010 Pro, but you will have to modify the include/lib search folders)
 - Windows DDK v7.1.0: http://www.microsoft.com/en-us/download/details.aspx?id=11800
 
