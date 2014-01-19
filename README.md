@@ -29,6 +29,9 @@ Requires:
 
 Modify the project include/lib search directories accordingly.
 
+If you get a link error about "failure during conversion to COFF," it may be related to the issue here:
+http://stackoverflow.com/questions/10888391/error-link-fatal-error-lnk1123-failure-during-conversion-to-coff-file-inval
+
 If a project target isn't yet in the list, i.e. "Release DX11 Win x64", it's in the works.  It may take a while.
 
 SoftTH contains incomplete code for Direct3D 10 (DXGI) and Direct3D 10.1 support. For Direct3D 11, most functionality is missing, but is under development.
