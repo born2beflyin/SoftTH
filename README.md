@@ -18,6 +18,7 @@ SoftTH works by rendering the whole scene on one display adapter, which then get
 Compiles with Code::Blocks 13.12: http://www.codeblocks.org using the Microsoft VC++ 2010 compiler.
 
 Requires:
+
 (Static libs included with SoftTH)
 - distorm disassembler library: http://code.google.com/p/distorm/ (Currently linking to distorm v3.3)
 - zlib compression library: http://www.zlib.net/ (Currently linking to v1.2.7)
