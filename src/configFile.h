@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 
+// Set up the output method definitions
 #define OUTMETHOD_AUTO          -1 // Auto-detect (done by config loader)
 #define OUTMETHOD_LOCAL         0 // Use a shared surface directly
 #define OUTMETHOD_NONLOCAL      1 // Use a shared surface as copy buffer
@@ -32,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern int nonlocalMethodDefault; // Default method for nonlocal autodetect
 
+// Set up method for checking whether the user has selected a shared surface method for nonlocal copy
 static bool copyMethodNonlocal(int x) {return (x == OUTMETHOD_NONLOCAL_16b || x == OUTMETHOD_NONLOCAL_24b || x == OUTMETHOD_NONLOCAL || x == OUTMETHOD_NONLOCAL_16bDither);};
 
 char* createDefaultConfig(char *outFile); // Creates default config by detecting desktop monitors
@@ -96,7 +98,7 @@ public:
     bool tripleBuffer; // true = use two backbuffers
     char dllPathD3D9[256];  // Overridden path to direct3D DLL, or blank string for auto
     char dllPathDXGI[256];  // Overridden path to DXGI DLL, or blank string for auto
-    char dllPathD3D11[256];  // Overridden path to D3D11 DLL, or blank string for auto    
+    char dllPathD3D11[256];  // Overridden path to D3D11 DLL, or blank string for auto
     char screenshotFormat[4];
     bool zClear;  // Use z-clear trick to skip drawing of non-visible screen areas
   } main;
@@ -126,7 +128,7 @@ private:
 
   int numHeads; // Number of additional heads
   HEAD primaryHead; // Primary head (always on primary device, not transport res)
-  HEAD *additionalHeads; 
+  HEAD *additionalHeads;
 };
 
 #endif

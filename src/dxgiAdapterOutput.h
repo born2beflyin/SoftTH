@@ -56,13 +56,13 @@ public:
     };
 
   HRESULT STDMETHODCALLTYPE EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
-    ;//{dbg("dxga: EnumOutputs");return dxga->EnumOutputs(Output, ppOutput);};    
+    ;//{dbg("dxga: EnumOutputs");return dxga->EnumOutputs(Output, ppOutput);};
   HRESULT STDMETHODCALLTYPE GetDesc(DXGI_ADAPTER_DESC *pDesc)
-    ;//{dbg("dxga: GetDesc");return dxga->GetDesc(pDesc);};    
+    ;//{dbg("dxga: GetDesc");return dxga->GetDesc(pDesc);};
   HRESULT STDMETHODCALLTYPE CheckInterfaceSupport(REFGUID InterfaceName, LARGE_INTEGER *pUMDVersion)
-    {dbg("dxga: CheckInterfaceSupport");return dxga->CheckInterfaceSupport(InterfaceName, pUMDVersion);};  
+    {dbg("dxga: CheckInterfaceSupport");return dxga->CheckInterfaceSupport(InterfaceName, pUMDVersion);};
   HRESULT STDMETHODCALLTYPE GetDesc1(DXGI_ADAPTER_DESC1 *pDesc)
-    ;//{dbg("dxga: GetDesc1");return dxga->GetDesc1(pDesc);};  
+    ;//{dbg("dxga: GetDesc1");return dxga->GetDesc1(pDesc);};
 
   IDXGIAdapter1* getReal() {dbg("Get real adapter");return dxga;};
 
@@ -99,29 +99,29 @@ public:
     return dxgo->GetParent(riid, ppParent);};
 
   HRESULT STDMETHODCALLTYPE GetDesc(DXGI_OUTPUT_DESC *pDesc)
-   {dbg("dxgo: GetDesc");HRESULT ret = dxgo->GetDesc(pDesc);return ret;};   
+   {dbg("dxgo: GetDesc");HRESULT ret = dxgo->GetDesc(pDesc);return ret;};
   HRESULT STDMETHODCALLTYPE GetDisplayModeList(DXGI_FORMAT EnumFormat, UINT Flags, UINT *pNumModes, DXGI_MODE_DESC *pDesc)
-   ;//{dbg("dxgo: GetDisplayModeList");return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);};   
+   ;//{dbg("dxgo: GetDisplayModeList");return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);};
   HRESULT STDMETHODCALLTYPE FindClosestMatchingMode(const DXGI_MODE_DESC *pModeToMatch, DXGI_MODE_DESC *pClosestMatch,IUnknown *pConcernedDevice)
-   {dbg("dxgo: FindClosestMatchingMode");return dxgo->FindClosestMatchingMode(pModeToMatch, pClosestMatch, pConcernedDevice);};   
+   {dbg("dxgo: FindClosestMatchingMode");return dxgo->FindClosestMatchingMode(pModeToMatch, pClosestMatch, pConcernedDevice);};
   HRESULT STDMETHODCALLTYPE WaitForVBlank(void)
-   {dbg("dxgo: WaitForVBlank");return dxgo->WaitForVBlank();};   
+   {dbg("dxgo: WaitForVBlank");return dxgo->WaitForVBlank();};
   HRESULT STDMETHODCALLTYPE TakeOwnership(IUnknown *pDevice, BOOL Exclusive)
-   {dbg("dxgo: TakeOwnership");return dxgo->TakeOwnership(pDevice, Exclusive);};   
+   {dbg("dxgo: TakeOwnership");return dxgo->TakeOwnership(pDevice, Exclusive);};
   void STDMETHODCALLTYPE ReleaseOwnership(void)
-   {dbg("dxgo: ReleaseOwnership");return dxgo->ReleaseOwnership();};   
+   {dbg("dxgo: ReleaseOwnership");return dxgo->ReleaseOwnership();};
   HRESULT STDMETHODCALLTYPE GetGammaControlCapabilities(DXGI_GAMMA_CONTROL_CAPABILITIES *pGammaCaps)
-    {dbg("dxgo: GetGammaControlCapabilities");return dxgo->GetGammaControlCapabilities(pGammaCaps);};   
+    {dbg("dxgo: GetGammaControlCapabilities");return dxgo->GetGammaControlCapabilities(pGammaCaps);};
   HRESULT STDMETHODCALLTYPE SetGammaControl(const DXGI_GAMMA_CONTROL *pArray)
-   {dbg("dxgo: SetGammaControl");return dxgo->SetGammaControl(pArray);};   
+   {dbg("dxgo: SetGammaControl");return dxgo->SetGammaControl(pArray);};
   HRESULT STDMETHODCALLTYPE GetGammaControl(DXGI_GAMMA_CONTROL *pArray)
-    {dbg("dxgo: GetGammaControl");return dxgo->GetGammaControl(pArray);};   
+    {dbg("dxgo: GetGammaControl");return dxgo->GetGammaControl(pArray);};
   HRESULT STDMETHODCALLTYPE SetDisplaySurface(IDXGISurface *pScanoutSurface)
-    {dbg("dxgo: SetDisplaySurface");return dxgo->SetDisplaySurface(pScanoutSurface);};   
+    {dbg("dxgo: SetDisplaySurface");return dxgo->SetDisplaySurface(pScanoutSurface);};
   HRESULT STDMETHODCALLTYPE GetDisplaySurfaceData(IDXGISurface *pDestination)
-   {dbg("dxgo: GetDisplaySurfaceData");return dxgo->GetDisplaySurfaceData(pDestination);};   
+   {dbg("dxgo: GetDisplaySurfaceData");return dxgo->GetDisplaySurfaceData(pDestination);};
   HRESULT STDMETHODCALLTYPE GetFrameStatistics(DXGI_FRAME_STATISTICS *pStats)
-    {dbg("dxgo: GetFrameStatistics");return dxgo->GetFrameStatistics(pStats);}; 
+    {dbg("dxgo: GetFrameStatistics");return dxgo->GetFrameStatistics(pStats);};
 
   IDXGIOutput* getReal() {dbg("Get real output");return dxgo;};
 

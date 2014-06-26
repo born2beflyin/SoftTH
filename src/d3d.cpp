@@ -93,7 +93,7 @@ HRESULT IDirect3D9New::CreateDeviceEx(UINT Adapter,D3DDEVTYPE DeviceType,HWND hF
   // TODO: Do we need to do something to pFullscreenDisplayMode?
 
   printDevices((IDirect3D9Ex*)d3d);
- 
+
   IDirect3DDevice9SoftTH *d3dd = new IDirect3DDevice9SoftTH(this, (IDirect3D9Ex*)d3d, hFocusWindow, BehaviorFlags, pp);
   d3dd->setEx(true);
   HRESULT ret = d3dd->getCreateDeviceResult();
@@ -160,7 +160,7 @@ IDirect3DDevice9New::IDirect3DDevice9New(IDirect3DDevice9 *device, IDirect3D9 *d
 }
 
 HRESULT IDirect3D9New::GetAdapterDisplayMode(UINT Adapter,D3DDISPLAYMODE* pMode)
-{  
+{
   if(Adapter != D3DADAPTER_DEFAULT)
     return D3DERR_INVALIDCALL;
   HRESULT ret = d3d->GetAdapterDisplayMode(Adapter, pMode);
@@ -199,8 +199,8 @@ void IDirect3D9New::updateRefreshRates()
       refreshRates.push_back(m.RefreshRate);
       sprintf(tmp, "%s %dHz", tmp, m.RefreshRate);
     }
-  }  
-  dbg("Detected refresh rates:%s (%d)", tmp, refreshRates.size());  
+  }
+  dbg("Detected refresh rates:%s (%d)", tmp, refreshRates.size());
 }
 
 HRESULT IDirect3D9New::EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mode, D3DDISPLAYMODE* pMode)
@@ -210,7 +210,7 @@ HRESULT IDirect3D9New::EnumAdapterModes(UINT Adapter, D3DFORMAT Format, UINT Mod
   if(numModes>0 && Mode >= numModes && (Format == D3DFMT_A8R8G8B8 || Format == D3DFMT_X8R8G8B8))
   {
     pMode->RefreshRate = refreshRates[Mode-numModes];
-    //d3d->GetAdapterDisplayMode(0, pMode); // Fill with desktop refresh rate    
+    //d3d->GetAdapterDisplayMode(0, pMode); // Fill with desktop refresh rate
 
     pMode->Width = config.main.renderResolution.x;
     pMode->Height = config.main.renderResolution.y;
@@ -345,7 +345,7 @@ IDirect3DBaseTexture9* IDirect3DDevice9New::OriginalFromNewTexture(IDirect3DBase
 IDirect3DSurface9* IDirect3DDevice9New::OriginalFromNewSurface(IDirect3DSurface9* surf)
 {
   if(!surf)
-    return surf; 
+    return surf;
   void* nilIF;
   // Is this IID_IDirect3DSurface9New?
   if(surf->QueryInterface(IID_IDirect3DSurface9New, &nilIF) == S_OK) {
@@ -359,7 +359,7 @@ IDirect3DSurface9* IDirect3DDevice9New::OriginalFromNewSurface(IDirect3DSurface9
 IDirect3DIndexBuffer9* IDirect3DDevice9New::OriginalFromNewIBuffer(IDirect3DIndexBuffer9* buf)
 {
   if(!buf)
-    return buf; 
+    return buf;
   void* nilIF;
   // Is this IID_IDirect3DIndexBuffer9New?
   if(buf->QueryInterface(IID_IDirect3DIndexBuffer9Managed, &nilIF) == S_OK) {
@@ -372,7 +372,7 @@ IDirect3DIndexBuffer9* IDirect3DDevice9New::OriginalFromNewIBuffer(IDirect3DInde
 IDirect3DVertexBuffer9* IDirect3DDevice9New::OriginalFromNewVBuffer(IDirect3DVertexBuffer9* buf)
 {
   if(!buf)
-    return buf; 
+    return buf;
   void* nilIF;
   // Is this IID_IDirect3DVertexBuffer9Quirk?
   if(buf->QueryInterface(IID_IDirect3DVertexBuffer9Managed, &nilIF) == S_OK) {
@@ -393,7 +393,7 @@ HRESULT IDirect3DDevice9New::CreateVertexBuffer(UINT Length,DWORD Usage,DWORD FV
 
 #if USE_D3DEX || MANAGE_DEBUG_VB
   if(config.debug.compatibleVB || config.debug.enableVBQuirk)
-  {    
+  {
     if(config.debug.enableVBQuirk) ONCE dbg("DEBUG: Vertex buffer quirk mode enabled: Using compatibleVB");
     // Not so good performance but works ok
     if(Pool == D3DPOOL_MANAGED) Pool = D3DPOOL_DEFAULT;
@@ -404,9 +404,9 @@ HRESULT IDirect3DDevice9New::CreateVertexBuffer(UINT Length,DWORD Usage,DWORD FV
     if(Pool == D3DPOOL_MANAGED)
     {
       // Emulate manage-vertexbuffer
-      *ppVertexBuffer = new IDirect3DVertexBuffer9Managed((IDirect3DDevice9Ex*)dev, this, Length, Usage, FVF, Pool, pSharedHandle);      
+      *ppVertexBuffer = new IDirect3DVertexBuffer9Managed((IDirect3DDevice9Ex*)dev, this, Length, Usage, FVF, Pool, pSharedHandle);
       return ((IDirect3DVertexBuffer9Managed*)*ppVertexBuffer)->GetResult();
-    }        
+    }
   }
 #endif
 
@@ -416,14 +416,14 @@ HRESULT IDirect3DDevice9New::CreateVertexBuffer(UINT Length,DWORD Usage,DWORD FV
     if(config.debug.enableVBQuirk)
     {
       // Vertex buffer quirk mode for old DCS-10C version (emulate D3D behaviour with illegal functionality)
-      ONCE dbg("DEBUG: using vertex buffer quirk mode");      
+      ONCE dbg("DEBUG: using vertex buffer quirk mode");
       *ppVertexBuffer = new IDirect3DVertexBuffer9Quirk(*ppVertexBuffer, Length);
     }
   }
   return ret;
 }
 
-HRESULT IDirect3DDevice9New::CreateIndexBuffer(UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle) 
+HRESULT IDirect3DDevice9New::CreateIndexBuffer(UINT Length,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DIndexBuffer9** ppIndexBuffer,HANDLE* pSharedHandle)
 {
   dbgf("dev: CreateIndexBuffer %s %s", getUsage(Usage), getPool(Pool));
 
@@ -470,7 +470,7 @@ HRESULT IDirect3DDevice9New::CreateCubeTexture(UINT EdgeLength,UINT Levels,DWORD
 HRESULT IDirect3DDevice9New::CreateVolumeTexture(UINT Width,UINT Height,UINT Depth,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DVolumeTexture9** ppVolumeTexture,HANDLE* pSharedHandle)
 {
   dbgf("dev: CreateVolumeTexture: %dx%dx%d %d levels %s %s %s", Width, Height, Depth, Levels, getPool(Pool), getUsage(Usage), getMode(Format));
-  
+
 #if USE_D3DEX || MANAGE_DEBUG_VOLTEXTURE
   if(Pool == D3DPOOL_MANAGED && config.debug.compatibleTextures)
   {
@@ -493,8 +493,8 @@ HRESULT IDirect3DDevice9New::CreateVolumeTexture(UINT Width,UINT Height,UINT Dep
 #endif
 }
 
-HRESULT IDirect3DDevice9New::CreateTexture(UINT Width,UINT Height,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DTexture9** ppTexture,HANDLE* pSharedHandle) 
-{  
+HRESULT IDirect3DDevice9New::CreateTexture(UINT Width,UINT Height,UINT Levels,DWORD Usage,D3DFORMAT Format,D3DPOOL Pool,IDirect3DTexture9** ppTexture,HANDLE* pSharedHandle)
+{
   dbgf("CreateTexture: %dx%d %d levels %s %s %s %d %s", Width, Height, Levels, getPool(Pool), getUsage(Usage), getMode(Format), pSharedHandle, pSharedHandle?"SHARED":"");
   int tb = GetTickCount();
 
@@ -524,7 +524,7 @@ HRESULT IDirect3DDevice9New::CreateTexture(UINT Width,UINT Height,UINT Levels,DW
     }
   }
 #endif
-  
+
 
   //dbg("CreateTexture: CreateTexture");
   HRESULT ret = dev->CreateTexture(Width, Height, Levels, Usage, Format, Pool, ppTexture, pSharedHandle);
@@ -533,7 +533,7 @@ HRESULT IDirect3DDevice9New::CreateTexture(UINT Width,UINT Height,UINT Levels,DW
   timeWarn(tb, 1000, "CreateTexture");
   if(ret != D3D_OK) {
     dbg("CreateTexture failed! %d %d %d %s %s %s (%s)", Width, Height, Levels, getPool(Pool), getUsage(Usage), getMode(Format), getD3DError(ret));
-  } else {    
+  } else {
     *ppTexture = new IDirect3DTexture9New((IDirect3DDevice9Ex*)this, *ppTexture);
   }
 #endif

@@ -61,7 +61,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   // Create output window
   int wflags = NULL;
   WINDOWPARAMS wp = {mInfo.rcMonitor.left, mInfo.rcMonitor.top, bbWidth, bbHeight, NULL, wflags, true, NULL}; // TODO: parent window?
-  
+
   wp.hWnd = NULL;
   _beginthread(windowHandler, 0, (void*) &wp);
   while(!wp.hWnd)
@@ -71,7 +71,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   head->hwnd = outWin;
   ShowWindow(outWin, SW_SHOWNA);
 
-  // Create factory, then get the actual factory  
+  // Create factory, then get the actual factory
   CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&dxgf));
   IDXGIFactory1New *fnew;
   if(dxgf->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
@@ -79,11 +79,11 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     fnew->Release();
   }
 
-  UINT i = 0; 
-  IDXGIAdapter *pAdapter; 
-  IDXGIAdapter *vAdapters[64]; 
+  UINT i = 0;
+  IDXGIAdapter *pAdapter;
+  IDXGIAdapter *vAdapters[64];
   dbg("Enum adapters...");
-  while(dxgf->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) { 
+  while(dxgf->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
     vAdapters[i] = pAdapter;
 
     DXGI_ADAPTER_DESC desc;
@@ -93,8 +93,8 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     WideCharToMultiByte(CP_ACP, 0, desc.Description, -1, name, 128, NULL, NULL);
 
     dbg("Adapter %d: <%s>", i, name);
-    ++i; 
-  } 
+    ++i;
+  }
 
   // Init Direct3D 10
   DXGI_SWAP_CHAIN_DESC sd;
@@ -134,7 +134,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   if(swapChain->GetBuffer( 0, __uuidof(ID3D10Texture2D), (LPVOID*) &bb) != S_OK) {
     dbg("swapChain->GetBuffer FAILED");
     exit(0);
-  }  
+  }
 
   // Create shared buffer
   CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D10_BIND_SHADER_RESOURCE|D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, 0, 1, 0, D3D10_RESOURCE_MISC_SHARED);
@@ -143,7 +143,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
   // Get share handle
   IDXGIResource* texRes(NULL);
-  sharedSurface->QueryInterface( __uuidof(IDXGIResource), (void**)&texRes);  
+  sharedSurface->QueryInterface( __uuidof(IDXGIResource), (void**)&texRes);
   texRes->GetSharedHandle(&shareHandle);
   texRes->Release();
 
@@ -155,12 +155,13 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     dbg("dev->CreateRenderTargetView FAILED");
     exit(0);
   }
-  dev->OMSetRenderTargets(1, &rttView, NULL);  
+  dev->OMSetRenderTargets(1, &rttView, NULL);
 
   D3D10_VIEWPORT vp = {0, 0, bbWidth, bbHeight, 0, 1};
   dev->RSSetViewports(1, &vp);
-  /*
+
   dbg("outDirect3D10: Initialize");
+  /*
   d3d9Surface = sourceSurface;
 
   // Create output window
@@ -175,11 +176,11 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   IDXGIFactory * pFactory;
   CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory));
 
-  UINT i = 0; 
-  IDXGIAdapter * pAdapter; 
-  IDXGIAdapter *vAdapters[64]; 
+  UINT i = 0;
+  IDXGIAdapter * pAdapter;
+  IDXGIAdapter *vAdapters[64];
   dbg("Enum adapters...");
-  while(pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) { 
+  while(pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
     vAdapters[i] = pAdapter;
 
     DXGI_ADAPTER_DESC desc;
@@ -189,8 +190,8 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     WideCharToMultiByte(CP_ACP, 0, desc.Description, -1, name, 128, NULL, NULL);
 
     dbg("Adapter %d: <%s>", i, name);
-    ++i; 
-  } 
+    ++i;
+  }
 
 
   // Init Direct3D 10
@@ -213,16 +214,16 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   //DWORD flags = D3D10_CREATE_DEVICE_BGRA_SUPPORT;
   DWORD flags = 0;
   if(D3D10CreateDeviceAndSwapChain(vAdapters[0], D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
-  //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_REFERENCE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {  
+  //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_REFERENCE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
     dbg("D3D10CreateDeviceAndSwapChain FAILED");
     exit(0);
   }
 
-  // Create a render target view  
+  // Create a render target view
   if(swapChain->GetBuffer( 0, __uuidof(ID3D10Texture2D), (LPVOID*)&pBackBuffer) != S_OK) {
     dbg("swapChain->GetBuffer FAILED");
     exit(0);
-  }  
+  }
 
   HRESULT ret = dev->CreateRenderTargetView(pBackBuffer, NULL, &rttView);
   pBackBuffer->Release();
@@ -271,14 +272,14 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   ID3D10Resource *tempResource10 = NULL;
   ID3D10Texture2D *sharedTex;
   dbg("OpenSharedResource 0x%08X", d3d9Surface);
-  //if(FAILED(dev->OpenSharedResource(d3d9Surface, __uuidof(ID3D10Resource), (void**)(&tempResource10)))) {  
+  //if(FAILED(dev->OpenSharedResource(d3d9Surface, __uuidof(ID3D10Resource), (void**)(&tempResource10)))) {
   //if(FAILED(dev->OpenSharedResource(d3d9Surface, __uuidof(IDirect3DTexture9), (void**)(&tempResource10)))) {
   if(FAILED(dev->OpenSharedResource(d3d9Surface, __uuidof(ID3D10Texture2D), (void**)(&tempResource10)))) {
     dbg("dev->OpenSharedResource FAILED");
     exit(0);
   }
   dbg("QueryInterface %d", tempResource10);
-  tempResource10->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&sharedTex)); 
+  tempResource10->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&sharedTex));
   dbg("Release");
   tempResource10->Release();
   */

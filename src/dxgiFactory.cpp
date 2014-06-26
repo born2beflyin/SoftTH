@@ -71,7 +71,7 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
   dbg("Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
   dbg("Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
 
-  dbg("Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"", 
+  dbg("Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
 
@@ -85,9 +85,9 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
     scd->BufferDesc.Height = h->screenMode.y;
   } else
     dbg("Singlehead swapchain mode");
-  
+
   IDXGISwapChain *sc = NULL;
-  HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &sc);  
+  HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &sc);
   if(ret != S_OK)
     dbg("CreateSwapChain failed!");
   else {
@@ -98,7 +98,7 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
     // TODO: check for other devices
     ID3D10Device *d3d10 = NULL;
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &d3d10) == S_OK)
-      dbg("Got Direct3D 10 device");    
+      dbg("Got Direct3D 10 device");
     if(d3d10)
       *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else

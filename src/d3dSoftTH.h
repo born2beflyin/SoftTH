@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef USE_D3DX
 #include <d3dx9.h>
-#pragma comment(lib, "d3dx9") 
+#pragma comment(lib, "d3dx9")
 #endif
 
 #ifdef USE_D3DX
@@ -62,7 +62,7 @@ interface IDirect3DDevice9SoftTH : public IDirect3DDevice9New
   IDirect3DDevice9SoftTH(IDirect3D9New *parentNew, IDirect3D9Ex *direct3D, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pp);
   ~IDirect3DDevice9SoftTH();
   STDMETHOD_(ULONG,Release)(THIS);
-/*    STDMETHOD(TestCooperativeLevel)(THIS) {      
+/*    STDMETHOD(TestCooperativeLevel)(THIS) {
       HRESULT ret = dev->TestCooperativeLevel();
       dbg("dev: TestCooperativeLevel: %s", getD3DError(ret));
       return ret;
@@ -94,10 +94,10 @@ interface IDirect3DDevice9SoftTH : public IDirect3DDevice9New
   STDMETHOD(Clear)(THIS_ DWORD Count,CONST D3DRECT* pRects,DWORD Flags,D3DCOLOR Color,float Z,DWORD Stencil);
   STDMETHOD(SetTransform)(THIS_ D3DTRANSFORMSTATETYPE State,CONST D3DMATRIX* pMatrix);
   STDMETHOD(GetSwapChain)(THIS_ UINT iSwapChain,IDirect3DSwapChain9** pSwapChain);
-  STDMETHOD_(void, SetGammaRamp)(THIS_ UINT iSwapChain,DWORD Flags,CONST D3DGAMMARAMP* pRamp); 
+  STDMETHOD_(void, SetGammaRamp)(THIS_ UINT iSwapChain,DWORD Flags,CONST D3DGAMMARAMP* pRamp);
 
   /*
-  STDMETHOD(GetRenderTargetData)(THIS_ IDirect3DSurface9* pRenderTarget,IDirect3DSurface9* pDestSurface) 
+  STDMETHOD(GetRenderTargetData)(THIS_ IDirect3DSurface9* pRenderTarget,IDirect3DSurface9* pDestSurface)
     {
       dbg("dev: GetRenderTargetData");
       dbg("dev: GetRenderTargetData source:");
@@ -108,7 +108,7 @@ interface IDirect3DDevice9SoftTH : public IDirect3DDevice9New
       dbg("dev: GetRenderTargetData result: %s", getD3DError(ret));
       return ret;
   };
-  STDMETHOD(CreateOffscreenPlainSurface)(THIS_ UINT Width,UINT Height,D3DFORMAT Format,D3DPOOL Pool,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle) 
+  STDMETHOD(CreateOffscreenPlainSurface)(THIS_ UINT Width,UINT Height,D3DFORMAT Format,D3DPOOL Pool,IDirect3DSurface9** ppSurface,HANDLE* pSharedHandle)
     {
       dbg("dev: CreateOffscreenPlainSurface %dx%d %s %s %d", Width, Height, getMode(Format), getPool(Pool), pSharedHandle);
       CHECKPOOL(Pool);
@@ -163,7 +163,7 @@ private:
   int FPS;
   int fCounter;
   int fTimer;
-  
+
   HWND hFocusWindow;
   int wantedX, wantedY;
   D3DMULTISAMPLE_TYPE msWanted;
@@ -204,7 +204,7 @@ interface IDirect3DSwapChain9SoftTH : public IDirect3DSwapChain9
     dev = device;
     sc = SwapChain;
   }
-  
+
     STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj)
       {return sc->QueryInterface(riid, ppvObj);};
     STDMETHOD_(ULONG,AddRef)(THIS)

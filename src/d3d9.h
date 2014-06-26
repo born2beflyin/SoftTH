@@ -7,6 +7,8 @@
  *
  ****************************************************************************/
 
+ /* Modified for SoftTH - search "SoftTH NOTE" for modifications */
+
 #ifndef _D3D9_H_
 #define _D3D9_H_
 
@@ -303,13 +305,15 @@ extern "C" {
  * against the right headers.
  */
 
+// SoftTH NOTE: The following line commented out
 //IDirect3D9 * WINAPI Direct3DCreate9(UINT SDKVersion);
 
 /*
  * Stubs for graphics profiling.
  */
- 
-/* 
+
+// SoftTH NOTE: The following section commented out
+/*
 int WINAPI D3DPERF_BeginEvent( D3DCOLOR col, LPCWSTR wszName );
 int WINAPI D3DPERF_EndEvent( void );
 void WINAPI D3DPERF_SetMarker( D3DCOLOR col, LPCWSTR wszName );
@@ -319,6 +323,7 @@ BOOL WINAPI D3DPERF_QueryRepeatFrame( void );
 void WINAPI D3DPERF_SetOptions( DWORD dwOptions );
 DWORD WINAPI D3DPERF_GetStatus( void );
 */
+
 /*
  * Direct3D interfaces
  */
@@ -353,12 +358,12 @@ DECLARE_INTERFACE_(IDirect3D9, IUnknown)
     STDMETHOD(GetDeviceCaps)(THIS_ UINT Adapter,D3DDEVTYPE DeviceType,D3DCAPS9* pCaps) PURE;
     STDMETHOD_(HMONITOR, GetAdapterMonitor)(THIS_ UINT Adapter) PURE;
     STDMETHOD(CreateDevice)(THIS_ UINT Adapter,D3DDEVTYPE DeviceType,HWND hFocusWindow,DWORD BehaviorFlags,D3DPRESENT_PARAMETERS* pPresentationParameters,IDirect3DDevice9** ppReturnedDeviceInterface) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Version;
     #endif
 };
-    
+
 typedef struct IDirect3D9 *LPDIRECT3D9, *PDIRECT3D9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -548,13 +553,13 @@ DECLARE_INTERFACE_(IDirect3DDevice9, IUnknown)
     STDMETHOD(DrawTriPatch)(THIS_ UINT Handle,CONST float* pNumSegs,CONST D3DTRIPATCH_INFO* pTriPatchInfo) PURE;
     STDMETHOD(DeletePatch)(THIS_ UINT Handle) PURE;
     STDMETHOD(CreateQuery)(THIS_ D3DQUERYTYPE Type,IDirect3DQuery9** ppQuery) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     D3DDEVICE_CREATION_PARAMETERS CreationParameters;
     D3DPRESENT_PARAMETERS PresentParameters;
     D3DDISPLAYMODE DisplayMode;
     D3DCAPS9 Caps;
-    
+
     UINT AvailableTextureMem;
     UINT SwapChains;
     UINT Textures;
@@ -562,29 +567,29 @@ DECLARE_INTERFACE_(IDirect3DDevice9, IUnknown)
     UINT IndexBuffers;
     UINT VertexShaders;
     UINT PixelShaders;
-    
+
     D3DVIEWPORT9 Viewport;
     D3DMATRIX ProjectionMatrix;
     D3DMATRIX ViewMatrix;
     D3DMATRIX WorldMatrix;
     D3DMATRIX TextureMatrices[8];
-    
+
     DWORD FVF;
     UINT VertexSize;
     DWORD VertexShaderVersion;
     DWORD PixelShaderVersion;
     BOOL SoftwareVertexProcessing;
-    
+
     D3DMATERIAL9 Material;
     D3DLIGHT9 Lights[16];
     BOOL LightsEnabled[16];
-    
+
     D3DGAMMARAMP GammaRamp;
     RECT ScissorRect;
     BOOL DialogBoxMode;
     #endif
 };
-    
+
 typedef struct IDirect3DDevice9 *LPDIRECT3DDEVICE9, *PDIRECT3DDEVICE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -847,12 +852,12 @@ DECLARE_INTERFACE_(IDirect3DStateBlock9, IUnknown)
     STDMETHOD(GetDevice)(THIS_ IDirect3DDevice9** ppDevice) PURE;
     STDMETHOD(Capture)(THIS) PURE;
     STDMETHOD(Apply)(THIS) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DStateBlock9 *LPDIRECT3DSTATEBLOCK9, *PDIRECT3DSTATEBLOCK9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -892,14 +897,14 @@ DECLARE_INTERFACE_(IDirect3DSwapChain9, IUnknown)
     STDMETHOD(GetDisplayMode)(THIS_ D3DDISPLAYMODE* pMode) PURE;
     STDMETHOD(GetDevice)(THIS_ IDirect3DDevice9** ppDevice) PURE;
     STDMETHOD(GetPresentParameters)(THIS_ D3DPRESENT_PARAMETERS* pPresentationParameters) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     D3DPRESENT_PARAMETERS PresentParameters;
     D3DDISPLAYMODE DisplayMode;
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DSwapChain9 *LPDIRECT3DSWAPCHAIN9, *PDIRECT3DSWAPCHAIN9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -948,7 +953,7 @@ DECLARE_INTERFACE_(IDirect3DResource9, IUnknown)
     STDMETHOD_(void, PreLoad)(THIS) PURE;
     STDMETHOD_(D3DRESOURCETYPE, GetType)(THIS) PURE;
 };
-    
+
 typedef struct IDirect3DResource9 *LPDIRECT3DRESOURCE9, *PDIRECT3DRESOURCE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -993,12 +998,12 @@ DECLARE_INTERFACE_(IDirect3DVertexDeclaration9, IUnknown)
     /*** IDirect3DVertexDeclaration9 methods ***/
     STDMETHOD(GetDevice)(THIS_ IDirect3DDevice9** ppDevice) PURE;
     STDMETHOD(GetDeclaration)(THIS_ D3DVERTEXELEMENT9* pElement,UINT* pNumElements) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DVertexDeclaration9 *LPDIRECT3DVERTEXDECLARATION9, *PDIRECT3DVERTEXDECLARATION9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1031,13 +1036,13 @@ DECLARE_INTERFACE_(IDirect3DVertexShader9, IUnknown)
     /*** IDirect3DVertexShader9 methods ***/
     STDMETHOD(GetDevice)(THIS_ IDirect3DDevice9** ppDevice) PURE;
     STDMETHOD(GetFunction)(THIS_ void*,UINT* pSizeOfData) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     DWORD Version;
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DVertexShader9 *LPDIRECT3DVERTEXSHADER9, *PDIRECT3DVERTEXSHADER9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1070,13 +1075,13 @@ DECLARE_INTERFACE_(IDirect3DPixelShader9, IUnknown)
     /*** IDirect3DPixelShader9 methods ***/
     STDMETHOD(GetDevice)(THIS_ IDirect3DDevice9** ppDevice) PURE;
     STDMETHOD(GetFunction)(THIS_ void*,UINT* pSizeOfData) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     DWORD Version;
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DPixelShader9 *LPDIRECT3DPIXELSHADER9, *PDIRECT3DPIXELSHADER9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1122,7 +1127,7 @@ DECLARE_INTERFACE_(IDirect3DBaseTexture9, IDirect3DResource9)
     STDMETHOD_(D3DTEXTUREFILTERTYPE, GetAutoGenFilterType)(THIS) PURE;
     STDMETHOD_(void, GenerateMipSubLevels)(THIS) PURE;
 };
-    
+
 typedef struct IDirect3DBaseTexture9 *LPDIRECT3DBASETEXTURE9, *PDIRECT3DBASETEXTURE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1197,7 +1202,7 @@ DECLARE_INTERFACE_(IDirect3DTexture9, IDirect3DBaseTexture9)
     STDMETHOD(LockRect)(THIS_ UINT Level,D3DLOCKED_RECT* pLockedRect,CONST RECT* pRect,DWORD Flags) PURE;
     STDMETHOD(UnlockRect)(THIS_ UINT Level) PURE;
     STDMETHOD(AddDirtyRect)(THIS_ CONST RECT* pDirtyRect) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Width;
@@ -1213,7 +1218,7 @@ DECLARE_INTERFACE_(IDirect3DTexture9, IDirect3DBaseTexture9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DTexture9 *LPDIRECT3DTEXTURE9, *PDIRECT3DTEXTURE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1298,7 +1303,7 @@ DECLARE_INTERFACE_(IDirect3DVolumeTexture9, IDirect3DBaseTexture9)
     STDMETHOD(LockBox)(THIS_ UINT Level,D3DLOCKED_BOX* pLockedVolume,CONST D3DBOX* pBox,DWORD Flags) PURE;
     STDMETHOD(UnlockBox)(THIS_ UINT Level) PURE;
     STDMETHOD(AddDirtyBox)(THIS_ CONST D3DBOX* pDirtyBox) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Width;
@@ -1315,7 +1320,7 @@ DECLARE_INTERFACE_(IDirect3DVolumeTexture9, IDirect3DBaseTexture9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DVolumeTexture9 *LPDIRECT3DVOLUMETEXTURE9, *PDIRECT3DVOLUMETEXTURE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1400,7 +1405,7 @@ DECLARE_INTERFACE_(IDirect3DCubeTexture9, IDirect3DBaseTexture9)
     STDMETHOD(LockRect)(THIS_ D3DCUBEMAP_FACES FaceType,UINT Level,D3DLOCKED_RECT* pLockedRect,CONST RECT* pRect,DWORD Flags) PURE;
     STDMETHOD(UnlockRect)(THIS_ D3DCUBEMAP_FACES FaceType,UINT Level) PURE;
     STDMETHOD(AddDirtyRect)(THIS_ D3DCUBEMAP_FACES FaceType,CONST RECT* pDirtyRect) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Width;
@@ -1416,7 +1421,7 @@ DECLARE_INTERFACE_(IDirect3DCubeTexture9, IDirect3DBaseTexture9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DCubeTexture9 *LPDIRECT3DCUBETEXTURE9, *PDIRECT3DCUBETEXTURE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1492,7 +1497,7 @@ DECLARE_INTERFACE_(IDirect3DVertexBuffer9, IDirect3DResource9)
     STDMETHOD(Lock)(THIS_ UINT OffsetToLock,UINT SizeToLock,void** ppbData,DWORD Flags) PURE;
     STDMETHOD(Unlock)(THIS) PURE;
     STDMETHOD(GetDesc)(THIS_ D3DVERTEXBUFFER_DESC *pDesc) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Length;
@@ -1504,7 +1509,7 @@ DECLARE_INTERFACE_(IDirect3DVertexBuffer9, IDirect3DResource9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DVertexBuffer9 *LPDIRECT3DVERTEXBUFFER9, *PDIRECT3DVERTEXBUFFER9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1564,7 +1569,7 @@ DECLARE_INTERFACE_(IDirect3DIndexBuffer9, IDirect3DResource9)
     STDMETHOD(Lock)(THIS_ UINT OffsetToLock,UINT SizeToLock,void** ppbData,DWORD Flags) PURE;
     STDMETHOD(Unlock)(THIS) PURE;
     STDMETHOD(GetDesc)(THIS_ D3DINDEXBUFFER_DESC *pDesc) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Length;
@@ -1576,7 +1581,7 @@ DECLARE_INTERFACE_(IDirect3DIndexBuffer9, IDirect3DResource9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DIndexBuffer9 *LPDIRECT3DINDEXBUFFER9, *PDIRECT3DINDEXBUFFER9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1639,7 +1644,7 @@ DECLARE_INTERFACE_(IDirect3DSurface9, IDirect3DResource9)
     STDMETHOD(UnlockRect)(THIS) PURE;
     STDMETHOD(GetDC)(THIS_ HDC *phdc) PURE;
     STDMETHOD(ReleaseDC)(THIS_ HDC hdc) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Width;
@@ -1655,7 +1660,7 @@ DECLARE_INTERFACE_(IDirect3DSurface9, IDirect3DResource9)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DSurface9 *LPDIRECT3DSURFACE9, *PDIRECT3DSURFACE9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1719,7 +1724,7 @@ DECLARE_INTERFACE_(IDirect3DVolume9, IUnknown)
     STDMETHOD(GetDesc)(THIS_ D3DVOLUME_DESC *pDesc) PURE;
     STDMETHOD(LockBox)(THIS_ D3DLOCKED_BOX * pLockedVolume,CONST D3DBOX* pBox,DWORD Flags) PURE;
     STDMETHOD(UnlockBox)(THIS) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     LPCWSTR Name;
     UINT Width;
@@ -1732,7 +1737,7 @@ DECLARE_INTERFACE_(IDirect3DVolume9, IUnknown)
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DVolume9 *LPDIRECT3DVOLUME9, *PDIRECT3DVOLUME9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1780,14 +1785,14 @@ DECLARE_INTERFACE_(IDirect3DQuery9, IUnknown)
     STDMETHOD_(DWORD, GetDataSize)(THIS) PURE;
     STDMETHOD(Issue)(THIS_ DWORD dwIssueFlags) PURE;
     STDMETHOD(GetData)(THIS_ void* pData,DWORD dwSize,DWORD dwGetDataFlags) PURE;
-    
+
     #ifdef D3D_DEBUG_INFO
     D3DQUERYTYPE Type;
     DWORD DataSize;
     LPCWSTR CreationCallStack;
     #endif
 };
-    
+
 typedef struct IDirect3DQuery9 *LPDIRECT3DQUERY9, *PDIRECT3DQUERY9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -1840,9 +1845,9 @@ typedef struct IDirect3DQuery9 *LPDIRECT3DQUERY9, *PDIRECT3DQUERY9;
 #define D3DCREATE_ADAPTERGROUP_DEVICE           0x00000200L
 #define D3DCREATE_DISABLE_DRIVER_MANAGEMENT_EX  0x00000400L
 
-// This flag causes the D3D runtime not to alter the focus 
+// This flag causes the D3D runtime not to alter the focus
 // window in any way. Use with caution- the burden of supporting
-// focus management events (alt-tab, etc.) falls on the 
+// focus management events (alt-tab, etc.) falls on the
 // application, and appropriate responses (switching display
 // mode, etc.) should be coded.
 #define D3DCREATE_NOWINDOWCHANGES				0x00000800L
@@ -2026,6 +2031,7 @@ typedef struct IDirect3DQuery9 *LPDIRECT3DQUERY9, *PDIRECT3DQUERY9;
 /* D3D9Ex interfaces
 /*********************/
 
+// SoftTH NOTE: The following line commented out
 //HRESULT WINAPI Direct3DCreate9Ex(UINT SDKVersion, IDirect3D9Ex**);
 
 
@@ -2061,7 +2067,7 @@ DECLARE_INTERFACE_(IDirect3D9Ex, IDirect3D9)
     STDMETHOD(CreateDeviceEx)(THIS_ UINT Adapter,D3DDEVTYPE DeviceType,HWND hFocusWindow,DWORD BehaviorFlags,D3DPRESENT_PARAMETERS* pPresentationParameters,D3DDISPLAYMODEEX* pFullscreenDisplayMode,IDirect3DDevice9Ex** ppReturnedDeviceInterface) PURE;
     STDMETHOD(GetAdapterLUID)(THIS_ UINT Adapter,LUID * pLUID) PURE;
 };
-    
+
 typedef struct IDirect3D9Ex *LPDIRECT3D9EX, *PDIRECT3D9EX;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2276,7 +2282,7 @@ DECLARE_INTERFACE_(IDirect3DDevice9Ex, IDirect3DDevice9)
     STDMETHOD(ResetEx)(THIS_ D3DPRESENT_PARAMETERS* pPresentationParameters,D3DDISPLAYMODEEX *pFullscreenDisplayMode) PURE;
     STDMETHOD(GetDisplayModeEx)(THIS_ UINT iSwapChain,D3DDISPLAYMODEEX* pMode,D3DDISPLAYROTATION* pRotation) PURE;
 };
-    
+
 typedef struct IDirect3DDevice9Ex *LPDIRECT3DDEVICE9EX, *PDIRECT3DDEVICE9EX;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2575,7 +2581,7 @@ DECLARE_INTERFACE_(IDirect3DSwapChain9Ex, IDirect3DSwapChain9)
     STDMETHOD(GetPresentStats)(THIS_ D3DPRESENTSTATS* pPresentationStatistics) PURE;
     STDMETHOD(GetDisplayModeEx)(THIS_ D3DDISPLAYMODEEX* pMode,D3DDISPLAYROTATION* pRotation) PURE;
 };
-    
+
 typedef struct IDirect3DSwapChain9Ex *LPDIRECT3DSWAPCHAIN9EX, *PDIRECT3DSWAPCHAIN9EX;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2612,7 +2618,9 @@ typedef struct IDirect3DSwapChain9Ex *LPDIRECT3DSWAPCHAIN9EX, *PDIRECT3DSWAPCHAI
 /* -- D3D9Ex only */
 
 
-
+/* D3D9Ex only -- */
+// SoftTH NOTE: The following line commented out
+// #if !defined(D3D_DISABLE_9EX)
 #undef INTERFACE
 #define INTERFACE IDirect3D9ExOverlayExtension
 
@@ -2626,7 +2634,7 @@ DECLARE_INTERFACE_(IDirect3D9ExOverlayExtension, IUnknown)
     /*** IDirect3D9ExOverlayExtension methods ***/
     STDMETHOD(CheckDeviceOverlayType)(THIS_ UINT Adapter,D3DDEVTYPE DevType,UINT OverlayWidth,UINT OverlayHeight,D3DFORMAT OverlayFormat,D3DDISPLAYMODEEX* pDisplayMode,D3DDISPLAYROTATION DisplayRotation,D3DOVERLAYCAPS* pOverlayCaps) PURE;
 };
-    
+
 typedef struct IDirect3D9ExOverlayExtension *LPDIRECT3D9EXOVERLAYEXTENSION, *PDIRECT3D9EXOVERLAYEXTENSION;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2658,7 +2666,7 @@ DECLARE_INTERFACE_(IDirect3DDevice9Video, IUnknown)
     STDMETHOD(CreateAuthenticatedChannel)(THIS_ D3DAUTHENTICATEDCHANNELTYPE ChannelType,IDirect3DAuthenticatedChannel9** ppAuthenticatedChannel,HANDLE* pChannelHandle) PURE;
     STDMETHOD(CreateCryptoSession)(THIS_ CONST GUID* pCryptoType,CONST GUID* pDecodeProfile,IDirect3DCryptoSession9** ppCryptoSession,HANDLE* pCryptoHandle) PURE;
 };
-    
+
 typedef struct IDirect3DDevice9Video *LPDIRECT3DDEVICE9VIDEO, *PDIRECT3DDEVICE9VIDEO;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2697,7 +2705,7 @@ DECLARE_INTERFACE_(IDirect3DAuthenticatedChannel9, IUnknown)
     STDMETHOD(Query)(THIS_ UINT InputSize,CONST VOID* pInput,UINT OutputSize,VOID* pOutput) PURE;
     STDMETHOD(Configure)(THIS_ UINT InputSize,CONST VOID* pInput,D3DAUTHENTICATEDCHANNEL_CONFIGURE_OUTPUT* pOutput) PURE;
 };
-    
+
 typedef struct IDirect3DAuthenticatedChannel9 *LPDIRECT3DAUTHENTICATEDCHANNEL9, *PDIRECT3DAUTHENTICATEDCHANNEL9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2743,7 +2751,7 @@ DECLARE_INTERFACE_(IDirect3DCryptoSession9, IUnknown)
     STDMETHOD(FinishSessionKeyRefresh)(THIS) PURE;
     STDMETHOD(GetEncryptionBltKey)(THIS_ VOID* pReadbackKey,UINT KeySize) PURE;
 };
-    
+
 typedef struct IDirect3DCryptoSession9 *LPDIRECT3DCRYPTOSESSION9, *PDIRECT3DCRYPTOSESSION9;
 
 #if !defined(__cplusplus) || defined(CINTERFACE)
@@ -2774,6 +2782,9 @@ typedef struct IDirect3DCryptoSession9 *LPDIRECT3DCRYPTOSESSION9, *PDIRECT3DCRYP
 #define IDirect3DCryptoSession9_GetEncryptionBltKey(p,a,b) (p)->GetEncryptionBltKey(a,b)
 #endif
 
+/* -- D3D9Ex only */
+// SoftTH NOTE: The following line commented out
+// #endif // !D3D_DISABLE_9EX
 
 #ifdef __cplusplus
 };

@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// 
+//
 //  Ugly stuff that makes our life easier is hidden here
 //
 
@@ -43,13 +43,13 @@ void ShowMessage(char *first, ...) {
   vsprintf (Message,first,argptr);
   va_end   (argptr);
 
-  dbg("ERROR: %s", Message); 
+  dbg("ERROR: %s", Message);
 /*
   // Minimize game window
   if(config.focusWindow)
   ShowWindow(config.focusWindow, SW_MINIMIZE);
 */
-  MessageBox(NULL, Message,"SoftTH message window",MB_OK|MB_ICONSTOP|MB_SETFOREGROUND|MB_TASKMODAL);    
+  MessageBox(NULL, Message,"SoftTH message window",MB_OK|MB_ICONSTOP|MB_SETFOREGROUND|MB_TASKMODAL);
 }
 
 #define BL_LINES 64
@@ -65,7 +65,7 @@ void backLogAdd(char *str)
     init = true;
   }
 
-  delete backLog[BL_LINES-1]; 
+  delete backLog[BL_LINES-1];
   for(int i=BL_LINES-1;i>=0;i--)
     backLog[i+1] = backLog[i];
 
@@ -124,7 +124,7 @@ void dbg(char *first, ...) {
 			if(logPath[i] == '\\' || logPath[i] == '/') {
 				logPath[i] = 0x00;
 				break;
-			}      
+			}
 		strcat(logPath, "\\SoftTH.log");
     */
 
@@ -135,7 +135,7 @@ void dbg(char *first, ...) {
 		init = 0;
 		InitializeCriticalSection(&cs);
 	}
-	
+
 
 	//if(config.debugOutput) {
 	if(true) {
@@ -189,7 +189,7 @@ void dbg(char *first, ...) {
 					OutputDebugString("CLEAR LOG");
 					fclose(f);
 					f = NULL;
-				}*/				
+				}*/
 
 				// Append to file
 				FILE *ff = fopen(logPath, "a");
@@ -198,9 +198,9 @@ void dbg(char *first, ...) {
 					LeaveCriticalSection(&cs);
 					return;
 				}
-				
+
         char t[64];
-        sprintf(t, "%d:%8.3f ", GetCurrentThreadId(), (GetTickCount()-initTime)/1000.0f);        
+        sprintf(t, "%d:%8.3f ", GetCurrentThreadId(), (GetTickCount()-initTime)/1000.0f);
 
 				if(repeatCount) {
 					char tmp[1024];
@@ -228,9 +228,9 @@ void dbg(char *first, ...) {
 	}
 }
 
+#include <d3d11.h>
 #include <d3d10_1.h>
 #include <d3d10.h>
-#include <d3d11.h>
 #include <dxgi.h>
 
 #include "dxgiSwapChain.h"
@@ -261,13 +261,14 @@ char* matchRiid(REFIID riid)
   if(riid == IID_ID3D10Texture2D) return "IID_ID3D10Texture2D";
   if(riid == IID_ID3D10Texture3D) return "IID_ID3D10Texture2D";
   if(riid == IID_ID3D10Device) return "IID_ID3D10Device";
-  if(riid == IID_ID3D10Device1) return "IID_ID3D10Device1";  
-  if(riid == IID_ID3D11Device) return "IID_ID3D11Device";  
-    
+  if(riid == IID_ID3D10Device1) return "IID_ID3D10Device1";
+  if(riid == IID_ID3D11Device) return "IID_ID3D11Device";
+  if(riid == IID_ID3D11DeviceContext) return "IID_ID3D11DeviceContext";
+
   if(riid == IID_IDXGISwapChainNew) return "IID_IDXGISwapChainNew";
   if(riid == IID_IDXGIFactory1New) return "IID_IDXGIFactory1New";
-  if(riid == IID_IDXGIAdapter1New) return "IID_IDXGIAdapter1New"; 
-  if(riid == IID_IDXGIOutputNew) return "IID_IDXGIOutputNew"; 
+  if(riid == IID_IDXGIAdapter1New) return "IID_IDXGIAdapter1New";
+  if(riid == IID_IDXGIOutputNew) return "IID_IDXGIOutputNew";
 
   if(riid == IID_IDirect3DBaseTexture9) return "IID_IDirect3DBaseTexture9";
   if(riid == IID_IDirect3DTexture9) return "IID_IDirect3DTexture9";
@@ -404,7 +405,7 @@ char* processName(void) {
 		// Retrieve process name
 		char tmp[512];
 		GetModuleFileName(GetModuleHandle(NULL), tmp, 512);
-		
+
 		// Strip path
 		char *fname = strrchr(tmp, '\\');
 		if(fname)
@@ -774,7 +775,7 @@ char* getD3DError(int v) {
     ERRORVALUE(D3DERR_OUTOFVIDEOMEMORY)
 		ERRORVALUE(D3DERR_INVALIDCALL)
 		ERRORVALUE(E_OUTOFMEMORY)
-		ERRORVALUE(D3DERR_NOTAVAILABLE)		
+		ERRORVALUE(D3DERR_NOTAVAILABLE)
 		ERRORVALUE(D3DERR_DEVICENOTRESET)
     ERRORVALUE(S_PRESENT_OCCLUDED)
     ERRORVALUE(S_PRESENT_MODE_CHANGED)
@@ -837,7 +838,7 @@ void memcpyPitched(void* dst, void *src, DWORD size, DWORD pitchDst, DWORD pitch
 		DWORD cpyPitch = pitchDst<pitchDst?pitchDst:pitchSrc;
 		DWORD copied = 0;
 		while(true) {
-      memcpy(dst, src, cpyPitch);      
+      memcpy(dst, src, cpyPitch);
 			dst = ((BYTE*)dst) + pitchDst;
 			src = ((BYTE*)src) + pitchSrc;
 			copied += cpyPitch;
@@ -847,28 +848,28 @@ void memcpyPitched(void* dst, void *src, DWORD size, DWORD pitchDst, DWORD pitch
 	}
 }
 
-BOOL SetPrivilege( 
-	HANDLE hToken,  // token handle 
-	LPCTSTR Privilege,  // Privilege to enable/disable 
-	BOOL bEnablePrivilege  // TRUE to enable. FALSE to disable 
-) 
-{ 
-	TOKEN_PRIVILEGES tp = { 0 }; 
-	// Initialize everything to zero 
-	LUID luid; 
-	DWORD cb=sizeof(TOKEN_PRIVILEGES); 
+BOOL SetPrivilege(
+	HANDLE hToken,  // token handle
+	LPCTSTR Privilege,  // Privilege to enable/disable
+	BOOL bEnablePrivilege  // TRUE to enable. FALSE to disable
+)
+{
+	TOKEN_PRIVILEGES tp = { 0 };
+	// Initialize everything to zero
+	LUID luid;
+	DWORD cb=sizeof(TOKEN_PRIVILEGES);
 	if(!LookupPrivilegeValue( NULL, Privilege, &luid ))
-		return FALSE; 
-	tp.PrivilegeCount = 1; 
-	tp.Privileges[0].Luid = luid; 
-	if(bEnablePrivilege) { 
-		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED; 
-	} else { 
-		tp.Privileges[0].Attributes = 0; 
-	} 
-	AdjustTokenPrivileges( hToken, FALSE, &tp, cb, NULL, NULL ); 
-	if (GetLastError() != ERROR_SUCCESS) 
-		return FALSE; 
+		return FALSE;
+	tp.PrivilegeCount = 1;
+	tp.Privileges[0].Luid = luid;
+	if(bEnablePrivilege) {
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	} else {
+		tp.Privileges[0].Attributes = 0;
+	}
+	AdjustTokenPrivileges( hToken, FALSE, &tp, cb, NULL, NULL );
+	if (GetLastError() != ERROR_SUCCESS)
+		return FALSE;
 
 	return TRUE;
 }

@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// 
+//
 // Main DLL loader
 //
 
@@ -64,7 +64,7 @@ std::list<GAMMARAMP*> restoreGammaRamps; // Stores default gamma ramps for emerg
 
 extern GHOOK SoftTHHooks[];
 extern GHOOK InitHooks[];
-bool didDisableComposition = false; 
+bool didDisableComposition = false;
 
 // Overridden outputdebugstring from d3d9d.dll
 void WINAPI OutputDebugStringNew(char* str) {
@@ -79,9 +79,9 @@ void WINAPI OutputDebugStringNew(char* str) {
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 {
-	switch (reason)
+  switch (reason)
   {
-		case DLL_PROCESS_ATTACH:
+    case DLL_PROCESS_ATTACH:
     {
       OutputDebugString("SoftTH.DLL: DLL_PROCESS_ATTACH");
 
@@ -100,7 +100,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       createDirs(foo);
 
       dbg(CLEAR_LOG);
-      dbg("%s (%s, %s)", SOFTTH_VERSION, processName(), lpReserved?"static link":"dynamic link");      
+      dbg("%s (%s, %s)", SOFTTH_VERSION, processName(), lpReserved?"static link":"dynamic link");
       dbg("Arguments: <%s>", GetCommandLine());
 
       hSelf = hModule;
@@ -159,11 +159,11 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         if(!dllDirect3DCreate9Ex)
 		      ShowMessage("Direct3DCreate9Ex not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
         if(!dllDirect3DCreate9)
-		      ShowMessage("dllDirect3DCreate9 not in DLL!\n\n'%s'", path), exit(0);
+		      ShowMessage("Direct3DCreate9 not in DLL!\n\n'%s'", path), exit(0);
       }
 
       // Load dxgi library
-      if(false) {
+      {
         char path[256];
         if(strlen(config.main.dllPathDXGI) < 2)
           sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "dxgi.dll");
@@ -183,11 +183,12 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
         dllDXGID3D10CreateDevice = (HRESULT(__stdcall *)(HMODULE, IDXGIFactory*, IDXGIAdapter*, UINT, DWORD, void**)) GetProcAddress(hLibDXGI, "DXGID3D10CreateDevice");
         if(!dllDXGID3D10CreateDevice)
-		      ShowMessage("dllDXGID3D10CreateDevice not in DLL!\n'%s'", path), exit(0);
+		      ShowMessage("DXGID3D10CreateDevice not in DLL!\n'%s'", path), exit(0);
       }
 
       /*
-      if(false) {
+      // Load d3d11 library
+      {
         // TODO: d3d11.dll handling
       }
       */
@@ -195,6 +196,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       if(hooks) {
         if(hLibD3D9) addNoHookModule(hLibD3D9);
         if(hLibDXGI) addNoHookModule(hLibDXGI);
+        // TODO: add d3d11.dll line
       }
 
       break;
@@ -219,7 +221,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         ReleaseDC((*i)->hwnd, (*i)->hdc);
         restoreGammaRamps.remove(*i);
       }
-      
+
 			if(hLibD3D9) {
 				FreeLibrary(hLibD3D9);
 				hLibD3D9 = NULL;
@@ -228,7 +230,8 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 				FreeLibrary(hLibDXGI);
 				hLibDXGI = NULL;
 			}
-      
+			// TODO: Add d3d11.dll
+
 
       if(didDisableComposition) {
         DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
@@ -250,7 +253,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 }
 
 #if DUMP_IMPORTS
-#pragma comment(lib, "Dbghelp.lib") 
+#pragma comment(lib, "Dbghelp.lib")
 #endif
 
 IDirect3D9Ex *riil;
@@ -276,8 +279,8 @@ extern "C" _declspec(dllexport) IDirect3D9 * __stdcall Direct3DCreate9(UINT SDKV
   d3dhReal = dllDirect3DCreate9(D3D_SDK_VERSION);
   #endif
 
-  d3dhNew = new IDirect3D9New((IDirect3D9Ex*)d3dhReal);  
-  return (IDirect3D9*) d3dhNew;  
+  d3dhNew = new IDirect3D9New((IDirect3D9Ex*)d3dhReal);
+  return (IDirect3D9*) d3dhNew;
 }
 
 extern "C" _declspec(dllexport) HRESULT __stdcall Direct3DCreate9Ex(UINT SDKVersion, IDirect3D9Ex** ptr)
@@ -293,11 +296,11 @@ extern "C" _declspec(dllexport) HRESULT __stdcall Direct3DCreate9Ex(UINT SDKVers
     // Create D3D9Ex interface
     dllDirect3DCreate9Ex(D3D_SDK_VERSION, &d3dhReal);
   #else
-    dbg("Ei näin.");
+    dbg("Not so.");
   #endif
 
   d3dhNew = new IDirect3D9New(d3dhReal);
-  *ptr = (IDirect3D9Ex*) d3dhNew;  
+  *ptr = (IDirect3D9Ex*) d3dhNew;
   return S_OK;
 }
 
@@ -318,10 +321,11 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory(REFIID riid,
 
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid, void **ppFactory)
 {
-  dbg("CreateDXGIFactory");
+  dbg("CreateDXGIFactory1");
 
   //HRESULT ret = dllCreateDXGIFactory(riid, ppFactory);
   HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
+  dbg("CreateDXGIFactory1 0x%08X", *ppFactory);
   if(ret == S_OK) {
     IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
     *ppFactory = new IDXGIFactory1New(dxgifNew);
@@ -359,7 +363,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d
 #endif
 
 // Passthrough exports
-#pragma warning (disable : 4731) 
+#pragma warning (disable : 4731)
 #define DEXPORT(hLib, x) _declspec(dllexport) void x(void) {\
 	static FARPROC foo = GetProcAddress((HMODULE) hLib, #x);\
 	__asm {pop STACK_BASE};\

@@ -43,6 +43,7 @@ __declspec(thread) static HHOOK threadHookMsg = NULL;  // Thread-local-storage h
 
 static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParamIn, LPARAM lParamIn)
 {
+  dbg("InputHandler: GetMsgProc");
   HWND win = ihGlobal.getHWND();
   if(!win) {
     //dbg("!win");
@@ -55,7 +56,7 @@ static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParamIn, LPARAM lParamIn)
   UINT wmsg = msg->message;
 
   // Keyboard hooks
-  switch(wmsg) {    
+  switch(wmsg) {
     case WM_KEYUP:
       if(GetKeyState(VK_APPLICATION) < 0) {
         ihGlobal.keyDown((int)wParam);
@@ -75,7 +76,7 @@ static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParamIn, LPARAM lParamIn)
         ihGlobal.keyUp((int)wParam);
       break;
   }
-  
+
   bool hookAllWindows = false;
   if(msg->hwnd != win && !hookAllWindows) {
 
@@ -142,7 +143,7 @@ static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParamIn, LPARAM lParamIn)
         }
 
         break;
-      }      
+      }
 
       POINT vp;
       HWND winCursor = WindowFromPoint(msg->pt);
@@ -178,10 +179,10 @@ static LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParamIn, LPARAM lParamIn)
         p.appWindow = win;
         overlayDoClick(&p);
       }
-      
+
       break;
     }
-    
+
       break;
   }
 
@@ -206,7 +207,7 @@ void InputHandler::detachThread()
 }
 
 void InputHandler::setHook(DWORD tid)
-{  
+{
   if(tid == NULL)
     tid = GetCurrentThreadId(); // Set the hook on current thread
 
@@ -220,13 +221,13 @@ void InputHandler::setHook(DWORD tid)
 
   threadHookMsg = SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC) GetMsgProc, 0, tid);
   hookedThreads.push_back(tid);
-  //dbg("InputHandler: Installed mouse hook 0x%08X on thread 0x%08X (%d hooks)", threadHookMsg, tid, hookedThreads.size());
+  dbg("InputHandler: Installed mouse hook 0x%08X on thread 0x%08X (%d hooks)", threadHookMsg, tid, hookedThreads.size());
 }
 
 void InputHandler::releaseHook()
 {
   DWORD tid = GetCurrentThreadId();
-  //dbg("InputHandler: Release mouse hook 0x%08X on thread 0x%08X (%d hooks)", threadHookMsg, tid, hookedThreads.size());
+  dbg("InputHandler: Release mouse hook 0x%08X on thread 0x%08X (%d hooks)", threadHookMsg, tid, hookedThreads.size());
 
   UnhookWindowsHookEx(threadHookMsg);
   hookedThreads.remove(tid);
@@ -235,19 +236,29 @@ void InputHandler::releaseHook()
 static HEAD* findHead(HWND win)
 {
   // Find head for this window
-  HEAD *head = NULL; 
+  HEAD *head = NULL;
   int numDevs = config.getNumAdditionalHeads();
   for(int i=0;i<numDevs;i++) {
     HEAD *h = config.getHead(i);
     if(h->hwnd && h->hwnd == win)
+    {
       head = h;
+      dbg("findHead: SecondaryHead");
+      break;
+    }
   }
   if(!head) {
     HEAD *h = config.getPrimaryHead();
     if(h->hwnd && h->hwnd == win)
+    {
       head = h;
+      dbg("findHead: PrimaryHead");
+    }
     else
+    {
+      dbg("findHead: Head not found");
       return NULL; // Head not found
+    }
   }
   return head;
 }
@@ -255,6 +266,7 @@ static HEAD* findHead(HWND win)
 // Return window client rect... Ignores main window size - Takes destrect into account as well
 static bool getTrueClientRect(HWND win, RECT *r)
 {
+  dbg("InputHandler: Getting true client rectangle");
   int numDevs = config.getNumAdditionalHeads();
   HEAD *h;
   for(int i=-1;i<numDevs;i++) {
@@ -280,12 +292,13 @@ static bool getTrueClientRect(HWND win, RECT *r)
 bool inputMapIsDeviceWindow(HWND win)
 {
   HEAD *h = config.getPrimaryHead();
-  return (h->hwnd && win == h->hwnd);    
+  return (h->hwnd && win == h->hwnd);
 }
 
 // Translates virtual backbuffer coordinates to desktop coordinates
 bool inputMapVirtualToDesktop(POINT *in, POINT *out)
 {
+  dbg("InputHandler: Map virtual to desktop");
   //if(SoftTHActiveSquashed && *SoftTHActiveSquashed)
   RECT *sr;
   RECT fullbb = {0, 0, config.main.renderResolution.x, config.main.renderResolution.y};
@@ -323,12 +336,13 @@ bool inputMapVirtualToDesktop(POINT *in, POINT *out)
 // Translates window client coordinates to virtual backbuffer coordinates
 bool inputMapClientToVirtual(HWND win, POINT *in, POINT *out)
 {
+  dbg("InputHandler: Map client to virtual");
   HEAD *head = findHead(win);
   if(!head)
     return false;
 
   RECT lpr;
-  getTrueClientRect(win, &lpr); 
+  getTrueClientRect(win, &lpr);
   float xr = (float)in->x / (float) (lpr.right-lpr.left);
   float yr = (float)in->y / (float) (lpr.bottom-lpr.top);
 

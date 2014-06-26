@@ -64,6 +64,8 @@ static void __cdecl trampoline(void* obj)
 
 outDirect3D9::outDirect3D9(int devID, int wantMethod, int w, int h, int transX, int transY, RECT *destRectWanted, HWND primaryFocusWindow, bool fpuPreserve, int logoStopTime, bool wantIndirect)
 {
+  dbg("outDirect3D9: Initialize");
+
   dev = NULL;
   d3d = NULL;
   devSec = NULL;

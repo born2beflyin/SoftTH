@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <d3d11.h>
 #include "dxgiSwapChain.h"
 #include "helper.h"
 #include "version.h"
@@ -69,6 +70,10 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
     // Check for D3D10 device
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &dev10) == S_OK)
       dbg("Got Direct3D 10 device");
+    else if(pDevice->QueryInterface(__uuidof(ID3D10Device1), (void**) &dev10) == S_OK)
+      dbg("Got Direct3D 10.1 device");
+    else if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &dev10) == S_OK)
+      dbg("Got Direct3D 11 device");
     else
       dbg("ERROR: Unknown swapchain device type!");
 
