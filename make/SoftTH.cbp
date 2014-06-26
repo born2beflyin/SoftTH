@@ -394,6 +394,8 @@
 		<Unit filename="../src/main.h" />
 		<Unit filename="../src/outD3D10.cpp" />
 		<Unit filename="../src/outD3D10.h" />
+		<Unit filename="../src/outD3D11.cpp" />
+		<Unit filename="../src/outD3D11.h" />
 		<Unit filename="../src/outD3D9.cpp" />
 		<Unit filename="../src/outD3D9.h" />
 		<Unit filename="../src/overlay_interface.cpp" />

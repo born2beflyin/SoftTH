@@ -83,7 +83,6 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
   {
     case DLL_PROCESS_ATTACH:
     {
-      OutputDebugString("SoftTH.DLL: DLL_PROCESS_ATTACH");
 
 #ifdef PREHOOKING
       // Do pre-hooking
@@ -91,6 +90,8 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       // Callin anything else (even dbg) will often trigger other hooks so it must be done first here
       setHooks(InitHooks);
 #endif
+
+      OutputDebugString("SoftTH.DLL: DLL_PROCESS_ATTACH");
 
       // Create SoftTH paths
       char mydocs[256] = "";

@@ -102,7 +102,7 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
     if(d3d10)
       *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else
-      dbg("ERROR: Unkonwn swapchain device type!");
+      dbg("ERROR: Unknown swapchain device type!");
   }
   return ret;*/
 }
