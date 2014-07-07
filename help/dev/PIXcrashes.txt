@@ -1,0 +1,37 @@
+http://www.gamedev.net/topic/639532-d3d11createdevice-failed/
+
+Hello,
+ 
+I have a huge problem. I can't run my program in Debug, I use the D3D11_CREATE_DEVICE_DEBUG when I want to initialize DX 11. However, it works in Release mode. I tried toreinstall the DirectX SDK but it's not successful
+
+-----
+
+Amazing... Look at the information of the update: http://support.microsoft.com/kb/2670838
+ 
+Quote
+If you are a Windows 7 DirectX developer who uses the June 2010 DirectX Software Development Kit (SDK), you will have to update your development environments after you install this platform update. The following development .dll files that are associated with the DirectX SDK are incompatible with this platform update:
+D3D10SDKLayers.dll
+D3D11SDKLayers.dll
+D3D10ref.dll
+D2D1debug.dll
+You can use one of the following applications or tools to update these .dll files:
+The Windows 8 SDK: This SDK updates the current development environment with new headers, libs, and tools. This includes the previously-listed development .dll files. This update does not update the C or C++ compilers or the IDE, but this update does enable developers to integrate the new features of the platform update into their applications.
+Microsoft Visual Studio 2012: This application includes the Windows 8 SDK, the Visual Studio 2012 IDE, and the new compilers. It also enables developers to integrate the new features of the platform update into their applications.
+Remote Tools for Visual Studio 2012: These tools are the minimum requirement in order to continue using the Direct3D debug layer. These tools update only the previously-listed development .dll files. These tools do not enable developers to integrate the new features of the platform update into their applications. These tools are available in the "Remote Tools for Visual Studio 2012" section of the Visual Studio Download Center, or can be downloaded from the following links. These packages can be safely installed on development systems:
+Remote Tools for Visual Studio 2012 (x86) English
+Remote Tools for Visual Studio 2012 (x64) English
+Note The Pix for Windows tool from the DirectX SDK is incompatible with this platform update. See Debugging Shaders in Visual Studio for more information about the new tools available in Visual Studio 2012.
+For more developer information about this platform update, go to the following MSDN website:
+Platform Update for Windows 7
+
+-----
+
+http://www.gamedev.net/topic/639532-d3d11createdevice-failed/page-2
+
+My solution was to uninstall the update and now everything works fine:
+ 
+How to uninstall update 2670838
+To uninstall update 2670838, follow these steps:
+Click Start, click Control Panel, click Programs, and then click Programs and Features.
+Click View installed updates.
+Click Update for Microsoft Windows (KB 2670838), and then click Uninstall.
