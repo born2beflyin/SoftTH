@@ -1,0 +1,15 @@
+From: http://forums.codeblocks.org/index.php/topic,6419.0.html
+
+I use VC2005 Express with C::B, partly because the MSVC debugger is quite good. I have found the easiest is to make a global variable in C::B called VC2005IDE which points to the install dir of VC2005 Express in my case.
+
+Then I configure a tool in the Tools menu
+
+Name: VC2005 Debug
+Executable: $(#VC2005IDE)\VCExpress.exe
+Parameters: /debugexe ${TARGET_OUTPUT_FILE}
+Working directory: ${TARGET_OUTPUT_DIR}
+check the option "Launch tool visible detached"
+
+So while I edit/compile/build in C::B, this simple fix launches the VC2005 Express for debugging when needed. Notice that you don't need a VS project/solution to do this.
+
+---------------------------
