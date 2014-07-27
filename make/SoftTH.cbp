@@ -4,6 +4,7 @@
 	<Project>
 		<Option title="SoftTH" />
 		<Option pch_mode="2" />
+		<Option default_target="Debug DX10 Win x86" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug DX9 Win x86">
@@ -37,7 +38,6 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
 					<Add directory="../include/distorm" />
@@ -45,7 +45,6 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
@@ -81,7 +80,6 @@
 					<Add library="shell32.lib" />
 					<Add library="kernel32.lib" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
@@ -89,7 +87,7 @@
 					<Add directory="../lib/zlib/win/x86" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\dx9\debug\d3d9.dll' />
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 				</ExtraCommands>
 			</Target>
 			<Target title="Release DX9 Win x86">
@@ -127,7 +125,6 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
 					<Add directory="../include/distorm" />
@@ -135,7 +132,6 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
@@ -170,7 +166,6 @@
 					<Add library="shell32.lib" />
 					<Add library="kernel32.lib" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
@@ -178,7 +173,7 @@
 					<Add directory="../lib/zlib/win/x86" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\dx9\release\d3d9.dll' />
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 				</ExtraCommands>
 			</Target>
 			<Target title="Debug DX10 Win x86">
@@ -188,6 +183,8 @@
 				<Option object_output="../obj/win/x86/dx10/debug/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
+				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
+				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MDd" />
 					<Add option="/arch:SSE2" />
@@ -210,7 +207,6 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
 					<Add directory="../include/distorm" />
@@ -218,7 +214,6 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
@@ -254,7 +249,6 @@
 					<Add library="shell32.lib" />
 					<Add library="kernel32.lib" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
@@ -262,7 +256,9 @@
 					<Add directory="../lib/zlib/win/x86" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\dx10\debug\dxgi.dll' />
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
+					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\debug\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Release DX10 Win x86">
@@ -272,6 +268,8 @@
 				<Option object_output="../obj/win/x86/dx10/release/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
+				<Option host_application="test/win/x86/dx10/SimpleSample10.exe" />
+				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MD" />
 					<Add option="/arch:SSE2" />
@@ -298,7 +296,6 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
 					<Add directory="../include/distorm" />
@@ -306,7 +303,6 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
 					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
@@ -341,7 +337,6 @@
 					<Add library="shell32.lib" />
 					<Add library="kernel32.lib" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
-					<Add directory="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/lib" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
 					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
@@ -349,7 +344,9 @@
 					<Add directory="../lib/zlib/win/x86" />
 				</Linker>
 				<ExtraCommands>
-					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:..\bin\win\x86\dx10\release\dxgi.dll' />
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
+					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\test\win\x86\dx10\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
 		</Build>
@@ -415,7 +412,8 @@
 			<code_completion />
 			<envvars />
 			<debugger>
-				<search_path add="..\bin\win\x86\debug" />
+				<search_path add="..\bin\win\x86\dx9\debug" />
+				<search_path add="..\bin\win\x86\dx10\debug" />
 				<search_path add="..\src" />
 			</debugger>
 			<lib_finder disable_auto="1" />

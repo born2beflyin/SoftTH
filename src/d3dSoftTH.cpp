@@ -52,7 +52,7 @@ DEFINE_GUID(IID_SoftTHInvalidRTT, 0x12345542, 0x2134, 0x4545, 0xff, 0xff, 0xba, 
 volatile int SoftTHActive = 0; // >0 if SoftTH is currently active and resolution is overridden
 bool *SoftTHActiveSquashed = NULL; // Pointer to latest SoftTH device squash variable (TODO: horrible)
 
-// New SoftTH device instace created
+// New SoftTH device instance created
 // Create our fake backbuffer etc.
 IDirect3DDevice9SoftTH::IDirect3DDevice9SoftTH(IDirect3D9New *parentNew, IDirect3D9Ex *direct3D, HWND hFocusWindowNew, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pp)
 :IDirect3DDevice9New(dev, direct3D)

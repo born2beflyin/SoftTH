@@ -94,6 +94,29 @@ void dbgSimple(char *first, ...) {
 }
 
 extern int startTime;
+
+void __cdecl odprintf(const char *format, ...)
+{
+  char    buf[4096], *p = buf;
+  va_list args;
+  int     n;
+
+  va_start(args, format);
+  n = _vsnprintf(p, sizeof buf - 3, format, args); // buf-3 is room for CR/LF/NUL
+  va_end(args);
+
+//  p += (n < 0) ? sizeof buf - 3 : n;
+//
+//  while ( p > buf  &&  isspace(p[-1]) )
+//          *--p = '\0';
+//
+//  *p++ = '\r';
+//  *p++ = '\n';
+//  *p   = '\0';
+
+  OutputDebugString(buf);
+}
+
 // Output debug string
 void dbg(char *first, ...) {
 	static char lastMsg[1024] = "";
@@ -162,9 +185,10 @@ void dbg(char *first, ...) {
 		}
 
 
-		char temp[2048];
-    sprintf(temp, "<%s:%d> %s", processName(), GetCurrentThreadId(), Message);
-		OutputDebugString(temp);
+		//char temp[2048];
+		odprintf("<%s:%d> %s", processName(), GetCurrentThreadId(), Message);
+    //sprintf(temp, "<%s:%d> %s", processName(), GetCurrentThreadId(), Message);
+		//OutputDebugString(temp);
     //backLogAdd(temp);
 		//OutputDebugString(Message);
 /*

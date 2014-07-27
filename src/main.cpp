@@ -91,7 +91,10 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       setHooks(InitHooks);
 #endif
 
-      OutputDebugString("SoftTH.DLL: DLL_PROCESS_ATTACH");
+      dbg(CLEAR_LOG);
+      dbg("%s (%s, %s)", SOFTTH_VERSION, processName(), lpReserved?"static link":"dynamic link");
+      dbg("Arguments: <%s>", GetCommandLine());
+      dbg("--- DLL_PROCESS_ATTACH ---");
 
       // Create SoftTH paths
       char mydocs[256] = "";
@@ -99,10 +102,6 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       char foo[256];
       sprintf(foo, "%s/SoftTH/Screenshots/", mydocs);
       createDirs(foo);
-
-      dbg(CLEAR_LOG);
-      dbg("%s (%s, %s)", SOFTTH_VERSION, processName(), lpReserved?"static link":"dynamic link");
-      dbg("Arguments: <%s>", GetCommandLine());
 
       hSelf = hModule;
 
@@ -205,7 +204,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
     case DLL_PROCESS_DETACH:
     {
-      dbg("DLL_PROCESS_DETACH (%s)", lpReserved?"process terminating":"DLL unloaded");
+      dbg("--- DLL_PROCESS_DETACH (%s) ---", lpReserved?"process terminating":"DLL unloaded");
       if(!lpReserved)
         unsetHooks(SoftTHHooks);
       /*emergencyRelease = true;

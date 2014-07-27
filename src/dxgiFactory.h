@@ -37,7 +37,7 @@ public:
         *ppvObj = this;
         return S_OK;
       } else
-        return dxgif->QueryInterface(riid, ppvObj);
+      return dxgif->QueryInterface(riid, ppvObj);
   };
 
   DECALE_DXGICOMMONIF(dxgif);
@@ -46,17 +46,17 @@ public:
     {dbg("dxgif: GetParent %s", matchRiid(riid));return dxgif->GetParent(riid, ppParent);};
 
   HRESULT STDMETHODCALLTYPE EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
-    ;//{dbg("dxgif: EnumAdapters");return dxgif->EnumAdapters(Adapter, ppAdapter);};  
+    ;//{dbg("dxgif: EnumAdapters");return dxgif->EnumAdapters(Adapter, ppAdapter);};
   HRESULT STDMETHODCALLTYPE MakeWindowAssociation(HWND WindowHandle, UINT Flags)
-    {dbg("dxgif: MakeWindowAssociation");return dxgif->MakeWindowAssociation(WindowHandle, Flags);};  
+    {dbg("dxgif: MakeWindowAssociation");return dxgif->MakeWindowAssociation(WindowHandle, Flags);};
   HRESULT STDMETHODCALLTYPE GetWindowAssociation(HWND *pWindowHandle)
-    {dbg("dxgif: GetWindowAssociation");return dxgif->GetWindowAssociation(pWindowHandle);};  
+    {dbg("dxgif: GetWindowAssociation");return dxgif->GetWindowAssociation(pWindowHandle);};
   HRESULT STDMETHODCALLTYPE CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *pDesc, IDXGISwapChain **ppSwapChain)
-    ;//{dbg("dxgif: CreateSwapChain");return dxgif->CreateSwapChain(pDevice, pDesc, ppSwapChain);};  
+    ;//{dbg("dxgif: CreateSwapChain");return dxgif->CreateSwapChain(pDevice, pDesc, ppSwapChain);};
   HRESULT STDMETHODCALLTYPE CreateSoftwareAdapter(HMODULE Module, IDXGIAdapter **ppAdapter)
-    {dbg("dxgif: CreateSoftwareAdapter");return dxgif->CreateSoftwareAdapter(Module, ppAdapter);};  
+    {dbg("dxgif: CreateSoftwareAdapter");return dxgif->CreateSoftwareAdapter(Module, ppAdapter);};
   HRESULT STDMETHODCALLTYPE EnumAdapters1(UINT Adapter, IDXGIAdapter1 **ppAdapter)
-    ;//{dbg("dxgif: EnumAdapters1");return dxgif->EnumAdapters1(Adapter, ppAdapter);};  
+    ;//{dbg("dxgif: EnumAdapters1");return dxgif->EnumAdapters1(Adapter, ppAdapter);};
   BOOL STDMETHODCALLTYPE IsCurrent()
     {dbg("dxgif: IsCurrent");return dxgif->IsCurrent();};
 

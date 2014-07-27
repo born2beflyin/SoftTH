@@ -70,42 +70,43 @@ public:
 
   // IDXGIDeviceSubObject
   HRESULT STDMETHODCALLTYPE GetDevice( REFIID riid, void **ppDevice)
-    {dbg("dxgsc: GetDevice");return dxgsc->GetDevice(riid, ppDevice);};  
+    {dbg("dxgsc: GetDevice");return dxgsc->GetDevice(riid, ppDevice);};
 
   HRESULT STDMETHODCALLTYPE Present(UINT SyncInterval,UINT Flags)
-    ;//{dbg("dxgsc: Present");return dxgsc->Present(SyncInterval, Flags);};  
+    ;//{dbg("dxgsc: Present");return dxgsc->Present(SyncInterval, Flags);};
   HRESULT STDMETHODCALLTYPE GetBuffer(UINT Buffer, REFIID riid, void **ppSurface)
-    ;//{dbg("dxgsc: GetBuffer");HRESULT ret = dxgsc->GetBuffer(Buffer, riid, ppSurface);dbg("joo-o"); return ret;};  
+    ;//{dbg("dxgsc: GetBuffer");HRESULT ret = dxgsc->GetBuffer(Buffer, riid, ppSurface);dbg("joo-o"); return ret;};
   HRESULT STDMETHODCALLTYPE SetFullscreenState(BOOL Fullscreen, IDXGIOutput *pTarget)
     {dbg("dxgsc: SetFullscreenState 0x%08X", pTarget);
     if(pTarget) {
+      dbg("test here");
       IDXGIOutputNew *onew;
       if(pTarget->QueryInterface(IID_IDXGIOutputNew, (void**) &onew) == S_OK) {
         pTarget = onew->getReal();
         onew->Release();
-      }    
+      }
     }
     return dxgsc->SetFullscreenState(Fullscreen, pTarget);
-    };  
+    };
   HRESULT STDMETHODCALLTYPE GetFullscreenState(BOOL *pFullscreen,IDXGIOutput **ppTarget)
-    {dbg("dxgsc: WARNING: GetFullscreenState, not implemented!");return dxgsc->GetFullscreenState(pFullscreen, ppTarget);};  
+    {dbg("dxgsc: WARNING: GetFullscreenState, not implemented!");return dxgsc->GetFullscreenState(pFullscreen, ppTarget);};
   HRESULT STDMETHODCALLTYPE GetDesc(DXGI_SWAP_CHAIN_DESC *pDesc)
-    ;//{dbg("dxgsc: GetDesc");return dxgsc->GetDesc(pDesc);};  
+    ;//{dbg("dxgsc: GetDesc");return dxgsc->GetDesc(pDesc);};
   HRESULT STDMETHODCALLTYPE ResizeBuffers(UINT BufferCount,UINT Width,UINT Height,DXGI_FORMAT NewFormat,UINT SwapChainFlags)
-    ;//{dbg("dxgsc: ResizeBuffers %dx%d", Width, Height);return dxgsc->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);};  
+    ;//{dbg("dxgsc: ResizeBuffers %dx%d", Width, Height);return dxgsc->ResizeBuffers(BufferCount, Width, Height, NewFormat, SwapChainFlags);};
   HRESULT STDMETHODCALLTYPE ResizeTarget(const DXGI_MODE_DESC *tgtp)
-    ;//{dbg("dxgsc: ResizeTarget %dx%d", tgtp->Width, tgtp->Height);return dxgsc->ResizeTarget(tgtp);};  
+    ;//{dbg("dxgsc: ResizeTarget %dx%d", tgtp->Width, tgtp->Height);return dxgsc->ResizeTarget(tgtp);};
   HRESULT STDMETHODCALLTYPE GetContainingOutput(IDXGIOutput **ppOutput)
-    {dbg("dxgsc: GetContainingOutput");return dxgsc->GetContainingOutput(ppOutput);};  
+    {dbg("dxgsc: GetContainingOutput");return dxgsc->GetContainingOutput(ppOutput);};
   HRESULT STDMETHODCALLTYPE GetFrameStatistics(DXGI_FRAME_STATISTICS *pStats)
-    {dbg("dxgsc: GetFrameStatistics");return dxgsc->GetFrameStatistics(pStats);};  
+    {dbg("dxgsc: GetFrameStatistics");return dxgsc->GetFrameStatistics(pStats);};
   HRESULT STDMETHODCALLTYPE GetLastPresentCount(UINT *pLastPresentCount)
-    {dbg("dxgsc: GetLastPresentCount");return dxgsc->GetLastPresentCount(pLastPresentCount);};  
+    {dbg("dxgsc: GetLastPresentCount");return dxgsc->GetLastPresentCount(pLastPresentCount);};
 
   IDXGISwapChain* getReal() {dbg("Get real swapchain");return dxgsc;};
 
 private:
-  IDXGISwapChain *dxgsc; 
+  IDXGISwapChain *dxgsc;
   IDXGIFactory1 *parent;
   IDXGIFactory1 *dxgif;
   ID3D10Device *dev10;

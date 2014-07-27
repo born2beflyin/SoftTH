@@ -87,6 +87,7 @@ extern bool emergencyRelease;
 //#define dbgf dbg
 
 void ShowMessage(char *first, ...);
+void __cdecl odprintf(const char *format, ...);
 void dbg(char *first, ...);
 void dbgSimple(char *first, ...);
 //void dbgf(char *first, ...);

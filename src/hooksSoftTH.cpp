@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma intrinsic(_ReturnAddress)
 
 GHOOK InitHooks[];
+DWORD RealDisplayCount = 99;
 
 // Sets source of call to module mod
 #if 1
@@ -58,6 +59,26 @@ BOOL WINAPI NewClipCursor(CONST RECT *rect)
   }
 }
 
+BOOL WINAPI NewEnumDisplaySettingsW(LPCTSTR lpszDeviceName, DWORD iModeNum, LPDEVMODE lpDevMode)
+{
+  dbgf("NewEnumDisplaySettingsW");
+  // This will actually call NewEnumDisplaySettingsExA, but SOURCE_MODULE will fail there so must handle source specific stuff here!
+	typedef BOOL (WINAPI*OCALL)(LPCTSTR, DWORD, LPDEVMODE);
+	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplaySettingsW");
+
+  int ret = origFunc(lpszDeviceName, iModeNum, lpDevMode);
+  lpszDeviceName = (char *) "SoftTH test W";
+  SOURCE_MODULE(srcMod);
+  if(isHooked(srcMod) && iModeNum == ENUM_CURRENT_SETTINGS && SoftTHActive)
+  {
+    lpDevMode->dmPelsWidth = config.main.renderResolution.x;
+    lpDevMode->dmPelsHeight = config.main.renderResolution.y;
+    dbg("EnumDisplaySettings: Returning mode %dx%d %dHz", lpDevMode->dmPelsWidth, lpDevMode->dmPelsHeight, lpDevMode->dmDisplayFrequency);
+  }
+
+  return ret;
+}
+
 BOOL WINAPI NewEnumDisplaySettingsA(LPCTSTR lpszDeviceName, DWORD iModeNum, LPDEVMODE lpDevMode)
 {
   dbgf("NewEnumDisplaySettingsA");
@@ -66,24 +87,26 @@ BOOL WINAPI NewEnumDisplaySettingsA(LPCTSTR lpszDeviceName, DWORD iModeNum, LPDE
 	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplaySettingsA");
 
   int ret = origFunc(lpszDeviceName, iModeNum, lpDevMode);
+  lpszDeviceName = (char *) "SoftTH test A";
   SOURCE_MODULE(srcMod);
   if(isHooked(srcMod) && iModeNum == ENUM_CURRENT_SETTINGS && SoftTHActive)
   {
     lpDevMode->dmPelsWidth = config.main.renderResolution.x;
     lpDevMode->dmPelsHeight = config.main.renderResolution.y;
-    dbgf("EnumDisplaySettings: Returning mode %dx%d %dHz", lpDevMode->dmPelsWidth, lpDevMode->dmPelsHeight, lpDevMode->dmDisplayFrequency);
+    dbg("EnumDisplaySettings: Returning mode %dx%d %dHz", lpDevMode->dmPelsWidth, lpDevMode->dmPelsHeight, lpDevMode->dmDisplayFrequency);
   }
 
   return ret;
 }
 
-BOOL WINAPI NewEnumDisplaySettingsExA(LPCTSTR lpszDeviceName, DWORD iModeNum, LPDEVMODE lpDevMode, DWORD dwFlags)
+BOOL WINAPI NewEnumDisplaySettingsExW(LPCWSTR lpszDeviceName, DWORD iModeNum, LPDEVMODEW lpDevMode, DWORD dwFlags)
 {
-  dbgf("NewEnumDisplaySettingsExA");
-	typedef BOOL (WINAPI*OCALL)(LPCTSTR, DWORD, LPDEVMODE, DWORD);
-	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplaySettingsExA");
+  dbgf("NewEnumDisplaySettingsExW");
+	typedef BOOL (WINAPI*OCALL)(LPCWSTR, DWORD, LPDEVMODEW, DWORD);
+	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplaySettingsExW");
 
   int ret = origFunc(lpszDeviceName, iModeNum, lpDevMode, dwFlags);
+  lpszDeviceName = (WCHAR *) L"SoftTH test ExW";
 
   SOURCE_MODULE(srcMod);
   if(isHooked(srcMod) && iModeNum == ENUM_CURRENT_SETTINGS && SoftTHActive)
@@ -94,8 +117,8 @@ BOOL WINAPI NewEnumDisplaySettingsExA(LPCTSTR lpszDeviceName, DWORD iModeNum, LP
 
   if(iModeNum != ENUM_REGISTRY_SETTINGS && iModeNum != ENUM_CURRENT_SETTINGS && iModeNum > 2)
   {
-    static DEVMODE mode;
-    mode.dmSize = sizeof(DEVMODE);
+    static DEVMODEW mode;
+    mode.dmSize = sizeof(DEVMODEW);
     int rr = origFunc(lpszDeviceName, iModeNum-1, &mode, dwFlags);
     if(rr && !ret)
     {
@@ -103,7 +126,42 @@ BOOL WINAPI NewEnumDisplaySettingsExA(LPCTSTR lpszDeviceName, DWORD iModeNum, LP
       origFunc(lpszDeviceName, ENUM_CURRENT_SETTINGS, &mode, dwFlags);
       mode.dmPelsWidth = config.main.renderResolution.x;
       mode.dmPelsHeight = config.main.renderResolution.y;
-      memcpy(lpDevMode, &mode, sizeof(DEVMODE));
+      memcpy(lpDevMode, &mode, sizeof(DEVMODEW));
+      dbg("EnumDisplaySettingsEx: Added mode ID %d: %dx%d %dHz", iModeNum, mode.dmPelsWidth, mode.dmPelsHeight, mode.dmDisplayFrequency);
+      return rr;
+    }
+  }
+  return ret;
+}
+
+BOOL WINAPI NewEnumDisplaySettingsExA(LPCTSTR lpszDeviceName, DWORD iModeNum, LPDEVMODEA lpDevMode, DWORD dwFlags)
+{
+  dbgf("NewEnumDisplaySettingsExA");
+	typedef BOOL (WINAPI*OCALL)(LPCTSTR, DWORD, LPDEVMODEA, DWORD);
+	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplaySettingsExA");
+
+  int ret = origFunc(lpszDeviceName, iModeNum, lpDevMode, dwFlags);
+  lpszDeviceName = (char *) "SoftTH test ExA";
+
+  SOURCE_MODULE(srcMod);
+  if(isHooked(srcMod) && iModeNum == ENUM_CURRENT_SETTINGS && SoftTHActive)
+  {
+    lpDevMode->dmPelsWidth = config.main.renderResolution.x;
+    lpDevMode->dmPelsHeight = config.main.renderResolution.y;
+  }
+
+  if(iModeNum != ENUM_REGISTRY_SETTINGS && iModeNum != ENUM_CURRENT_SETTINGS && iModeNum > 2)
+  {
+    static DEVMODEA mode;
+    mode.dmSize = sizeof(DEVMODEA);
+    int rr = origFunc(lpszDeviceName, iModeNum-1, &mode, dwFlags);
+    if(rr && !ret)
+    {
+      // Next to last mode is queried - this is going to be our mode
+      origFunc(lpszDeviceName, ENUM_CURRENT_SETTINGS, &mode, dwFlags);
+      mode.dmPelsWidth = config.main.renderResolution.x;
+      mode.dmPelsHeight = config.main.renderResolution.y;
+      memcpy(lpDevMode, &mode, sizeof(DEVMODEA));
       dbg("EnumDisplaySettingsEx: Added mode ID %d: %dx%d %dHz", iModeNum, mode.dmPelsWidth, mode.dmPelsHeight, mode.dmDisplayFrequency);
       return rr;
     }
@@ -587,13 +645,95 @@ static BOOL CALLBACK NewMonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPREC
     return TRUE;
 }
 
+BOOL WINAPI NewEnumDisplayDevicesW(LPCWSTR lpDevice, DWORD iDevNum, PDISPLAY_DEVICEW lpDisplayDevice, DWORD dwFlags)
+{
+  typedef BOOL (WINAPI*OCALL)(LPCWSTR, DWORD, PDISPLAY_DEVICEW, DWORD);
+  const static OCALL origFunc = (OCALL) getHookCall("EnumDisplayDevicesW");
+
+  if (iDevNum == 0) RealDisplayCount = 99;
+
+  BOOL ret = origFunc(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
+
+  SOURCE_MODULE(srcMod);
+  if(isHooked(srcMod)) {
+    // TODO: CJR - Add SoftTH as a display device once all other displays have been enumerated
+    if (!ret && iDevNum < RealDisplayCount)
+    {
+      dbg("NewEnumDisplayDevicesW");
+      dbg("Adding SoftTH as a display device");
+
+      RealDisplayCount = iDevNum - 1;
+
+      WCHAR             dname[32] = L"SoftTH";
+      WCHAR             dstr[128] = SOFTTH_VERSIONW;
+      WCHAR             did[128]  = SOFTTHDEVIDW;
+      WCHAR             dkey[128] = L"";
+
+
+      *lpDisplayDevice->DeviceName = *dname;
+      *lpDisplayDevice->DeviceString = *dstr;
+      lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ACTIVE;// | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
+      *lpDisplayDevice->DeviceID = *did;
+      *lpDisplayDevice->DeviceKey = *dkey;
+
+      //memcpy(&lpDisplayDevice, &dd, sizeof(DISPLAY_DEVICE));
+
+      //lpDisplayDevice = *lpdd;
+
+      ret = true;
+    }
+  }
+  return ret;
+}
+
+BOOL WINAPI NewEnumDisplayDevicesA(LPCTSTR lpDevice, DWORD iDevNum, PDISPLAY_DEVICEA lpDisplayDevice, DWORD dwFlags)
+{
+  typedef BOOL (WINAPI*OCALL)(LPCTSTR, DWORD, PDISPLAY_DEVICEA, DWORD);
+  const static OCALL origFunc = (OCALL) getHookCall("EnumDisplayDevicesA");
+
+  if (iDevNum == 0) RealDisplayCount = 99;
+
+  BOOL ret = origFunc(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
+
+  SOURCE_MODULE(srcMod);
+  if(isHooked(srcMod)) {
+    // TODO: CJR - Add SoftTH as a display device once all other displays have been enumerated
+    if (!ret && iDevNum < RealDisplayCount)
+    {
+      dbg("NewEnumDisplayDevicesA");
+      dbg("Adding SoftTH as a display device");
+
+      RealDisplayCount = iDevNum - 1;
+
+      CHAR             dname[32] = "SoftTH";
+      CHAR             dstr[128] = SOFTTH_VERSION;
+      CHAR             did[128]  = SOFTTHDEVID;
+      CHAR             dkey[128] = "";
+
+
+      *lpDisplayDevice->DeviceName = *dname;
+      *lpDisplayDevice->DeviceString = *dstr;
+      lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ACTIVE;// | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
+      *lpDisplayDevice->DeviceID = *did;
+      *lpDisplayDevice->DeviceKey = *dkey;
+
+      //memcpy(&lpDisplayDevice, &dd, sizeof(DISPLAY_DEVICE));
+
+      //lpDisplayDevice = *lpdd;
+
+      ret = true;
+    }
+  }
+  return ret;
+}
+
 BOOL WINAPI NewEnumDisplayMonitors(HDC hdc, LPCRECT lprcClip, MONITORENUMPROC lpfnEnum, LPARAM dwData)
 {
 	typedef BOOL (WINAPI*OCALL)(HDC, LPCRECT, MONITORENUMPROC, LPARAM);
 	const static OCALL origFunc = (OCALL) getHookCall("EnumDisplayMonitors");
   SOURCE_MODULE(srcMod);
   if(isHooked(srcMod)) {
-    dbgf("NewEnumDisplayMonitors");
+    dbg("NewEnumDisplayMonitors");
     MonitorEnumProcReal = lpfnEnum;
     lpfnEnum = NewMonitorEnumProc;
   }
@@ -615,17 +755,12 @@ GHOOK InitHooks[] = {
 // Main hook function table
 GHOOK SoftTHHooks[] = {
 #if 1
-  HOOK(NewClipCursor, user32.dll, ClipCursor)
   //HOOK(NewGetModuleHandleA, kernel32.dll, GetModuleHandleA)
   //HOOK(NewGetProcAddress, kernel32.dll, GetProcAddress)
+  HOOK(NewClipCursor, user32.dll, ClipCursor)
   HOOK(NewGetCursorPos, user32.dll, GetCursorPos)
   HOOK(NewGetCursorInfo, user32.dll, GetCursorInfo)
   HOOK(NewSetCursorPos, user32.dll, SetCursorPos)
-  //HOOK(NewEnumDisplaySettingsExW, user32.dll, EnumDisplaySettingsExW)
-  HOOK(NewEnumDisplaySettingsExA, user32.dll, EnumDisplaySettingsExA)
-  HOOK(NewChangeDisplaySettingsExA, user32.dll, ChangeDisplaySettingsExA)
-  HOOK(NewEnumDisplaySettingsA, user32.dll, EnumDisplaySettingsA)
-  //HOOK(NewChangeDisplaySettingsA, user32.dll, ChangeDisplaySettingsA)
   HOOK(NewGetWindowRect, user32.dll, GetWindowRect)
   HOOK(NewGetClientRect, user32.dll, GetClientRect)
   HOOK(NewSetWindowPos, user32.dll, SetWindowPos)
@@ -639,22 +774,26 @@ GHOOK SoftTHHooks[] = {
   /*HOOK(nil_debug, user32.dll, GetMouseMovePointsEx)
   HOOK(nil_debug, user32.dll, DragDetect)
   HOOK(nil_debug, user32.dll, GetMouseMovePointsEx)*/
-  HOOK(NewClientToScreen, user32.dll, ClientToScreen)
-  HOOK(NewScreenToClient, user32.dll, ScreenToClient)
   /*HOOK(NewSendMessageA, user32.dll, SendMessageA)
   HOOK(NewPostMessageA, user32.dll, PostMessageA)	*/
   //HOOK(NewMapWindowPoints, user32.dll, MapWindowPoints)
 
-  /*
-  HOOK(NullHook, user32.dll, ChangeDisplaySettingsW)
-  HOOK(NullHook, user32.dll, ChangeDisplaySettingsExW)
-  HOOK(NullHook, user32.dll, EnumDisplaySettingsW)
-  HOOK(NullHook, user32.dll, EnumDisplaySettingsExW)
-  */
-
   // GDI
+  //HOOK(NewGetMonitorInfo, user32.dll, GetMonitorInfoW)
   HOOK(NewGetMonitorInfo, user32.dll, GetMonitorInfoA)
+  HOOK(NewEnumDisplayDevicesW, user32.dll, EnumDisplayDevicesW)
+  HOOK(NewEnumDisplayDevicesA, user32.dll, EnumDisplayDevicesA)
+  HOOK(NewEnumDisplaySettingsW, user32.dll, EnumDisplaySettingsW)
+  HOOK(NewEnumDisplaySettingsA, user32.dll, EnumDisplaySettingsA)
+  HOOK(NewEnumDisplaySettingsExW, user32.dll, EnumDisplaySettingsExW)
+  HOOK(NewEnumDisplaySettingsExA, user32.dll, EnumDisplaySettingsExA)
+  //HOOK(NewChangeDisplaySettingsW, user32.dll, ChangeDisplaySettingsW)
+  HOOK(NewChangeDisplaySettingsA, user32.dll, ChangeDisplaySettingsA)
+  //HOOK(NewChangeDisplaySettingsExW, user32.dll, ChangeDisplaySettingsExW)
+  HOOK(NewChangeDisplaySettingsExA, user32.dll, ChangeDisplaySettingsExA)
   HOOK(NewEnumDisplayMonitors, user32.dll, EnumDisplayMonitors)
+  HOOK(NewClientToScreen, user32.dll, ClientToScreen)
+  HOOK(NewScreenToClient, user32.dll, ScreenToClient)
 
   //HOOK(NewD3DXMatrixPerspectiveOffCenterRH, d3dx9_42.dll, D3DXMatrixPerspectiveOffCenterRH)
   //HOOK(NewD3DXMatrixPerspectiveFovLH, d3dx9_38.dll, D3DXMatrixPerspectiveFovLH)

@@ -86,7 +86,7 @@ public:
         *ppvObj = this;
         return S_OK;
       } else
-        return dxgo->QueryInterface(riid, ppvObj);
+      return dxgo->QueryInterface(riid, ppvObj);
   };
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
@@ -99,27 +99,27 @@ public:
     return dxgo->GetParent(riid, ppParent);};
 
   HRESULT STDMETHODCALLTYPE GetDesc(DXGI_OUTPUT_DESC *pDesc)
-   {dbg("dxgo: GetDesc");HRESULT ret = dxgo->GetDesc(pDesc);return ret;};
+    ;//{dbg("dxgo: GetDesc");HRESULT ret = dxgo->GetDesc(pDesc);return ret;};
   HRESULT STDMETHODCALLTYPE GetDisplayModeList(DXGI_FORMAT EnumFormat, UINT Flags, UINT *pNumModes, DXGI_MODE_DESC *pDesc)
-   ;//{dbg("dxgo: GetDisplayModeList");return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);};
+    ;//{dbg("dxgo: GetDisplayModeList");return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);};
   HRESULT STDMETHODCALLTYPE FindClosestMatchingMode(const DXGI_MODE_DESC *pModeToMatch, DXGI_MODE_DESC *pClosestMatch,IUnknown *pConcernedDevice)
-   {dbg("dxgo: FindClosestMatchingMode");return dxgo->FindClosestMatchingMode(pModeToMatch, pClosestMatch, pConcernedDevice);};
+    {dbg("dxgo: FindClosestMatchingMode");return dxgo->FindClosestMatchingMode(pModeToMatch, pClosestMatch, pConcernedDevice);};
   HRESULT STDMETHODCALLTYPE WaitForVBlank(void)
-   {dbg("dxgo: WaitForVBlank");return dxgo->WaitForVBlank();};
+    {dbg("dxgo: WaitForVBlank");return dxgo->WaitForVBlank();};
   HRESULT STDMETHODCALLTYPE TakeOwnership(IUnknown *pDevice, BOOL Exclusive)
-   {dbg("dxgo: TakeOwnership");return dxgo->TakeOwnership(pDevice, Exclusive);};
+    {dbg("dxgo: TakeOwnership");return dxgo->TakeOwnership(pDevice, Exclusive);};
   void STDMETHODCALLTYPE ReleaseOwnership(void)
-   {dbg("dxgo: ReleaseOwnership");return dxgo->ReleaseOwnership();};
+    {dbg("dxgo: ReleaseOwnership");return dxgo->ReleaseOwnership();};
   HRESULT STDMETHODCALLTYPE GetGammaControlCapabilities(DXGI_GAMMA_CONTROL_CAPABILITIES *pGammaCaps)
     {dbg("dxgo: GetGammaControlCapabilities");return dxgo->GetGammaControlCapabilities(pGammaCaps);};
   HRESULT STDMETHODCALLTYPE SetGammaControl(const DXGI_GAMMA_CONTROL *pArray)
-   {dbg("dxgo: SetGammaControl");return dxgo->SetGammaControl(pArray);};
+    {dbg("dxgo: SetGammaControl");return dxgo->SetGammaControl(pArray);};
   HRESULT STDMETHODCALLTYPE GetGammaControl(DXGI_GAMMA_CONTROL *pArray)
     {dbg("dxgo: GetGammaControl");return dxgo->GetGammaControl(pArray);};
   HRESULT STDMETHODCALLTYPE SetDisplaySurface(IDXGISurface *pScanoutSurface)
     {dbg("dxgo: SetDisplaySurface");return dxgo->SetDisplaySurface(pScanoutSurface);};
   HRESULT STDMETHODCALLTYPE GetDisplaySurfaceData(IDXGISurface *pDestination)
-   {dbg("dxgo: GetDisplaySurfaceData");return dxgo->GetDisplaySurfaceData(pDestination);};
+    {dbg("dxgo: GetDisplaySurfaceData");return dxgo->GetDisplaySurfaceData(pDestination);};
   HRESULT STDMETHODCALLTYPE GetFrameStatistics(DXGI_FRAME_STATISTICS *pStats)
     {dbg("dxgo: GetFrameStatistics");return dxgo->GetFrameStatistics(pStats);};
 

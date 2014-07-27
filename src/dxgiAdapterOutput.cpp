@@ -52,7 +52,7 @@ HRESULT IDXGIAdapter1New::GetDesc(DXGI_ADAPTER_DESC *pDesc)
   HRESULT ret = dxga->GetDesc(pDesc);
   tamperDesc(pDesc);
   return ret;
-};    
+};
 
 HRESULT IDXGIAdapter1New::GetDesc1(DXGI_ADAPTER_DESC1 *pDesc)
 {
@@ -60,10 +60,10 @@ HRESULT IDXGIAdapter1New::GetDesc1(DXGI_ADAPTER_DESC1 *pDesc)
   HRESULT ret = dxga->GetDesc1(pDesc);
   tamperDesc((DXGI_ADAPTER_DESC*)pDesc);
   return ret;
-};  
+};
 
 HRESULT IDXGIAdapter1New::EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
-{  
+{
   dbg("dxga: EnumOutputs");
   // Hide all but the primary output
   if(Output > 0)
@@ -72,7 +72,14 @@ HRESULT IDXGIAdapter1New::EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
     IDXGIOutput *o;
     HRESULT ret = dxga->EnumOutputs(Output, &o);
     if(ret == S_OK)
-      *ppOutput = new IDXGIOutputNew(this, o);    
+    {
+      *ppOutput = new IDXGIOutputNew(this, o);
+      /*DXGI_OUTPUT_DESC *pDesc = NULL;
+      dbg("dxga: Booyah");
+      ppOutput[0]->GetDesc(pDesc);
+      dbg((char *)pDesc->DeviceName);*/
+    }
+
     return ret;
   }
 }
@@ -92,6 +99,29 @@ IDXGIOutputNew::~IDXGIOutputNew()
   dbg("~IDXGIOutputNew 0x%08X", this);
 }
 
+HRESULT IDXGIOutputNew::GetDesc(DXGI_OUTPUT_DESC *pDesc)
+{
+  dbg("dxgo: GetDesc");
+
+  RECT        rt;
+  WCHAR       dname[32] = L"SoftTH";
+  HRESULT ret = dxgo->GetDesc(pDesc);
+
+  rt.left = 0.f;
+  rt.right = config.main.renderResolution.x;
+  rt.top = 0.f;
+  rt.bottom = config.main.renderResolution.y;
+
+  wcscpy(pDesc->DeviceName, dname);
+  pDesc->DesktopCoordinates = rt;
+  pDesc->Rotation = DXGI_MODE_ROTATION_UNSPECIFIED;
+  pDesc->AttachedToDesktop = true;
+  //desc->Monitor = // TODO: fix this
+
+  return ret;
+}
+
+
 HRESULT IDXGIOutputNew::GetDisplayModeList(DXGI_FORMAT EnumFormat, UINT Flags, UINT *pNumModes, DXGI_MODE_DESC *pDesc)
 {
   const int extraModes = 1; // TODO: get refresh rates
@@ -101,7 +131,7 @@ HRESULT IDXGIOutputNew::GetDisplayModeList(DXGI_FORMAT EnumFormat, UINT Flags, U
     HRESULT ret = dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);
     if(*pNumModes > 1) {
       dbg("dxgo: GetDisplayModeList: %d+%d modes", *pNumModes, extraModes);
-      *pNumModes+=extraModes;    
+      *pNumModes+=extraModes;
     }
     return ret;
   } else {
@@ -127,12 +157,12 @@ HRESULT IDXGIOutputNew::GetDisplayModeList(DXGI_FORMAT EnumFormat, UINT Flags, U
 
     dbg("Mode dump:");
     for(DWORD i=0;i<*pNumModes;i++) {
-      dbg("Mode %d, %dx%d %d.%dHz scaling:%d so:%d format:%s", i, pDesc[i].Width, pDesc[i].Height, pDesc[i].RefreshRate.Numerator, pDesc[i].RefreshRate.Denominator, pDesc[i].Scaling, pDesc[i].ScanlineOrdering, getFormatDXGI(mode->Format));
+      dbg("Mode %d, %dx%d %dHz scaling:%d so:%d format:%s", i, pDesc[i].Width, pDesc[i].Height, pDesc[i].RefreshRate.Numerator/pDesc[i].RefreshRate.Denominator, pDesc[i].Scaling, pDesc[i].ScanlineOrdering, getFormatDXGI(mode->Format));
     }
     dbg("Mode dump end");
 
     return ret;
   }
 
- return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);
+  return dxgo->GetDisplayModeList(EnumFormat, Flags, pNumModes, pDesc);
 }

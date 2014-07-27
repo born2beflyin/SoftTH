@@ -53,7 +53,7 @@ static bool writeJmpOpcode(HANDLE h, void *ptr, void* target) {
   SIZE_T foo;
 	if(IsBadWritePtr(ptr, JMPDATALEN))
 		VirtualProtectEx(h, ptr, JMPDATALEN, PAGE_EXECUTE_READWRITE, &oldprot);
-	
+
 	const static BYTE jmp = 0xE9;		// JMP opcode
 	LONG_PTR wptr = (LONG_PTR) ((BYTE*)((BYTE*)target - (BYTE*)ptr) - JMPDATALEN); // Relative jump address
 
@@ -94,7 +94,7 @@ static bool restoreHook(GHOOK *h) {
 		return true;
 	}
 
-	HANDLE hSelf = NULL; 
+	HANDLE hSelf = NULL;
 	hSelf = OpenProcess(PROCESS_VM_WRITE|PROCESS_VM_OPERATION, FALSE, GetCurrentProcessId());
 	if(!hSelf) // TODO: add debug access
 		return false;
@@ -115,7 +115,7 @@ static bool restoreHook(GHOOK *h) {
 
 
 void setHooks(GHOOK *hooks) {
-  OutputDebugString("hook-king");
+  //OutputDebugString("hook-king");
   int num = 0;
   while(hooks[num].funcOver)
     writeHook(&hooks[num]), num++;
@@ -153,11 +153,11 @@ static bool writeHook(GHOOK *h) {
 
 	// Walk instructions from beginning of function to find stub data size & stub jmp pos
 	BYTE *sJmp = instructionCount((BYTE*) h->funcOrig, 5);
-	DWORD slen = (DWORD) (sJmp - (BYTE*)h->funcOrig);// Stub length (without jmp)  
+	DWORD slen = (DWORD) (sJmp - (BYTE*)h->funcOrig);// Stub length (without jmp)
 	h->stublen = slen;
 
 	// Open handle to current process
-	HANDLE hSelf = NULL; 
+	HANDLE hSelf = NULL;
 	hSelf = OpenProcess(PROCESS_VM_WRITE|PROCESS_VM_OPERATION, FALSE, GetCurrentProcessId());
 	if(!hSelf) {
 		// Openprocess failed, attempt debug access
@@ -213,7 +213,7 @@ static bool writeHook(GHOOK *h) {
 
 #ifdef USE_DISTORM
 // Count instructions
-BYTE* instructionCount(BYTE *func, int tcount) { 
+BYTE* instructionCount(BYTE *func, int tcount) {
 
 #ifndef _WIN64
   _DecodeType dt = Decode32Bits;
@@ -242,7 +242,7 @@ BYTE* instructionCount(BYTE *func, int tcount) {
 }
 #else
 // Walk x86 instructions
-BYTE* instructionCount(BYTE *func, int tcount) { 
+BYTE* instructionCount(BYTE *func, int tcount) {
   // No longer needed
   return 0;
 }
