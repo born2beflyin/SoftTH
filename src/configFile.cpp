@@ -100,7 +100,7 @@ bool configFile::getHead(int num, HEAD *head)
 {
   char name[24];
   if(num)
-    sprintf(name, "head_%d", num); 
+    sprintf(name, "head_%d", num);
   else
     strcpy(name, "head_primary");
 
@@ -124,7 +124,7 @@ bool configFile::getHead(int num, HEAD *head)
     {
       head->rateLimit = 0;
     }
-    
+
     getResolution(name, "transportResolution", &head->transportRes);
 
     //head->transportMethod = GetPrivateProfileInt(name, "transportMethod", head->transportMethod, cfgPath);
@@ -167,6 +167,12 @@ void configFile::loadConfigFile()
   else
     strcpy(main.dllPathDXGI, "");
 
+  GetPrivateProfileString("main", "dllPathD3D10", "auto", (LPSTR) &temp, 256, cfgPath);
+  if(_stricmp(temp, "auto") && strlen(temp) > 2)
+    strcpy(main.dllPathD3D10, temp);
+  else
+    strcpy(main.dllPathD3D10, "");
+
   GetPrivateProfileString("main", "dllPathD3D11", "auto", (LPSTR) &temp, 256, cfgPath);
   if(_stricmp(temp, "auto") && strlen(temp) > 2)
     strcpy(main.dllPathD3D11, temp);
@@ -180,8 +186,8 @@ void configFile::loadConfigFile()
   else dbg("WARNING: Unrecognized nonlocal format: <%s>, defaulting to RGB16D", temp);
 
   GetPrivateProfileString("main", "screenshotFormat", "jpg", (LPSTR) &main.screenshotFormat, 4, cfgPath);
-  
-  overrides.forceResolution = GetPrivateProfileInt("overrides", "forceResolution", 0, cfgPath)!=0;  
+
+  overrides.forceResolution = GetPrivateProfileInt("overrides", "forceResolution", 0, cfgPath)!=0;
   overrides.antialiasing = GetPrivateProfileInt("overrides", "antialiasing", 0, cfgPath);
   overrides.processAffinity = GetPrivateProfileInt("overrides", "processAffinity", 0, cfgPath);
   overrides.FOVForceHorizontal = GetPrivateProfileInt("overrides", "FOVForceHorizontal", 0, cfgPath)!=0;
@@ -200,7 +206,7 @@ void configFile::loadConfigFile()
   int heads = 0;
   do {
     char foo[16], hd[24];
-    sprintf(hd, "head_%d", heads+1);    
+    sprintf(hd, "head_%d", heads+1);
     r = GetPrivateProfileSection(hd, foo, 16, cfgPath);
     if(r)
       heads++;
@@ -238,6 +244,7 @@ tripleBuffer=0\n\
 screenshotFormat=jpg\n\
 dllPathD3D9=auto\n\
 dllPathDXGI=auto\n\
+dllPathD3D10=auto\n\
 dllPathD3D11=auto\n\
 \n\
 [overrides]\n\
@@ -329,7 +336,7 @@ char* createDefaultConfig(char *outFile)
     D3DADAPTER_IDENTIFIER9 ai;
     d3d->GetAdapterIdentifier(i, 0, &ai);
     sprintf(d->info, "Autodetected as %s at %s", ai.DeviceName, ai.Description);
-  }  
+  }
   width  -= minX;
   height -= minY;
 
@@ -354,8 +361,8 @@ char* createDefaultConfig(char *outFile)
   fprintf(o, cfgHeader, width, height);
   fprintf(o, cfgHeadMain, displays[0].r.left, displays[0].r.top, displays[0].r.right-displays[0].r.left, displays[0].r.bottom-displays[0].r.top, displays[0].r.right-displays[0].r.left, displays[0].r.bottom-displays[0].r.top);
   for(int i=1;i<numa;i++) {
-    fprintf(o, cfgHead, i, displays[i].info, displays[i].devID, 
-            displays[i].r.left, displays[i].r.top, displays[i].r.right-displays[i].r.left, displays[i].r.bottom-displays[i].r.top, 
+    fprintf(o, cfgHead, i, displays[i].info, displays[i].devID,
+            displays[i].r.left, displays[i].r.top, displays[i].r.right-displays[i].r.left, displays[i].r.bottom-displays[i].r.top,
             displays[i].r.right-displays[i].r.left, displays[i].r.bottom-displays[i].r.top);
   }
   fclose(o);

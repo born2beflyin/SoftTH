@@ -46,7 +46,7 @@ void* getHookCall(char *name);
 
 BOOL WINAPI NewClipCursor(CONST RECT *rect)
 {
-  dbg("hooksSoftTH: NewClipCursor");
+  dbgf("hooksSoftTH: NewClipCursor");
   typedef BOOL (WINAPI*OCALL)(CONST RECT*);
   const static OCALL origFunc = (OCALL) getHookCall("ClipCursor");
 
@@ -205,7 +205,7 @@ LONG WINAPI NewChangeDisplaySettingsExA(LPCTSTR lpszDeviceName, LPDEVMODE lpDevM
 
 static void pointToVirtual(POINT *point)
 {
-  dbg("hooksSoftTH: pointToVirtual");
+  dbgf("hooksSoftTH: pointToVirtual");
   HWND w = WindowFromPoint(*point);
 
   POINT op = {point->x, point->y};
@@ -224,7 +224,7 @@ static void pointToVirtual(POINT *point)
 
 BOOL WINAPI NewLogicalToPhysicalPoint(HWND hWnd, LPPOINT point)
 {
-  dbg("hooksSoftTH: NewLogicalToPhysicalPoint");
+  dbgf("hooksSoftTH: NewLogicalToPhysicalPoint");
 	typedef BOOL (WINAPI*OCALL)(HWND, POINT *p);
 	const static OCALL origFunc = (OCALL) getHookCall("LogicalToPhysicalPoint");
 
@@ -247,7 +247,7 @@ BOOL WINAPI NewLogicalToPhysicalPoint(HWND hWnd, LPPOINT point)
 
 BOOL WINAPI NewGetPhysicalCursorPos(LPPOINT point)
 {
-  dbg("hooksSoftTH: NewGetPhysicalCursorPos");
+  dbgf("hooksSoftTH: NewGetPhysicalCursorPos");
 	typedef BOOL (WINAPI*OCALL)(POINT *p);
 	const static OCALL origFunc = (OCALL) getHookCall("GetPhysicalCursorPos");
 
@@ -268,7 +268,7 @@ BOOL WINAPI NewGetPhysicalCursorPos(LPPOINT point)
 
 BOOL WINAPI NewGetCursorPos(LPPOINT point)
 {
-  dbg("hooksSoftTH: NewGetCursorPos");
+  dbgf("hooksSoftTH: NewGetCursorPos");
 	typedef BOOL (WINAPI*OCALL)(POINT *p);
 	const static OCALL origFunc = (OCALL) getHookCall("GetCursorPos");
   BOOL ret = origFunc(point);
@@ -278,7 +278,7 @@ BOOL WINAPI NewGetCursorPos(LPPOINT point)
 
   SOURCE_MODULE(srcMod);
 
-  dbg("NewGetCursorPos from %s", getModuleName(srcMod));
+  dbgf("NewGetCursorPos from %s", getModuleName(srcMod));
   if((isHooked(srcMod) || srcMod == hLibD3D9) && SoftTHActive)
   {
     // Find window under cursor, map to backbuffer coordinate
@@ -290,7 +290,7 @@ BOOL WINAPI NewGetCursorPos(LPPOINT point)
 
 BOOL WINAPI NewGetCursorInfo(CURSORINFO *pci)
 {
-  dbg("hooksSoftTH: NewGetCursorInfo");
+  dbgf("hooksSoftTH: NewGetCursorInfo");
 	typedef BOOL (WINAPI*OCALL)(CURSORINFO *p);
 	const static OCALL origFunc = (OCALL) getHookCall("GetCursorInfo");
   BOOL ret = origFunc(pci);
@@ -307,7 +307,7 @@ BOOL WINAPI NewGetCursorInfo(CURSORINFO *pci)
 
 BOOL WINAPI NewSetPhysicalCursorPos(int x, int y)
 {
-  dbg("hooksSoftTH: NewSetPhysicalCursorPos");
+  dbgf("hooksSoftTH: NewSetPhysicalCursorPos");
 	typedef BOOL (WINAPI*OCALL)(int, int);
 	const static OCALL origFunc = (OCALL) getHookCall("SetPhysicalCursorPos");
 
@@ -330,7 +330,7 @@ BOOL WINAPI NewSetPhysicalCursorPos(int x, int y)
 
 BOOL WINAPI NewSetCursorPos(int x, int y)
 {
-  dbg("hooksSoftTH: NewSetCursorPos");
+  dbgf("hooksSoftTH: NewSetCursorPos");
 	typedef BOOL (WINAPI*OCALL)(int, int);
 	const static OCALL origFunc = (OCALL) getHookCall("SetCursorPos");
 
@@ -353,7 +353,7 @@ BOOL WINAPI NewSetCursorPos(int x, int y)
 
 BOOL WINAPI NewClientToScreen(HWND hWnd, LPPOINT lpPoint)
 {
-  dbg("hooksSoftTH: NewClientToScreen");
+  dbgf("hooksSoftTH: NewClientToScreen");
 	typedef BOOL (WINAPI*OCALL)(HWND, LPPOINT);
 	const static OCALL origFunc = (OCALL) getHookCall("ClientToScreen");
 
@@ -373,7 +373,7 @@ BOOL WINAPI NewClientToScreen(HWND hWnd, LPPOINT lpPoint)
 
 BOOL WINAPI NewScreenToClient(HWND hWnd, LPPOINT lpPoint)
 {
-  dbg("hooksSoftTH: NewScreenToClient");
+  dbgf("hooksSoftTH: NewScreenToClient");
 	typedef BOOL (WINAPI*OCALL)(HWND, LPPOINT);
 	const static OCALL origFunc = (OCALL) getHookCall("ScreenToClient");
 
@@ -393,7 +393,7 @@ BOOL WINAPI NewScreenToClient(HWND hWnd, LPPOINT lpPoint)
 
 BOOL WINAPI NewGetWindowRect(HWND win, LPRECT rect)
 {
-  dbg("hooksSoftTH: NewGetWindowRect");
+  dbgf("hooksSoftTH: NewGetWindowRect");
 	typedef BOOL (WINAPI*OCALL)(HWND, LPRECT);
 	const static OCALL origFunc = (OCALL) getHookCall("GetWindowRect");
 
@@ -412,12 +412,12 @@ BOOL WINAPI NewGetWindowRect(HWND win, LPRECT rect)
 
 BOOL WINAPI NewGetClientRect(HWND win, LPRECT rect)
 {
-  dbg("hooksSoftTH: NewGetClientRect");
+  dbgf("hooksSoftTH: NewGetClientRect");
 	typedef BOOL (WINAPI*OCALL)(HWND, LPRECT);
 	const static OCALL origFunc = (OCALL) getHookCall("GetClientRect");
 	BOOL ret = origFunc(win, rect);
   SOURCE_MODULE(srcMod);
-  dbg("NewGetClientRect from %s", getModuleName(srcMod));
+  dbgf("NewGetClientRect from %s", getModuleName(srcMod));
   if(isHooked(srcMod) && SoftTHActive)
   {
     if(inputMapIsDeviceWindow(win)) {
@@ -599,9 +599,11 @@ FARPROC WINAPI NewGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
   return origFunc(hModule, lpProcName);
 }
 
-BOOL WINAPI NewGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFOEX lpmi) {
+BOOL WINAPI NewGetMonitorInfoW(HMONITOR hMonitor, LPMONITORINFOEX lpmi) {
 	typedef BOOL (WINAPI*OCALL)(HMONITOR, LPMONITORINFOEX);
-	const static OCALL origFunc = (OCALL) getHookCall("GetMonitorInfoA");
+	const static OCALL origFunc = (OCALL) getHookCall("GetMonitorInfoW");
+
+	dbg("NewGetMonitorInfoW");
 
   MONITORINFOEX tmp;
   tmp.cbSize = lpmi->cbSize;
@@ -611,7 +613,7 @@ BOOL WINAPI NewGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFOEX lpmi) {
   if(isHooked(srcMod) && SoftTHActive && ret) {
     if(tmp.dwFlags & MONITORINFOF_PRIMARY) {
       // Primary monitor - pretend it spans all monitors
-      dbg("NewGetMonitorInfo - Pretending primary monitor %08X spans all monitors for: %s", hMonitor, getModuleName(srcMod));
+      dbg("NewGetMonitorInfoW - Pretending primary monitor %08X spans all monitors for: %s", hMonitor, getModuleName(srcMod));
       memcpy(lpmi, &tmp, lpmi->cbSize);
 
       lpmi->rcWork.left = lpmi->rcMonitor.left = 0;
@@ -622,7 +624,42 @@ BOOL WINAPI NewGetMonitorInfo(HMONITOR hMonitor, LPMONITORINFOEX lpmi) {
       return ret;
     } else {
       // Non-primary monitor - pretend it does not exist
-		  dbg("NewGetMonitorInfo - Hid monitor %08X from: %s", hMonitor, getModuleName(srcMod));
+		  dbg("NewGetMonitorInfoW - Hid monitor %08X from: %s", hMonitor, getModuleName(srcMod));
+		  return FALSE;
+    }
+  } else {
+    memcpy(lpmi, &tmp, lpmi->cbSize);
+    return ret;
+  }
+  return FALSE;
+}
+
+BOOL WINAPI NewGetMonitorInfoA(HMONITOR hMonitor, LPMONITORINFOEX lpmi) {
+	typedef BOOL (WINAPI*OCALL)(HMONITOR, LPMONITORINFOEX);
+	const static OCALL origFunc = (OCALL) getHookCall("GetMonitorInfoA");
+
+	dbg("NewGetMonitorInfoA");
+
+  MONITORINFOEX tmp;
+  tmp.cbSize = lpmi->cbSize;
+  BOOL ret = origFunc(hMonitor, &tmp);
+
+  SOURCE_MODULE(srcMod);
+  if(isHooked(srcMod) && SoftTHActive && ret) {
+    if(tmp.dwFlags & MONITORINFOF_PRIMARY) {
+      // Primary monitor - pretend it spans all monitors
+      dbg("NewGetMonitorInfoA - Pretending primary monitor %08X spans all monitors for: %s", hMonitor, getModuleName(srcMod));
+      memcpy(lpmi, &tmp, lpmi->cbSize);
+
+      lpmi->rcWork.left = lpmi->rcMonitor.left = 0;
+      lpmi->rcWork.top  = lpmi->rcMonitor.top = 0;
+      lpmi->rcWork.right  = lpmi->rcMonitor.right  = config.main.renderResolution.x;
+      lpmi->rcWork.bottom = lpmi->rcMonitor.bottom = config.main.renderResolution.y;
+
+      return ret;
+    } else {
+      // Non-primary monitor - pretend it does not exist
+		  dbg("NewGetMonitorInfoA - Hid monitor %08X from: %s", hMonitor, getModuleName(srcMod));
 		  return FALSE;
     }
   } else {
@@ -779,8 +816,8 @@ GHOOK SoftTHHooks[] = {
   //HOOK(NewMapWindowPoints, user32.dll, MapWindowPoints)
 
   // GDI
-  //HOOK(NewGetMonitorInfo, user32.dll, GetMonitorInfoW)
-  HOOK(NewGetMonitorInfo, user32.dll, GetMonitorInfoA)
+  //HOOK(NewGetMonitorInfoW, user32.dll, GetMonitorInfoW)
+  //HOOK(NewGetMonitorInfoA, user32.dll, GetMonitorInfoA)
   HOOK(NewEnumDisplayDevicesW, user32.dll, EnumDisplayDevicesW)
   HOOK(NewEnumDisplayDevicesA, user32.dll, EnumDisplayDevicesA)
   HOOK(NewEnumDisplaySettingsW, user32.dll, EnumDisplaySettingsW)

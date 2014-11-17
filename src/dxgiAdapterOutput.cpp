@@ -116,7 +116,7 @@ HRESULT IDXGIOutputNew::GetDesc(DXGI_OUTPUT_DESC *pDesc)
   pDesc->DesktopCoordinates = rt;
   pDesc->Rotation = DXGI_MODE_ROTATION_UNSPECIFIED;
   pDesc->AttachedToDesktop = true;
-  //desc->Monitor = // TODO: fix this
+  //pDesc->Monitor = //TODO: finish this
 
   return ret;
 }

@@ -2,5 +2,6 @@
 <CodeBlocks_workspace_file>
 	<Workspace title="SoftTH">
 		<Project filename="SoftTH.cbp" />
+		<Project filename="../../SoftTHtester/SoftTHtester.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

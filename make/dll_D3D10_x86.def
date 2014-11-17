@@ -5,3 +5,5 @@ EXPORTS
 	CreateDXGIFactory=_newCreateDXGIFactory@8
 	CreateDXGIFactory1=_newCreateDXGIFactory1@8
 	DXGID3D10CreateDevice=_DXGID3D10CreateDevice@24
+	D3D10CreateDevice=_newD3D10CreateDevice@24
+	D3D10CreateDeviceAndSwapChain=_newD3D10CreateDeviceAndSwapChain@32
