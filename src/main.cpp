@@ -26,8 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <stdio.h>
-#include <d3d10.h>
-#include <d3d10misc.h>
 #include "d3d9.h"
 #include "helper.h"
 #include "d3d.h"
@@ -48,11 +46,13 @@ HINSTANCE hLibD3D9 = NULL; // Real d3d9.dll
 HINSTANCE hLibDXGI = NULL; // Real dxgi.dll
 HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
 HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
+HINSTANCE hLibD3D12 = NULL; // Real d3d12.dll
 HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
 
 //#define PREHOOKING
 
 char hLibD3D9_path[256]; // Path to real d3d9.dll
+
 
 /* D3D 9 */
 HRESULT (WINAPI*dllDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = NULL;
@@ -63,9 +63,6 @@ HRESULT (WINAPI*dllDXGID3D10CreateDevice)(HMODULE d3d10core, IDXGIFactory *facto
 HRESULT (WINAPI*dllCreateDXGIFactory)(REFIID riid, void **ppFactory) = NULL;
 HRESULT (WINAPI*dllCreateDXGIFactory1)(REFIID riid, void **ppFactory) = NULL;
 
-/* D3D 10 */
-HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, ID3D10Device** ppDevice) = NULL;
-HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice) = NULL;
 
 configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
@@ -196,28 +193,6 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("DXGID3D10CreateDevice not in DLL!\n'%s'", path), exit(0);
       }
 
-      // Load d3d10 library
-      {
-        char path[256];
-        if(strlen(config.main.dllPathD3D10) < 2)
-          sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "d3d10.dll");
-        else
-          strcpy(path, config.main.dllPathD3D10);
-        dbg("D3D10 DLL Path: <%s>", path);
-        hLibD3D10 = LoadLibrary(path);
-	      if(!hLibD3D10)
-		      ShowMessage("D3D10 DLL not found!\n'%s'", path), exit(0);
-
-        dllD3D10CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter*, D3D10_DRIVER_TYPE, HMODULE, UINT, UINT, ID3D10Device**)) GetProcAddress(hLibD3D10, "D3D10CreateDevice");
-        dllD3D10CreateDeviceAndSwapChain = (HRESULT(__stdcall *)(IDXGIAdapter*, D3D10_DRIVER_TYPE, HMODULE, UINT, UINT, DXGI_SWAP_CHAIN_DESC *, IDXGISwapChain **, ID3D10Device **)) GetProcAddress(hLibD3D10, "D3D10CreateDeviceAndSwapChain");
-
-        if(!dllD3D10CreateDevice)
-		      ShowMessage("D3D10CreateDevice not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
-        if(!dllD3D10CreateDeviceAndSwapChain)
-		      ShowMessage("D3D10CreateDeviceAndSwapChain not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
-      }
-
-
       // Load d3d11 library
       /*{
         char path[256];
@@ -242,8 +217,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       if(hooks) {
         if(hLibD3D9) addNoHookModule(hLibD3D9);
         if(hLibDXGI) addNoHookModule(hLibDXGI);
-        if(hLibD3D10) addNoHookModule(hLibD3D10);
-        if(hLibD3D11) addNoHookModule(hLibD3D11);
+        //if(hLibD3D11) addNoHookModule(hLibD3D11);
       }
 
       break;
@@ -277,14 +251,10 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 				FreeLibrary(hLibDXGI);
 				hLibDXGI = NULL;
 			}
-			if(hLibD3D10) {
-				FreeLibrary(hLibD3D10);
-				hLibD3D10 = NULL;
-			}
-			if(hLibD3D11) {
+			/*if(hLibD3D11) {
 				FreeLibrary(hLibD3D11);
 				hLibD3D11 = NULL;
-			}
+			}*/
 
 
       if(didDisableComposition) {
@@ -406,61 +376,6 @@ extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d
   return dllDXGID3D10CreateDevice(d3d10core, factory, adapter, flags, unknown0, device);
 }
 
-// TODO: Export all of the following
-
-/*    Direct3D 10     */
-//D3D10CreateDevice
-extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDevice(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, ID3D10Device** ppDevice)
-{
-  dbg("D3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
-
-  HRESULT ret = dllD3D10CreateDevice(adapter, DriverType, Software, Flags, SDKVersion, ppDevice);
-
-  /*IDXGIFactory1New *fnew;
-  if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
-    factory = fnew->getReal();
-    fnew->Release();
-  }
-  IDXGIAdapter1New *anew;
-  if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
-    adapter = anew->getReal();
-    anew->Release();
-  }*/
-
-  return ret;
-}
-
-//D3D10CreateDeviceAndSwapChain
-extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDeviceAndSwapChain(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice)
-{
-  dbg("D3D10CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
-
-  HRESULT ret = dllD3D10CreateDeviceAndSwapChain(adapter, DriverType, Software, Flags, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
-
-  /*IDXGIFactory1New *fnew;
-  if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
-    factory = fnew->getReal();
-    fnew->Release();
-  }
-  IDXGIAdapter1New *anew;
-  if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
-    adapter = anew->getReal();
-    anew->Release();
-  }*/
-
-  return ret;
-}
-
-/*    Direct3D 10.1   */
-//D3D10CreateDevice1
-//D3D10CreateDeviceAndSwapChain1
-
-/*    Direct3D 11     */
-//D3D11CreateDevice
-//D3D11CreateDeviceAndSwapChain
-
-// END TODO
-
 #ifndef _WIN64
 //#if 1
 
@@ -523,9 +438,6 @@ DEXPORTD(hLibDXGI, DXGIDumpJournal);
 DEXPORTD(hLibDXGI, DXGIReportAdapterConfiguration);
 DEXPORTD(hLibDXGI, OpenAdapter10);
 DEXPORTD(hLibDXGI, OpenAdapter10_2);
-
-// D3D10
-// TODO: D3D10 exports
 
 /*
 // D3D11

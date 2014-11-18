@@ -3,5 +3,6 @@
 	<Workspace title="SoftTH">
 		<Project filename="SoftTH.cbp" />
 		<Project filename="../../SoftTHtester/SoftTHtester.cbp" />
+		<Project filename="SoftTH_D3D10.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

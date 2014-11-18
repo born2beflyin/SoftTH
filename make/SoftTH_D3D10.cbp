@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SoftTH_D3D10" />
+		<Option platforms="Windows;" />
+		<Option pch_mode="2" />
+		<Option compiler="msvc10" />
+		<Build>
+			<Target title="Debug DX10 Win x86">
+				<Option platforms="Windows;" />
+				<Option output="../bin/win/x86/dx10/debug/d3d10" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../SoftTHtester" />
+				<Option object_output="../obj/win/x86/dx10/debug/" />
+				<Option type="3" />
+				<Option compiler="msvc10" />
+				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="/MDd" />
+					<Add option="/arch:SSE2" />
+					<Add option="/Gd" />
+					<Add option="/Gm" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/GS" />
+					<Add option="/Zc:wchar_t" />
+					<Add option="/Zc:forScope" />
+					<Add option="/Zi" />
+					<Add option="/DxUSE_NEW_CUDA" />
+					<Add option="/DxUSE_CUDA" />
+					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="/DWIN32" />
+					<Add option="/DDEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/DZLIB_WINAPI" />
+					<Add option="/D_WINDLL" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="../include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="/DEBUG" />
+					<Add option="/NODEFAULTLIB:libcmt" />
+					<Add option="/DEF:..\make\dll_D3D10_x86.def" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add option="/MANIFEST:NO" />
+					<Add option="/SUBSYSTEM:WINDOWS" />
+					<Add option="/OPT:REF" />
+					<Add option="/OPT:ICF" />
+					<Add option="/LTCG" />
+					<Add option="/TLBID:1" />
+					<Add option="/DYNAMICBASE" />
+					<Add option="/NXCOMPAT" />
+					<Add option="/MACHINE:X86" />
+					<Add library="D3DX10.lib" />
+					<Add library="Dwmapi.lib" />
+					<Add library="Winmm.lib" />
+					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
+					<Add library="d3d10.lib" />
+					<Add library="DXGI.lib" />
+					<Add library="Advapi32.lib" />
+					<Add library="Gdi32.lib" />
+					<Add library="user32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="kernel32.lib" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
+					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\debug\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Release DX10 Win x86">
+				<Option platforms="Windows;" />
+				<Option output="../bin/win/x86/dx10/release/d3d10" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../SoftTHtester" />
+				<Option object_output="../obj/win/x86/dx10/release/" />
+				<Option type="3" />
+				<Option compiler="msvc10" />
+				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="/MD" />
+					<Add option="/arch:SSE2" />
+					<Add option="/Gd" />
+					<Add option="/GL" />
+					<Add option="/fp:precise" />
+					<Add option="/EHc" />
+					<Add option="/EHs" />
+					<Add option="/GS" />
+					<Add option="/Oy" />
+					<Add option="/Oi" />
+					<Add option="/Ot" />
+					<Add option="/Ox" />
+					<Add option="/Zc:wchar_t" />
+					<Add option="/Zc:forScope" />
+					<Add option="/Ob2" />
+					<Add option="/DxUSE_NEW_CUDA" />
+					<Add option="/DxUSE_CUDA" />
+					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="/DWIN32" />
+					<Add option="/DNDEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/DZLIB_WINAPI" />
+					<Add option="/D_WINDLL" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="../include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/mfc42" />
+					<Add directory="C:/WinDDK/7600.16385.1/inc/atl71" />
+					<Add directory="../include" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="/NODEFAULTLIB:libcmt" />
+					<Add option="/DEF:..\make\dll_D3D10_x86.def" />
+					<Add option="/INCREMENTAL:NO" />
+					<Add option="/MANIFEST:NO" />
+					<Add option="/SUBSYSTEM:WINDOWS" />
+					<Add option="/OPT:REF" />
+					<Add option="/OPT:ICF" />
+					<Add option="/LTCG" />
+					<Add option="/TLBID:1" />
+					<Add option="/DYNAMICBASE" />
+					<Add option="/NXCOMPAT" />
+					<Add option="/MACHINE:X86" />
+					<Add library="D3DX10.lib" />
+					<Add library="Dwmapi.lib" />
+					<Add library="Winmm.lib" />
+					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
+					<Add library="d3d10.lib" />
+					<Add library="DXGI.lib" />
+					<Add library="Advapi32.lib" />
+					<Add library="Gdi32.lib" />
+					<Add library="user32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="kernel32.lib" />
+					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" />
+					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/Mfc/i386" />
+					<Add directory="C:/WinDDK/7600.16385.1/lib/ATL/i386" />
+				</Linker>
+				<ExtraCommands>
+					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
+					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\test\win\x86\dx10\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="/W3" />
+		</Compiler>
+		<Unit filename="../src/d3d10main.cpp" />
+		<Unit filename="../src/d3d10main.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

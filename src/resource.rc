@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "SoftTH"
             VALUE "FileVersion", "3.0.0.0"
             VALUE "InternalName", "SoftTH"
-            VALUE "OriginalFilename", "d3d9.dll, dxgi.dll, d3d11.dll"
+            VALUE "OriginalFilename", "d3d9.dll, dxgi.dll, d3d10.dll, d3d11.dll"
             VALUE "ProductName", "SoftTH by born2beflyin"
             VALUE "ProductVersion", "3.0.0.0"
         END

@@ -1,9 +1,4 @@
-LIBRARY dxgi
+LIBRARY d3d10
 EXPORTS
-	Direct3DCreate9=_Direct3DCreate9@4
-	Direct3DCreate9Ex=_Direct3DCreate9Ex@8
-	CreateDXGIFactory=_newCreateDXGIFactory@8
-	CreateDXGIFactory1=_newCreateDXGIFactory1@8
-	DXGID3D10CreateDevice=_DXGID3D10CreateDevice@24
 	D3D10CreateDevice=_newD3D10CreateDevice@24
 	D3D10CreateDeviceAndSwapChain=_newD3D10CreateDeviceAndSwapChain@32
