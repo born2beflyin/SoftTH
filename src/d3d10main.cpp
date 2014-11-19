@@ -26,16 +26,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <d3d10.h>
 #include "d3d10main.h"
-#include "helper.h"
 #include "configFile.h"
 #include "globalHooker.h"
 #include "hooksSoftTH.h"
 
 
 /* Declare external function, or include the cpp file in the project */
-// addNoHookModule
-// ShowMessage
 // dbg
+extern "C" __declspec(dllimport) void dbg(char*, ...);
+// ShowMessage
+extern "C" __declspec(dllimport) void ShowMessage(char*, ...);
+// addNoHookModule
 // configFile::load
 // configFile::configFile
 
