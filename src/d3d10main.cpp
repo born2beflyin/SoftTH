@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "configFile.h"
 #include "globalHooker.h"
 #include "hooksSoftTH.h"
+#include "helper.h"
 
 
 /* Declare external function, or include the cpp file in the project */
@@ -37,6 +38,7 @@ extern "C" __declspec(dllimport) void dbg(char*, ...);
 // ShowMessage
 extern "C" __declspec(dllimport) void ShowMessage(char*, ...);
 // addNoHookModule
+extern "C" __declspec(dllimport) void addNoHookModule(HMODULE);
 // configFile::load
 // configFile::configFile
 

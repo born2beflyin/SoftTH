@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 // Show message box
-void ShowMessage(char *first, ...) {
+extern "C" __declspec(dllexport) void ShowMessage(char *first, ...) {
   va_list     argptr;
   char        Message[512];
 
@@ -118,7 +118,7 @@ void __cdecl odprintf(const char *format, ...)
 }
 
 // Output debug string
-void dbg(char *first, ...) {
+extern "C" __declspec(dllexport) void dbg(char *first, ...) {
 	static char lastMsg[1024] = "";
 	static int repeatCount = 0;
 	static char logPath[1024] = "";

@@ -848,7 +848,7 @@ const int numHooks = (sizeof(SoftTHHooks)/sizeof(GHOOK));
 static HMODULE noHookModules[NUM_MOD];
 static int curNumModules = 0;
 
-void addNoHookModule(HMODULE mod)
+extern "C" __declspec(dllexport) void addNoHookModule(HMODULE mod)
 {
   if(!mod) return;
   char fn[256];

@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _HOOKSSOFTTH_H_
 #define _HOOKSSOFTTH_H_
 
-void addNoHookModule(HMODULE mod);
+extern "C" __declspec(dllexport) void addNoHookModule(HMODULE mod);
 
 #endif
