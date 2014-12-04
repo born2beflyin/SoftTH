@@ -19,6 +19,8 @@ for /L %%f in (9,1,11) do (
   echo   d3dx%%f
   dumpbin /exports "%sys32%\d3dx%%f*.dll" > d3dx%%f_dll_exports.txt
   )
+  
+dumpbin /exports "%sys32%\dxgi.dll" > dxgi_dll_exports.txt
 
 echo.
 echo FINISHED!

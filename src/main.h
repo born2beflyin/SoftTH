@@ -31,7 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "configFile.h"
 
-extern configFile config; // Main configuration
+extern "C" __declspec(dllexport) configFile config; // Main configuration
+//extern "C" __declspec(dllexport) configFile* pconfig; // external pointer to the main config file
 extern bool emergencyRelease;
 
 typedef struct {

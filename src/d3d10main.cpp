@@ -25,34 +25,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <windows.h>
 #include <stdio.h>
 #include <d3d10.h>
-#include "d3d10main.h"
 #include "configFile.h"
-#include "globalHooker.h"
-#include "hooksSoftTH.h"
-#include "helper.h"
+#include "d3d10main.h"
 
 
-/* Declare external function, or include the cpp file in the project */
-// dbg
-extern "C" __declspec(dllimport) void dbg(char*, ...);
-// ShowMessage
-extern "C" __declspec(dllimport) void ShowMessage(char*, ...);
-// addNoHookModule
-extern "C" __declspec(dllimport) void addNoHookModule(HMODULE);
-// configFile::load
-// configFile::configFile
+// SoftTH Lib
+HINSTANCE hLibSoftTH = NULL; // Main SoftTH dll (dxgi.dll)
+
+// SoftTH main dll import function/variable prototypes
+void (__stdcall * dbg)(char *first, ...) = NULL;
+void (__stdcall * ShowMessage)(char *first, ...) = NULL;
+void (__stdcall * addNoHookModule)(HMODULE mod) = NULL;
+extern "C" __declspec(dllimport) configFile config; // Main configuration
 
 
-// D3D 10 Lib
+/* D3D 10 Lib */
 HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
 
-
-/* D3D 10 */
+/* D3D 10 real function prototypes */
 HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, ID3D10Device** ppDevice) = NULL;
 HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice) = NULL;
 
 
-configFile config; // Main configuration
+
 
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
@@ -61,10 +56,22 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
   {
     case DLL_PROCESS_ATTACH:
     {
-      // Load configuration settings
-      config.load();
-
       bool hooks = true;
+
+      // Load main SoftTH library
+      {
+        // Load the library
+        hLibSoftTH = LoadLibrary(".\\dxgi.dll");
+        if (!hLibSoftTH)
+          ShowMessage("Main SoftTH library not found (dxgi.dll)!"), exit(0);
+
+        // Capture functions from main SoftTH library
+        dbg = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"dbg");
+        ShowMessage = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"ShowMessage");
+        addNoHookModule = (void(__stdcall *)(HMODULE)) GetProcAddress(hLibSoftTH,"addNoHookModule");
+
+        dbg("D3D10: Main SoftTH functions captured.");
+      }
 
       // Load d3d10 library
       {
@@ -88,6 +95,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       }
 
       if(hooks) {
+        /*if(hLibSoftTH) addNoHookModule(hLibSoftTH);*/
         if(hLibD3D10) addNoHookModule(hLibD3D10);
       }
 
@@ -96,6 +104,11 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
     case DLL_PROCESS_DETACH:
     {
+      /*if(hLibSoftTH) {
+        FreeLibrary(hLibSoftTH);
+        hLibSoftTH = NULL;
+      }*/
+
 			if(hLibD3D10) {
 				FreeLibrary(hLibD3D10);
 				hLibD3D10 = NULL;
@@ -149,3 +162,4 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDeviceAndSwapChain(
 
   return ret;
 }
+
