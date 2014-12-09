@@ -5,7 +5,7 @@
 		<Option title="SoftTH" />
 		<Option pch_mode="2" />
 		<Option default_target="Debug DX10 Win x86" />
-		<Option compiler="gcc" />
+		<Option compiler="msvc10" />
 		<Build>
 			<Target title="Debug DX9 Win x86">
 				<Option platforms="Windows;" />
@@ -206,6 +206,7 @@
 					<Add option="/D_USRDLL" />
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
+					<Add option="/DDXGI" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
@@ -241,6 +242,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
+					<Add library="..\bin\win\x86\dx10\debug\d3d10.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -295,6 +297,7 @@
 					<Add option="/D_USRDLL" />
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
+					<Add option="/DDXGI" />
 					<Add directory="C:/Program Files/Microsoft SDKs/Windows/v7.1/Include" />
 					<Add directory="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include" />
 					<Add directory="../include" />
@@ -329,6 +332,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
+					<Add library="..\bin\win\x86\dx10\release\d3d10.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -353,6 +357,10 @@
 		<VirtualTargets>
 			<Add alias="All" targets="Debug DX9 Win x86;Release DX9 Win x86;Debug DX10 Win x86;Release DX10 Win x86;" />
 		</VirtualTargets>
+		<Compiler>
+			<Add option="-DSOFTTHMAIN" />
+			<Add option="/DSOFTTHMAIN" />
+		</Compiler>
 		<Unit filename="../src/InputHandler.cpp" />
 		<Unit filename="../src/InputHandler.h" />
 		<Unit filename="../src/configFile.cpp" />

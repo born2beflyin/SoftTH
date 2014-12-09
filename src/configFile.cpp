@@ -35,8 +35,16 @@ configFile::configFile()
 
 void configFile::load()
 {
+  char *modName;
+
+  #ifdef DXGI
+  modName = "dxgi.dll";
+  #else
+  modName = "d3d9.dll";
+  #endif // DXGI
+
 	// Get path from module handle
-  int len = GetModuleFileName(GetModuleHandle("d3d9.dll"), cfgPath, 512);
+  int len = GetModuleFileName(GetModuleHandle(modName), cfgPath, 512);
 	for(int i=len;i>0;i--)
 		if(cfgPath[i] == '\\' || cfgPath[i] == '/') {
 			cfgPath[i] = 0x00;

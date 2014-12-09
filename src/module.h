@@ -1,6 +1,7 @@
 /*
 SoftTH, Software multihead solution for Direct3D
 Copyright (C) 2005-2012 Keijo Ruotsalainen, www.kegetys.fi
+              2014-     C. Justin Ratcliff, www.softth.net
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,35 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef _MODULE_H_
+#define _MODULE_H_
 
-#define _BIND_TO_CURRENT_CRT_VERSION 0
-#define _BIND_TO_CURRENT_VCLIBS_VERSION 0
+#include <windows.h>
 
-#define DUMP_IMPORTS 0  // Dump all DLL imports
+class Module
+{
+public:
+  Module();
+  Module(Module &);
+  ~Module();
 
-#define DEBUG_TIMESTAMPED
+  bool    SetHandle(char*);
+  HMODULE GetHandle();
 
-#include "version.h"
-#include <list>
+  void    Release();
+private:
+  HMODULE hMod;
+};
 
-#include "configFile.h"
-
-#ifdef SOFTTHMAIN
-#define DLLEXPORT __declspec(dllexport)
-#else
-#define DLLEXPORT __declspec(dllimport)
-#endif // SOFTTHMAIN
-
-extern "C" DLLEXPORT configFile config; // Main configuration
-extern bool emergencyRelease;
-
-typedef struct {
-  HWND hwnd;
-  HDC hdc;
-  WORD ramp[256*3];
-} GAMMARAMP;
-extern std::list<GAMMARAMP*> restoreGammaRamps;
-
-#endif
+#endif // _MODULE_H_

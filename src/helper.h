@@ -86,9 +86,9 @@ extern bool emergencyRelease;
 //#define dbg_input dbg
 //#define dbgf dbg
 
-extern "C" __declspec(dllexport) void ShowMessage(char *first, ...);
+void ShowMessage(char *first, ...);
 void __cdecl odprintf(const char *format, ...);
-extern "C" __declspec(dllexport) void dbg(char *first, ...);
+void dbg(char *first, ...);
 void dbgSimple(char *first, ...);
 //void dbgf(char *first, ...);
 char* getModuleName(HMODULE mod);

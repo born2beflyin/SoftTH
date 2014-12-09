@@ -21,30 +21,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Main DLL loader
 //
 
-
 #include <windows.h>
 #include <stdio.h>
 #include <d3d10.h>
 #include "configFile.h"
 #include "d3d10main.h"
+#include "dxgiFactory.h"
+#include "dxgiAdapterOutput.h"
+#include "dxgiSwapChain.h"
+#include "main.h"
 
 
-// SoftTH Lib
-HINSTANCE hLibSoftTH = NULL; // Main SoftTH dll (dxgi.dll)
+volatile int SoftTHActive = 0; // >0 if SoftTH is currently active and resolution is overridden
+bool *SoftTHActiveSquashed = NULL; // Pointer to latest SoftTH device squash variable (TODO: horrible)
+bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
+
 
 // SoftTH main dll import function/variable prototypes
-void (__stdcall * dbg)(char *first, ...) = NULL;
-void (__stdcall * ShowMessage)(char *first, ...) = NULL;
+//void (__stdcall * dbg)(char *first, ...) = NULL;
+//void (__stdcall * ShowMessage)(char *first, ...) = NULL;
 void (__stdcall * addNoHookModule)(HMODULE mod) = NULL;
-extern "C" __declspec(dllimport) configFile config; // Main configuration
+DLLEXPORT configFile config; // Main configuration
 
-
-/* D3D 10 Lib */
-HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
 
 /* D3D 10 real function prototypes */
 HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, ID3D10Device** ppDevice) = NULL;
-HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice) = NULL;
+//extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *, D3D10_DRIVER_TYPE , HMODULE , UINT , UINT , DXGI_SWAP_CHAIN_DESC *, IDXGISwapChain **, ID3D10Device **);
+extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice) = NULL;
 
 
 
@@ -52,6 +55,12 @@ HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_D
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 {
+
+  SoftTHMod = NULL;
+  D3D10Mod = NULL;
+  hLibSoftTH = NULL; // Main SoftTH dll (dxgi.dll)
+  hLibD3D10 = NULL; // Real d3d10.dll
+
   switch (reason)
   {
     case DLL_PROCESS_ATTACH:
@@ -61,16 +70,20 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       // Load main SoftTH library
       {
         // Load the library
-        hLibSoftTH = LoadLibrary(".\\dxgi.dll");
+        SoftTHMod = new Module;
+        if(SoftTHMod->SetHandle(".\\dxgi.dll"))
+          hLibSoftTH = SoftTHMod->GetHandle();
+        //hLibSoftTH = LoadLibrary(".\\dxgi.dll");
+
         if (!hLibSoftTH)
           ShowMessage("Main SoftTH library not found (dxgi.dll)!"), exit(0);
 
         // Capture functions from main SoftTH library
-        dbg = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"dbg");
-        ShowMessage = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"ShowMessage");
+        //dbg = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"dbg");
+        //ShowMessage = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"ShowMessage");
         addNoHookModule = (void(__stdcall *)(HMODULE)) GetProcAddress(hLibSoftTH,"addNoHookModule");
 
-        dbg("D3D10: Main SoftTH functions captured.");
+        dbg("d3d10: Main SoftTH functions captured.");
       }
 
       // Load d3d10 library
@@ -81,7 +94,12 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         else
           strcpy(path, config.main.dllPathD3D10);
         dbg("D3D10 DLL Path: <%s>", path);
-        hLibD3D10 = LoadLibrary(path);
+
+        D3D10Mod = new Module;
+        if(D3D10Mod->SetHandle(path))
+          hLibD3D10 = D3D10Mod->GetHandle();
+        //hLibD3D10 = LoadLibrary(path);
+
 	      if(!hLibD3D10)
 		      ShowMessage("D3D10 DLL not found!\n'%s'", path), exit(0);
 
@@ -95,6 +113,16 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       }
 
       if(hooks) {
+        // Pin our DLL - cannot allow unloading since hook code is stored by us
+        char fn[256];
+        GetModuleFileName(hModule, fn, 256);
+        HMODULE foo;
+        HRESULT ret = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, fn, &foo);
+        if(!ret)
+          dbg("Failed to pin DLL: error %d", GetLastError());
+        else
+          dbg("Pinned DLL: <%s>", fn);
+
         /*if(hLibSoftTH) addNoHookModule(hLibSoftTH);*/
         if(hLibD3D10) addNoHookModule(hLibD3D10);
       }
@@ -104,15 +132,28 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
     case DLL_PROCESS_DETACH:
     {
-      /*if(hLibSoftTH) {
-        FreeLibrary(hLibSoftTH);
-        hLibSoftTH = NULL;
-      }*/
 
 			if(hLibD3D10) {
 				FreeLibrary(hLibD3D10);
 				hLibD3D10 = NULL;
 			}
+      if(hLibSoftTH) {
+        FreeLibrary(hLibSoftTH);
+        hLibSoftTH = NULL;
+      }
+
+			if(D3D10Mod)
+      {
+        D3D10Mod->Release();
+        delete D3D10Mod;
+        D3D10Mod = NULL;
+      }
+      if(SoftTHMod)
+      {
+        SoftTHMod->Release();
+        delete SoftTHMod;
+        SoftTHMod = NULL;
+      }
 
       break;
     }
@@ -124,16 +165,11 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 //D3D10CreateDevice
 extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDevice(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, ID3D10Device** ppDevice)
 {
-  dbg("D3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+  dbg("d3d10: D3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
 
   HRESULT ret = dllD3D10CreateDevice(adapter, DriverType, Software, Flags, SDKVersion, ppDevice);
 
-  /*IDXGIFactory1New *fnew;
-  if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
-    factory = fnew->getReal();
-    fnew->Release();
-  }
-  IDXGIAdapter1New *anew;
+  /*IDXGIAdapter1New *anew;
   if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
     adapter = anew->getReal();
     anew->Release();
@@ -145,19 +181,33 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDevice(IDXGIAdapter
 //D3D10CreateDeviceAndSwapChain
 extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDeviceAndSwapChain(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice)
 {
-  dbg("D3D10CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
+  dbg("d3d10: D3D10CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
 
-  HRESULT ret = dllD3D10CreateDeviceAndSwapChain(adapter, DriverType, Software, Flags, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
+  HRESULT ret =  dllD3D10CreateDeviceAndSwapChain(adapter, DriverType, Software, Flags, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
 
-  /*IDXGIFactory1New *fnew;
-  if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
-    factory = fnew->getReal();
-    fnew->Release();
-  }
-  IDXGIAdapter1New *anew;
+  /*IDXGIAdapter1New *anew;
   if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
     adapter = anew->getReal();
     anew->Release();
+  }*/
+
+  /*IDXGIFactory1 *fold;
+  IDXGIFactory1New *fnew;
+  CreateDXGIFactory1(IID_IDXGIFactory1New, (void **) &fnew);
+  if(adapter->GetParent(IID_IDXGIFactory1, (void**) &fold) == S_OK)
+    *ppSwapChain = new IDXGISwapChainNew(fold, fnew, *ppDevice, pSwapChainDesc);*/
+
+  /*IDXGISwapChainNew *scnew;
+  if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {
+    (*ppSwapChain) = scnew->getReal();
+    scnew->Release();
+  } else dbg("Booh! No real swap chain!");*/
+
+  /*if(fnew)
+  {
+    fnew->Release();
+    delete fnew;
+    fnew = NULL;
   }*/
 
   return ret;

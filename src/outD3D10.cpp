@@ -28,6 +28,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dxgiSwapChain.h"
 #include <D3DX10Tex.h>
 
+
+#ifdef SOFTTHMAIN
+extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice);
+#else
+extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice);
+#endif  //SOFTTHMAIN
+
+
 outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)
 {
   dbg("outDirect3D10: Initialize");
@@ -116,7 +124,8 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   //DWORD flags = D3D10_CREATE_DEVICE_BGRA_SUPPORT;
   DWORD flags = 0;
   // TODO: verify devID match!
-  if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
+  //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
+  if(dllD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
     dbg("D3D10CreateDeviceAndSwapChain FAILED");
     exit(0);
   }
@@ -160,7 +169,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   D3D10_VIEWPORT vp = {0, 0, bbWidth, bbHeight, 0, 1};
   dev->RSSetViewports(1, &vp);
 
-  dbg("outDirect3D10: Initialize");
+  dbg("outDirect3D10: Initialize COMPLETE");
   /*
   d3d9Surface = sourceSurface;
 

@@ -64,8 +64,7 @@ HRESULT (WINAPI*dllCreateDXGIFactory)(REFIID riid, void **ppFactory) = NULL;
 HRESULT (WINAPI*dllCreateDXGIFactory1)(REFIID riid, void **ppFactory) = NULL;
 
 
-__declspec(dllexport) configFile config; // Main configuration
-//extern "C" __declspec(dllexport) configFile* pconfig = &config; // external pointer to the main config file
+DLLEXPORT configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
 std::list<GAMMARAMP*> restoreGammaRamps; // Stores default gamma ramps for emergency restore on DLL release
 
