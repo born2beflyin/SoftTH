@@ -31,7 +31,7 @@ public:
   ~IDXGIFactory1New();
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
-      dbg("dxgif: QueryInterface %s", matchRiid(riid));
+      dbg("dxgif: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
       if(riid == IID_IDXGIFactory1New) {
         this->AddRef();
         *ppvObj = this;
@@ -60,7 +60,7 @@ public:
   BOOL STDMETHODCALLTYPE IsCurrent()
     {dbg("dxgif: IsCurrent");return dxgif->IsCurrent();};
 
-  IDXGIFactory1* getReal() {dbg("Get real factory");return dxgif;};
+  IDXGIFactory1* getReal() {dbg("Get real factory 0x%08X", dxgif);return dxgif;};
 private:
   IDXGIFactory1 *dxgif;
 };

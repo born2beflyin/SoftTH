@@ -36,7 +36,7 @@ public:
   DECALE_DXGICOMMONIF(dxga);
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
-      dbg("dxga: QueryInterface %s", matchRiid(riid));
+      dbg("dxga: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
       if(riid == IID_IDXGIAdapter1New || riid == IID_IDXGIAdapter1 || riid == IID_IDXGIAdapter) {
         this->AddRef();
         *ppvObj = this;
@@ -46,7 +46,7 @@ public:
   };
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
-    {dbg("dxga: GetParent %s", matchRiid(riid));
+    {dbg("dxga: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
       if(riid == IID_IDXGIFactory || riid == IID_IDXGIFactory1) {
         *ppParent = parent;
         parent->AddRef();
@@ -64,7 +64,7 @@ public:
   HRESULT STDMETHODCALLTYPE GetDesc1(DXGI_ADAPTER_DESC1 *pDesc)
     ;//{dbg("dxga: GetDesc1");return dxga->GetDesc1(pDesc);};
 
-  IDXGIAdapter1* getReal() {dbg("Get real adapter");return dxga;};
+  IDXGIAdapter1* getReal() {dbg("Get real adapter 0x%08X", dxga);return dxga;};
 
 private:
   IDXGIAdapter1 *dxga;
@@ -80,7 +80,7 @@ public:
   DECALE_DXGICOMMONIF(dxgo);
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
-      dbg("dxgo: QueryInterface %s", matchRiid(riid));
+      dbg("dxgo: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
       if(riid == IID_IDXGIOutputNew) {
         this->AddRef();
         *ppvObj = this;
@@ -90,7 +90,7 @@ public:
   };
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
-    {dbg("dxgo: GetParent %s", matchRiid(riid));
+    {dbg("dxgo: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
     if(riid == IID_IDXGIAdapter || riid == IID_IDXGIAdapter1) {
       *ppParent = parent;
       parent->AddRef();
@@ -123,7 +123,7 @@ public:
   HRESULT STDMETHODCALLTYPE GetFrameStatistics(DXGI_FRAME_STATISTICS *pStats)
     {dbg("dxgo: GetFrameStatistics");return dxgo->GetFrameStatistics(pStats);};
 
-  IDXGIOutput* getReal() {dbg("Get real output");return dxgo;};
+  IDXGIOutput* getReal() {dbg("Get real output 0x%08X", &dxgo);return dxgo;};
 
 private:
   IDXGIOutput *dxgo;

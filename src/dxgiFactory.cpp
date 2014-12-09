@@ -31,7 +31,7 @@ DEFINE_GUID(IID_IDXGIFactory1New, 0xc1bbaf12, 0x70f6, 0x4c47, 0xa3, 0x92, 0x2b, 
 
 IDXGIFactory1New::IDXGIFactory1New(IDXGIFactory1 *dxgifNew)
 {
-  dbg("IDXGIFactory1New");
+  dbg("IDXGIFactory1New 0x%08X",dxgifNew);
   dxgif = dxgifNew;
 }
 

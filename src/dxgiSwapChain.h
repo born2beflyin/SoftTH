@@ -49,7 +49,7 @@ public:
   DECALE_DXGICOMMONIF(dxgsc);
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
-    {dbg("dxgsc: GetParent %s", matchRiid(riid));
+    {dbg("dxgsc: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
       if(riid == IID_IDXGIFactory) {
         *ppParent = parent;
         parent->AddRef();
@@ -59,7 +59,7 @@ public:
     };
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
-      dbg("dxgsc: QueryInterface %s", matchRiid(riid));
+      dbg("dxgsc: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
       if(riid == IID_IDXGISwapChainNew) {
         this->AddRef();
         *ppvObj = this;
@@ -103,7 +103,7 @@ public:
   HRESULT STDMETHODCALLTYPE GetLastPresentCount(UINT *pLastPresentCount)
     {dbg("dxgsc: GetLastPresentCount");return dxgsc->GetLastPresentCount(pLastPresentCount);};
 
-  IDXGISwapChain* getReal() {dbg("Get real swapchain");return dxgsc;};
+  IDXGISwapChain* getReal() {dbg("Get real swapchain 0x%08X", &dxgsc);return dxgsc;};
 
 private:
   IDXGISwapChain *dxgsc;

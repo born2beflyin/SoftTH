@@ -360,7 +360,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid
 
 extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d10core, IDXGIFactory *factory, IDXGIAdapter *adapter, UINT flags, DWORD unknown0, void **device)
 {
-  dbg("DXGID3D10CreateDevice! 0x%08X 0x%08X", adapter, *adapter);
+  dbg("DXGID3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
 
   IDXGIFactory1New *fnew;
   if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
