@@ -2,16 +2,16 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="SoftTH_D3D10" />
+		<Option title="SoftTH_D3D11" />
 		<Option platforms="Windows;" />
 		<Option pch_mode="2" />
 		<Option compiler="msvc10" />
 		<Build>
-			<Target title="D3D10 Debug Win x86">
+			<Target title="D3D11 Debug Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/d3d10/debug/d3d10" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/win/x86/d3d11/debug/d3d11" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../SoftTHtester" />
-				<Option object_output="../obj/win/x86/d3d10/debug/" />
+				<Option object_output="../obj/win/x86/d3d11/debug/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
@@ -50,7 +50,7 @@
 				<Linker>
 					<Add option="/DEBUG" />
 					<Add option="/NODEFAULTLIB:libcmt" />
-					<Add option="/DEF:..\make\dll_D3D10_x86.def" />
+					<Add option="/DEF:..\make\dll_D3D11_x86.def" />
 					<Add option="/INCREMENTAL:NO" />
 					<Add option="/MANIFEST:NO" />
 					<Add option="/SUBSYSTEM:WINDOWS" />
@@ -66,6 +66,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
+					<Add library="d3d11.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="..\bin\win\x86\dxgi\debug\dxgi.lib" />
 					<Add library="DXGI.lib" />
@@ -85,11 +86,11 @@
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
-			<Target title="D3D10 Release Win x86">
+			<Target title="D3D11 Release Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/d3d10/release/d3d10" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/win/x86/d3d11/release/d3d11" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../SoftTHtester" />
-				<Option object_output="../obj/win/x86/d3d10/release/" />
+				<Option object_output="../obj/win/x86/d3d11/release/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="D:/Development/SoftTHtester/bin/release/SoftTHtester.exe" />
@@ -130,7 +131,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="/NODEFAULTLIB:libcmt" />
-					<Add option="/DEF:..\make\dll_D3D10_x86.def" />
+					<Add option="/DEF:..\make\dll_D3D11_x86.def" />
 					<Add option="/INCREMENTAL:NO" />
 					<Add option="/MANIFEST:NO" />
 					<Add option="/SUBSYSTEM:WINDOWS" />
@@ -146,6 +147,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
+					<Add library="d3d11.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="..\bin\win\x86\dxgi\release\dxgi.lib" />
 					<Add library="DXGI.lib" />
@@ -169,15 +171,15 @@
 		<Compiler>
 			<Add option="/W3" />
 			<Add option="/DDXGI" />
-			<Add option="/DD3D10" />
+			<Add option="/DD3D11" />
 		</Compiler>
 		<Unit filename="../src/InputHandler.cpp" />
 		<Unit filename="../src/InputHandler.h" />
 		<Unit filename="../src/configFile.cpp" />
 		<Unit filename="../src/configFile.h" />
-		<Unit filename="../src/d3d10exports.cpp" />
-		<Unit filename="../src/d3d10main.cpp" />
-		<Unit filename="../src/d3d10main.h" />
+		<Unit filename="../src/d3d11exports.cpp" />
+		<Unit filename="../src/d3d11main.cpp" />
+		<Unit filename="../src/d3d11main.h" />
 		<Unit filename="../src/dxgiAdapterOutput.cpp" />
 		<Unit filename="../src/dxgiAdapterOutput.h" />
 		<Unit filename="../src/dxgiFactory.cpp" />
@@ -188,8 +190,8 @@
 		<Unit filename="../src/helper.h" />
 		<Unit filename="../src/module.cpp" />
 		<Unit filename="../src/module.h" />
-		<Unit filename="../src/outD3D10.cpp" />
-		<Unit filename="../src/outD3D10.h" />
+		<Unit filename="../src/outD3D11.cpp" />
+		<Unit filename="../src/outD3D11.h" />
 		<Unit filename="../src/overlay_interface.cpp" />
 		<Unit filename="../src/overlay_interface.h" />
 		<Unit filename="../src/win32.cpp" />

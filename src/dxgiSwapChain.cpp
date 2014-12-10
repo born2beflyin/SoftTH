@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dxgi.h>
 #include "main.h"
+#include <D3DX11Tex.h>
 #include <D3DX10Tex.h>
 
 #include "InputHandler.h"
@@ -57,27 +58,31 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
   dbg("IDXGISwapChainNew 0x%08X 0x%08X", this, pDevice);
 
   win = scd->OutputWindow;
-  newbb = NULL;
+  newbb10 = NULL;
+  newbb11 = NULL;
   dev10 = NULL;
+  dev11 = NULL;
   dxgsc = NULL;
   dxgif = dxgifNew;
   parent = parentNew;
-  realbb = NULL;
+  realbb10 = NULL;
+  realbb11 = NULL;
 
   if(!pDevice)
     dbg("ERROR: NULL device!");
   else {
-    // Check for D3D10 device
+    // Check for D3D10/11 device
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &dev10) == S_OK)
       dbg("Got Direct3D 10 device");
     else if(pDevice->QueryInterface(__uuidof(ID3D10Device1), (void**) &dev10) == S_OK)
       dbg("Got Direct3D 10.1 device");
-    else if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &dev10) == S_OK)
+    else if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &dev11) == S_OK)
       dbg("Got Direct3D 11 device");
     else
       dbg("ERROR: Unknown swapchain device type!");
 
-    if(dev10) {
+    if(dev11 || dev10)
+    {
       // Check for TH mode and create bb texture
       preUpdateBB(&scd->BufferDesc.Width, &scd->BufferDesc.Height);
     }
@@ -89,6 +94,7 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
     dbg("CreateSwapChain failed!");
   else
     updateBB();
+
 }
 
 IDXGISwapChainNew::~IDXGISwapChainNew()
@@ -100,10 +106,18 @@ HRESULT IDXGISwapChainNew::GetBuffer(UINT Buffer, REFIID riid, void **ppSurface)
 {
   // App wants pointer to backbuffer
   dbg("dxgsc: GetBuffer %d %s", Buffer, matchRiid(riid));
-  if(newbb) {
+  if(newbb10 || newbb11) {
     // Return our fake buffer
-    *ppSurface = newbb;
-    newbb->AddRef();
+    if(newbb11)
+    {
+      *ppSurface = newbb11;
+      newbb11->AddRef();
+    }
+    else
+    {
+      *ppSurface = newbb10;
+      newbb10->AddRef();
+    }
     return S_OK;
   } else {
     // Return real backbuffer
@@ -115,7 +129,7 @@ HRESULT IDXGISwapChainNew::GetDesc(DXGI_SWAP_CHAIN_DESC *pDesc)
 {
   dbg("dxgsc: GetDesc");
   HRESULT ret = dxgsc->GetDesc(pDesc);
-  if(newbb) {
+  if(newbb10 || newbb11) {
     // Pretend it is triplehead
     pDesc->BufferDesc.Width = config.main.renderResolution.x;
     pDesc->BufferDesc.Height = config.main.renderResolution.y;
@@ -125,39 +139,85 @@ HRESULT IDXGISwapChainNew::GetDesc(DXGI_SWAP_CHAIN_DESC *pDesc)
 
 HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
 {
-  dbg("dxgsc: Present %d %d", SyncInterval, newbb);
-  if(!newbb) {
+  if(newbb11)
+    dbg("dxgsc: Present %d %d", SyncInterval, newbb11);
+  else
+    dbg("dxgsc: Present %d %d", SyncInterval, newbb10);
+
+  if(!newbb10 && !newbb11) {
     // Not multihead mode, plain old present
     return dxgsc->Present(SyncInterval, Flags);
   }
 
-  D3D10_TEXTURE2D_DESC dt, ds;
-  dbg("realbbdesc... %d", realbb);
-  realbb->GetDesc(&dt);
-  newbb->GetDesc(&ds);
-
-  dbg("Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
-  dbg("Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
-
-  HEAD *h = config.getPrimaryHead();
-  D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
-  dev10->CopySubresourceRegion(realbb, 0, 0, 0, 0, newbb, 0, &sb);
-
-  if(GetKeyState('O') < 0)
-    D3DX10SaveTextureToFile(realbb, D3DX10_IFF_JPG, "d:\\pelit\\_realbb.jpg");
-  if(GetKeyState('P') < 0)
-    D3DX10SaveTextureToFile(newbb, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");
-
-  // Copy & Present secondary heads
-  for(int i=0;i<numDevs;i++)
+  #if defined(SOFTTHMAIN) || defined(D3D11)
+  if(dev11)
   {
-    OUTDEVICE *o = &outDevs[i];
-    D3D10_BOX sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
-    dev10->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb, 0, &sb);
-    dev10->Flush();
+    D3D11_TEXTURE2D_DESC dt, ds;
+    dbg("realbbdesc11... %d", realbb11);
+    realbb11->GetDesc(&dt);
+    newbb11->GetDesc(&ds);
 
-    o->output->present();
+    dbg("Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
+    dbg("Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+
+    HEAD *h = config.getPrimaryHead();
+    D3D11_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
+    ID3D11DeviceContext *dev11context;
+    dev11->GetImmediateContext(&dev11context);
+    dev11context->CopySubresourceRegion(realbb11, 0, 0, 0, 0, newbb11, 0, &sb);
+
+    /*if(GetKeyState('O') < 0)
+      D3DX11SaveTextureToFile(realbb10, D3DX10_IFF_JPG, "d:\\pelit\\_realbb.jpg");
+    if(GetKeyState('P') < 0)
+      D3DX11SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
+
+    // Copy & Present secondary heads
+    for(int i=0;i<numDevs;i++)
+    {
+      OUTDEVICE11 *o = &outDevs11[i];
+      D3D11_BOX sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
+      dev11context->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb11, 0, &sb);
+      dev11context->Flush();
+
+      o->output->present();
+    }
   }
+  #endif
+  #ifdef SOFTTHMAIN
+  else
+  #endif
+  #if defined(SOFTTHMAIN) || defined(D3D10)
+  if(dev10)
+  {
+    D3D10_TEXTURE2D_DESC dt, ds;
+    dbg("realbbdesc10... %d", realbb10);
+    realbb10->GetDesc(&dt);
+    newbb10->GetDesc(&ds);
+
+    dbg("Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
+    dbg("Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+
+    HEAD *h = config.getPrimaryHead();
+    D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
+    dev10->CopySubresourceRegion(realbb10, 0, 0, 0, 0, newbb10, 0, &sb);
+
+    if(GetKeyState('O') < 0)
+      D3DX10SaveTextureToFile(realbb10, D3DX10_IFF_JPG, "d:\\pelit\\_realbb.jpg");
+    if(GetKeyState('P') < 0)
+      D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");
+
+    // Copy & Present secondary heads
+    for(int i=0;i<numDevs;i++)
+    {
+      OUTDEVICE10 *o = &outDevs10[i];
+      D3D10_BOX sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
+      dev10->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+      dev10->Flush();
+
+      o->output->present();
+    }
+  }
+  #endif // defined
 
   HRESULT ret = dxgsc->Present(SyncInterval, Flags);
   if(ret != S_OK)
@@ -209,55 +269,120 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 
     // Create new backbuffer
     // TODO: format
-    CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, NULL);
-    newbbDesc = d;
-    if(dev10->CreateTexture2D(&newbbDesc, NULL, &newbb) != S_OK)
-      dbg("CreateTexture2D failed :("), exit(0);
-
-    // Initialize outputs
-    numDevs = config.getNumAdditionalHeads();
-    dbg("Initializing %d outputs", numDevs);
-    int logoStopTime = GetTickCount() + 4000;
-
-    bool fpuPreserve = true; // TODO: does this exist in d3d10?
-
-    outDevs = new OUTDEVICE[numDevs];
-    for(int i=0;i<numDevs;i++)
+    #if defined(SOFTTHMAIN) || defined(D3D11)
+    if(dev11)
     {
-      OUTDEVICE *o = &outDevs[i];
+      //CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, NULL);
+      CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, NULL);
+      newbbDesc11 = d;
+      if(dev11->CreateTexture2D(&newbbDesc11, NULL, &newbb11) != S_OK)
+        dbg("CreateTexture2D failed :("), exit(0);
 
-      // Create the output device
-      HEAD *h = config.getHead(i);
-      bool local = h->transportMethod==OUTMETHOD_LOCAL;
-      dbg("Initializing head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
-      o->output = new outDirect3D10(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
-      o->cfg = h;
+      // Initialize outputs
+      numDevs = config.getNumAdditionalHeads();
+      dbg("Initializing %d outputs", numDevs);
+      int logoStopTime = GetTickCount() + 4000;
 
-      // Create shared surfaces
-      HANDLE sha = o->output->GetShareHandle();
-      if(sha) {
-        o->localSurf = NULL;
+      bool fpuPreserve = true; // TODO: does this exist in d3d10?
 
-        { // Open surfA share handle
-          ID3D10Resource *tr;
-          if(dev10->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
-            dbg("OpenSharedResource A failed!"), exit(0);
-          if(tr->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&o->localSurf)) != S_OK)
-            dbg("Shared surface QueryInterface failed!"), exit(0);
-          tr->Release();
-        }
-        dbg("Opened share handles");
-      } else
-        dbg("ERROR: Head %d: No share handle!", i+1), exit(0);
+      outDevs11 = new OUTDEVICE11[numDevs];
+      for(int i=0;i<numDevs;i++)
+      {
+        OUTDEVICE11 *o = &outDevs11[i];
+
+        // Create the output device
+        HEAD *h = config.getHead(i);
+        bool local = h->transportMethod==OUTMETHOD_LOCAL;
+        dbg("Initializing head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
+        o->output = new outDirect3D11(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
+        o->cfg = h;
+
+        // Create shared surfaces
+        HANDLE sha = o->output->GetShareHandle();
+        if(sha) {
+          o->localSurf = NULL;
+
+          { // Open surfA share handle
+            ID3D11Resource *tr;
+            if(dev11->OpenSharedResource(sha, __uuidof(ID3D11Resource), (void**)(&tr)) != S_OK)
+              dbg("OpenSharedResource A failed!"), exit(0);
+            if(tr->QueryInterface(__uuidof(ID3D11Texture2D), (void**)(&o->localSurf)) != S_OK)
+              dbg("Shared surface QueryInterface failed!"), exit(0);
+            tr->Release();
+          }
+          dbg("Opened share handles");
+        } else
+          dbg("ERROR: Head %d: No share handle!", i+1), exit(0);
+      }
     }
+    #endif
+    #ifdef SOFTTHMAIN
+    else
+    #endif
+    #if defined(SOFTTHMAIN) || defined(D3D10)
+    if(dev10)
+    {
+      CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, NULL);
+      newbbDesc10 = d;
+      if(dev10->CreateTexture2D(&newbbDesc10, NULL, &newbb10) != S_OK)
+        dbg("CreateTexture2D failed :("), exit(0);
+
+      // Initialize outputs
+      numDevs = config.getNumAdditionalHeads();
+      dbg("Initializing %d outputs", numDevs);
+      int logoStopTime = GetTickCount() + 4000;
+
+      bool fpuPreserve = true; // TODO: does this exist in d3d10?
+
+      outDevs10 = new OUTDEVICE10[numDevs];
+      for(int i=0;i<numDevs;i++)
+      {
+        OUTDEVICE10 *o = &outDevs10[i];
+
+        // Create the output device
+        HEAD *h = config.getHead(i);
+        bool local = h->transportMethod==OUTMETHOD_LOCAL;
+        dbg("Initializing head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
+        o->output = new outDirect3D10(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
+        o->cfg = h;
+
+        // Create shared surfaces
+        HANDLE sha = o->output->GetShareHandle();
+        if(sha) {
+          o->localSurf = NULL;
+
+          { // Open surfA share handle
+            ID3D10Resource *tr;
+            if(dev10->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
+              dbg("OpenSharedResource A failed!"), exit(0);
+            if(tr->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&o->localSurf)) != S_OK)
+              dbg("Shared surface QueryInterface failed!"), exit(0);
+            tr->Release();
+          }
+          dbg("Opened share handles");
+        } else
+          dbg("ERROR: Head %d: No share handle!", i+1), exit(0);
+      }
+    }
+    #endif
 
   } else {
     dbg("Singlehead swapchain mode");
     SoftTHActive--;
 
-    if(newbb)
-      SAFE_RELEASE_LAST(newbb);
-    newbb = NULL;
+    if(dev11)
+    {
+      if(newbb11)
+        SAFE_RELEASE_LAST(newbb11);
+      newbb11 = NULL;
+    }
+    else if(dev10)
+    {
+      if(newbb10)
+        SAFE_RELEASE_LAST(newbb10);
+      newbb10 = NULL;
+    }
+
   }
 }
 
@@ -266,10 +391,22 @@ void IDXGISwapChainNew::updateBB()
   dbg("IDXGISwapChainNew::updateBB!");
 
   // Get realbb
-  if(dxgsc->GetBuffer(0, IID_ID3D10Texture2D, (void**)&realbb) != S_OK)
-    dbg("dxgsc->GetBuffer failed!"), exit(0);
+  if(dev11)
+  {
+    if(dxgsc->GetBuffer(0, IID_ID3D11Texture2D, (void**)&realbb11) != S_OK)
+      dbg("dxgsc->GetBuffer failed!"), exit(0);
 
-  realbb->GetDesc(&realbbDesc);
-  dbg("Backbuffer: %dx%d ms%d %s", realbbDesc.Width, realbbDesc.Height, realbbDesc.SampleDesc.Count, getFormatDXGI(realbbDesc.Format));
-  realbb->Release();  // Pretend we didn't get pointer to it so it can be released by size changes
+    realbb11->GetDesc(&realbbDesc11);
+    dbg("Backbuffer: %dx%d ms%d %s", realbbDesc11.Width, realbbDesc11.Height, realbbDesc11.SampleDesc.Count, getFormatDXGI(realbbDesc11.Format));
+    realbb11->Release();  // Pretend we didn't get pointer to it so it can be released by size changes
+  }
+  else if(dev10)
+  {
+    if(dxgsc->GetBuffer(0, IID_ID3D10Texture2D, (void**)&realbb10) != S_OK)
+      dbg("dxgsc->GetBuffer failed!"), exit(0);
+
+    realbb10->GetDesc(&realbbDesc10);
+    dbg("Backbuffer: %dx%d ms%d %s", realbbDesc10.Width, realbbDesc10.Height, realbbDesc10.SampleDesc.Count, getFormatDXGI(realbbDesc10.Format));
+    realbb10->Release();  // Pretend we didn't get pointer to it so it can be released by size changes
+  }
 }

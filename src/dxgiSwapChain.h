@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "helper.h"
 #include "configFile.h"
 
-#include <d3d10.h>
+#include <d3d11.h>
+#include "outD3D11.h"
+#include <d3d10_1.h>
 #include "outD3D10.h"
 //#include "d3dSoftTH.h"
 #include "dxgiAdapterOutput.h"
@@ -35,7 +37,13 @@ typedef struct {
   outDirect3D10  *output;
   ID3D10Texture2D *localSurf; // Local surface bound to shared handle of output
   HEAD *cfg;  // Pointer to configuration data
-} OUTDEVICE;
+} OUTDEVICE10;
+
+typedef struct {
+  outDirect3D11  *output;
+  ID3D11Texture2D *localSurf; // Local surface bound to shared handle of output
+  HEAD *cfg;  // Pointer to configuration data
+} OUTDEVICE11;
 
 DEFINE_GUID(IID_IDXGISwapChainNew, 0x41ba0075, 0xbc7b, 0x4eee, 0x99, 0x8d, 0xb6, 0xdb, 0xb7, 0xba, 0xeb, 0x46);
 
@@ -110,18 +118,25 @@ private:
   IDXGIFactory1 *parent;
   IDXGIFactory1 *dxgif;
   ID3D10Device *dev10;
+  ID3D11Device *dev11;
   HWND win;
 
-  ID3D10Texture2D *newbb; // New backbuffer (full size)
-  D3D10_TEXTURE2D_DESC newbbDesc;
-  ID3D10Texture2D *realbb; // Real backbuffer (one monitor)
-  D3D10_TEXTURE2D_DESC realbbDesc;
+  ID3D10Texture2D *newbb10; // New backbuffer (full size)
+  D3D10_TEXTURE2D_DESC newbbDesc10;
+  ID3D10Texture2D *realbb10; // Real backbuffer (one monitor)
+  D3D10_TEXTURE2D_DESC realbbDesc10;
+
+  ID3D11Texture2D *newbb11; // New backbuffer (full size)
+  D3D11_TEXTURE2D_DESC newbbDesc11;
+  ID3D11Texture2D *realbb11; // Real backbuffer (one monitor)
+  D3D11_TEXTURE2D_DESC realbbDesc11;
 
   void preUpdateBB(UINT *width, UINT *height);
   void updateBB();  // Updates backbuffer data
 
   int numDevs;
-  OUTDEVICE *outDevs;
+  OUTDEVICE10 *outDevs10;
+  OUTDEVICE11 *outDevs11;
 
 };
 

@@ -29,11 +29,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <D3DX10Tex.h>
 
 
-#ifdef SOFTTHMAIN
-extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice);
-#else
-extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter, D3D10_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, UINT SDKVersion, DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, IDXGISwapChain **ppSwapChain, ID3D10Device **ppDevice);
-#endif  //SOFTTHMAIN
+/*#ifdef SOFTTHMAIN
+extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+                                                                                   D3D10_DRIVER_TYPE DriverType,
+                                                                                   HMODULE Software,
+                                                                                   UINT Flags,
+                                                                                   UINT SDKVersion,
+                                                                                   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                   IDXGISwapChain **ppSwapChain,
+                                                                                   ID3D10Device **ppDevice);
+#else*/
+extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+                                                             D3D10_DRIVER_TYPE DriverType,
+                                                             HMODULE Software,
+                                                             UINT Flags,
+                                                             UINT SDKVersion,
+                                                             DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                             IDXGISwapChain **ppSwapChain,
+                                                             ID3D10Device **ppDevice);
+/*#endif  //SOFTTHMAIN*/
 
 
 outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)

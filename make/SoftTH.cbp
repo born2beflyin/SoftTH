@@ -7,11 +7,11 @@
 		<Option default_target="Debug DX10 Win x86" />
 		<Option compiler="msvc10" />
 		<Build>
-			<Target title="Debug DX9 Win x86">
+			<Target title="D3D9 Debug Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/dx9/debug/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../obj/win/x86/dx9/debug/" />
-				<Option object_output="../obj/win/x86/dx9/debug/" />
+				<Option output="../bin/win/x86/d3d9/debug/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../SoftTHtester" />
+				<Option object_output="../obj/win/x86/d3d9/debug/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Samples/C++/Direct3D/Bin/x86/HDRCubeMap.exe" />
@@ -90,11 +90,11 @@
 					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 				</ExtraCommands>
 			</Target>
-			<Target title="Release DX9 Win x86">
+			<Target title="D3D9 Release Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/dx9/release/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../obj/win/x86/dx9/release/" />
-				<Option object_output="../obj/win/x86/dx9/release/" />
+				<Option output="../bin/win/x86/d3d9/release/d3d9" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../SoftTHtester" />
+				<Option object_output="../obj/win/x86/d3d9/release/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Samples/C++/Direct3D/Bin/x86/HDRCubeMap.exe" />
@@ -111,10 +111,8 @@
 					<Add option="/Oy" />
 					<Add option="/Oi" />
 					<Add option="/Ot" />
-					<Add option="/Ox" />
 					<Add option="/Zc:wchar_t" />
 					<Add option="/Zc:forScope" />
-					<Add option="/Ob2" />
 					<Add option="/DxUSE_NEW_CUDA" />
 					<Add option="/DxUSE_CUDA" />
 					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
@@ -176,11 +174,11 @@
 					<Add after='&quot;C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 				</ExtraCommands>
 			</Target>
-			<Target title="Debug DX10 Win x86">
+			<Target title="DXGI Debug Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/dx10/debug/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/win/x86/dxgi/debug/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../SoftTHtester" />
-				<Option object_output="../obj/win/x86/dx10/debug/" />
+				<Option object_output="../obj/win/x86/dxgi/debug/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
@@ -242,7 +240,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
-					<Add library="..\bin\win\x86\dx10\debug\d3d10.lib" />
+					<Add library="d3d11.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -263,11 +261,11 @@
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
-			<Target title="Release DX10 Win x86">
+			<Target title="DXGI Release Win x86">
 				<Option platforms="Windows;" />
-				<Option output="../bin/win/x86/dx10/release/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/win/x86/dxgi/release/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../SoftTHtester" />
-				<Option object_output="../obj/win/x86/dx10/release/" />
+				<Option object_output="../obj/win/x86/dxgi/release/" />
 				<Option type="3" />
 				<Option compiler="msvc10" />
 				<Option host_application="D:/Development/SoftTHtester/bin/release/SoftTHtester.exe" />
@@ -284,10 +282,8 @@
 					<Add option="/Oy" />
 					<Add option="/Oi" />
 					<Add option="/Ot" />
-					<Add option="/Ox" />
 					<Add option="/Zc:wchar_t" />
 					<Add option="/Zc:forScope" />
-					<Add option="/Ob2" />
 					<Add option="/DxUSE_NEW_CUDA" />
 					<Add option="/DxUSE_CUDA" />
 					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
@@ -332,7 +328,7 @@
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
-					<Add library="..\bin\win\x86\dx10\release\d3d10.lib" />
+					<Add library="d3d11.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -355,7 +351,7 @@
 			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="All" targets="Debug DX9 Win x86;Release DX9 Win x86;Debug DX10 Win x86;Release DX10 Win x86;" />
+			<Add alias="All" targets="D3D9 Debug Win x86;D3D9 Release Win x86;DXGI Debug Win x86;DXGI Release Win x86;" />
 		</VirtualTargets>
 		<Compiler>
 			<Add option="-DSOFTTHMAIN" />

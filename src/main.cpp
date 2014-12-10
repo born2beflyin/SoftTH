@@ -26,6 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <stdio.h>
+#include <d3d11.h>
+#include <d3d10_1.h>
+#include <d3d10.h>
 #include "d3d9.h"
 #include "helper.h"
 #include "d3d.h"
@@ -54,17 +57,64 @@ HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
 char hLibD3D9_path[256]; // Path to real d3d9.dll
 
 
+// Get the REAL DLL functions
 /* D3D 9 */
 HRESULT (WINAPI*dllDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = NULL;
 IDirect3D9* (WINAPI*dllDirect3DCreate9)(UINT SDKVersion) = NULL;
-HRESULT (WINAPI*dllDXGID3D10CreateDevice)(HMODULE d3d10core, IDXGIFactory *factory, IDXGIAdapter *adapter, UINT flags, DWORD unknown0, void **device) = NULL;
+HRESULT (WINAPI*dllDXGID3D10CreateDevice)(HMODULE d3d10core,
+                                          IDXGIFactory *factory,
+                                          IDXGIAdapter *adapter,
+                                          UINT flags,
+                                          DWORD unknown0,
+                                          void **device) = NULL;
 
 /* DXGI */
 HRESULT (WINAPI*dllCreateDXGIFactory)(REFIID riid, void **ppFactory) = NULL;
 HRESULT (WINAPI*dllCreateDXGIFactory1)(REFIID riid, void **ppFactory) = NULL;
 
+/* D3D 10 */
+HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
+                                      D3D10_DRIVER_TYPE DriverType,
+                                      HMODULE Software,
+                                      UINT Flags,
+                                      UINT SDKVersion,
+                                      ID3D10Device** ppDevice) = NULL;
 
-DLLEXPORT configFile config; // Main configuration
+extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+                                                                                   D3D10_DRIVER_TYPE DriverType,
+                                                                                   HMODULE Software,
+                                                                                   UINT Flags,
+                                                                                   UINT SDKVersion,
+                                                                                   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                   IDXGISwapChain **ppSwapChain,
+                                                                                   ID3D10Device **ppDevice) = NULL;
+
+/* D3D 11 */
+HRESULT (WINAPI*dllD3D11CreateDevice)(IDXGIAdapter *adapter,
+                                      D3D_DRIVER_TYPE DriverType,
+                                      HMODULE Software,
+                                      UINT Flags,
+                                      const D3D_FEATURE_LEVEL *pFeatureLevels,
+                                      UINT FeatureLevels,
+                                      UINT SDKVersion,
+                                      ID3D11Device** ppDevice,
+                                      D3D_FEATURE_LEVEL *pFeatureLevel,
+                                      ID3D11DeviceContext **ppImmediateContext) = NULL;
+
+extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+                                                                                   D3D_DRIVER_TYPE DriverType,
+                                                                                   HMODULE Software,
+                                                                                   UINT Flags,
+                                                                                   const D3D_FEATURE_LEVEL *pFeatureLevels,
+                                                                                   UINT FeatureLevels,
+                                                                                   UINT SDKVersion,
+                                                                                   const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                   IDXGISwapChain **ppSwapChain,
+                                                                                   ID3D11Device** ppDevice,
+                                                                                   D3D_FEATURE_LEVEL *pFeatureLevel,
+                                                                                   ID3D11DeviceContext **ppImmediateContext) = NULL;
+
+DLL configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
 std::list<GAMMARAMP*> restoreGammaRamps; // Stores default gamma ramps for emergency restore on DLL release
 
@@ -137,7 +187,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
           dbg("Pinned DLL: <%s>", fn);
       }
 
-      // Load d3d9 library
+      /* Load D3D9 Library */
       {
         bool useDebug = config.main.debugD3D;
 
@@ -168,7 +218,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("Direct3DCreate9 not in DLL!\n\n'%s'", path), exit(0);
       }
 
-      // Load dxgi library
+      /* Load DXGI Library */
       {
         char path[256];
         if(strlen(config.main.dllPathDXGI) < 2)
@@ -193,8 +243,44 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("DXGID3D10CreateDevice not in DLL!\n'%s'", path), exit(0);
       }
 
-      // Load d3d11 library
-      /*{
+      /* Load D3D10 LIbrary */
+      {
+        char path[256];
+        if(strlen(config.main.dllPathD3D10) < 2)
+          sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "d3d10.dll");
+        else
+          strcpy(path, config.main.dllPathD3D10);
+        dbg("D3D10 DLL Path: <%s>", path);
+        hLibD3D10 = LoadLibrary(path);
+	      if(!hLibD3D10)
+		      ShowMessage("D3D10 DLL not found!\n'%s'", path), exit(0);
+
+        dllD3D10CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter*,
+                                                     D3D10_DRIVER_TYPE,
+                                                     HMODULE,
+                                                     UINT,
+                                                     UINT,
+                                                     ID3D10Device**))
+                                                     GetProcAddress(hLibD3D10, "D3D10CreateDevice");
+
+        dllD3D10CreateDeviceAndSwapChain = (HRESULT(__stdcall *)(IDXGIAdapter*,
+                                                                 D3D10_DRIVER_TYPE,
+                                                                 HMODULE,
+                                                                 UINT,
+                                                                 UINT,
+                                                                 DXGI_SWAP_CHAIN_DESC *,
+                                                                 IDXGISwapChain **,
+                                                                 ID3D10Device **))
+                                                                 GetProcAddress(hLibD3D10, "D3D10CreateDeviceAndSwapChain");
+
+        if(!dllD3D10CreateDevice)
+		      ShowMessage("D3D10CreateDevice not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
+        if(!dllD3D10CreateDeviceAndSwapChain)
+		      ShowMessage("D3D10CreateDeviceAndSwapChain not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
+      }
+
+      /* Load D3D11 LIbrary */
+      {
         char path[256];
         if(strlen(config.main.dllPathD3D11) < 2)
           sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "d3d11.dll");
@@ -205,19 +291,43 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 	      if(!hLibD3D11)
 		      ShowMessage("D3D11 DLL not found!\n'%s'", path), exit(0);
 
-        dllD3D11CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, UINT, ID3D10Device**)) GetProcAddress(hLibD3D11, "D3D11CreateDevice");
-        dllD3D11CreateDeviceAndSwapChain = (HRESULT(__stdcall *)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, UINT, DXGI_SWAP_CHAIN_DESC *, IDXGISwapChain **, ID3D10Device **)) GetProcAddress(hLibD3D11, "D3D11CreateDeviceAndSwapChain");
+        dllD3D11CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter *,
+                                      D3D_DRIVER_TYPE,
+                                      HMODULE,
+                                      UINT,
+                                      const D3D_FEATURE_LEVEL *,
+                                      UINT,
+                                      UINT,
+                                      ID3D11Device **,
+                                      D3D_FEATURE_LEVEL *,
+                                      ID3D11DeviceContext **))
+                                      GetProcAddress(hLibD3D11, "D3D11CreateDevice");
+
+        dllD3D11CreateDeviceAndSwapChain = (HRESULT(__stdcall *)(IDXGIAdapter *,
+                                                                 D3D_DRIVER_TYPE,
+                                                                 HMODULE,
+                                                                 UINT,
+                                                                 const D3D_FEATURE_LEVEL *,
+                                                                 UINT,
+                                                                 UINT,
+                                                                 const DXGI_SWAP_CHAIN_DESC *,
+                                                                 IDXGISwapChain **,
+                                                                 ID3D11Device **,
+                                                                 D3D_FEATURE_LEVEL *,
+                                                                 ID3D11DeviceContext **))
+                                                                 GetProcAddress(hLibD3D11, "D3D11CreateDeviceAndSwapChain");
 
         if(!dllD3D11CreateDevice)
 		      ShowMessage("D3D11CreateDevice not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
-        if(!dllD3D10CreateDeviceAndSwapChain)
+        if(!dllD3D11CreateDeviceAndSwapChain)
 		      ShowMessage("D3D11CreateDeviceAndSwapChain not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
-      }*/
+      }
 
       if(hooks) {
         if(hLibD3D9) addNoHookModule(hLibD3D9);
         if(hLibDXGI) addNoHookModule(hLibDXGI);
-        //if(hLibD3D11) addNoHookModule(hLibD3D11);
+        // Don't do "addNoHookModule" here for D3D10/11
+        // "addNoHookModule" will occur within the D3D10/11 SoftTH DLLs
       }
 
       break;
@@ -251,11 +361,18 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 				FreeLibrary(hLibDXGI);
 				hLibDXGI = NULL;
 			}
-			/*if(hLibD3D11) {
+			if(hLibD3D10) {
+				FreeLibrary(hLibD3D10);
+				hLibD3D10 = NULL;
+			}
+			if(hLibD3D11) {
 				FreeLibrary(hLibD3D11);
 				hLibD3D11 = NULL;
-			}*/
-
+			}
+			if(hLibD3D12) {
+				FreeLibrary(hLibD3D12);
+				hLibD3D12 = NULL;
+			}
 
       if(didDisableComposition) {
         DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
@@ -439,50 +556,7 @@ DEXPORTD(hLibDXGI, DXGIReportAdapterConfiguration);
 DEXPORTD(hLibDXGI, OpenAdapter10);
 DEXPORTD(hLibDXGI, OpenAdapter10_2);
 
-/*
-// D3D11
-DEXPORTD(hLibD3D11, D3DKMTCloseAdapter);
-DEXPORTD(hLibD3D11, D3DKMTDestroyAllocation);
-DEXPORTD(hLibD3D11, D3DKMTDestroyContext);
-DEXPORTD(hLibD3D11, D3DKMTDestroyDevice);
-DEXPORTD(hLibD3D11, D3DKMTDestroySynchronizationObject);
-DEXPORTD(hLibD3D11, D3DKMTQueryAdapterInfo);
-DEXPORTD(hLibD3D11, D3DKMTSetDisplayPrivateDriverFormat);
-DEXPORTD(hLibD3D11, D3DKMTSignalSynchronizationObject);
-DEXPORTD(hLibD3D11, D3DKMTUnlock);
-DEXPORTD(hLibD3D11, D3DKMTWaitForSynchronizationObject);
-DEXPORTD(hLibD3D11, OpenAdapter10);
-DEXPORTD(hLibD3D11, OpenAdapter10_2);
-DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
-DEXPORTD(hLibD3D11, D3D11CoreCreateLayeredDevice);
-DEXPORTD(hLibD3D11, D3D11CoreGetLayeredDeviceSize);
-DEXPORTD(hLibD3D11, D3D11CoreRegisterLayers);
-//DEXPORTD(hLibD3D11, D3D11CreateDevice);
-DEXPORTD(hLibD3D11, D3D11CreateDeviceAndSwapChain);
-DEXPORTD(hLibD3D11, D3DKMTCreateAllocation);
-DEXPORTD(hLibD3D11, D3DKMTCreateContext);
-DEXPORTD(hLibD3D11, D3DKMTCreateDevice);
-DEXPORTD(hLibD3D11, D3DKMTCreateSynchronizationObject);
-DEXPORTD(hLibD3D11, D3DKMTEscape);
-DEXPORTD(hLibD3D11, D3DKMTGetContextSchedulingPriority);
-DEXPORTD(hLibD3D11, D3DKMTGetDeviceState);
-DEXPORTD(hLibD3D11, D3DKMTGetMultisampleMethodList);
-DEXPORTD(hLibD3D11, D3DKMTGetRuntimeData);
-DEXPORTD(hLibD3D11, D3DKMTGetSharedPrimaryHandle);
-DEXPORTD(hLibD3D11, D3DKMTLock);
-DEXPORTD(hLibD3D11, D3DKMTOpenAdapterFromHdc);
-DEXPORTD(hLibD3D11, D3DKMTOpenResource);
-DEXPORTD(hLibD3D11, D3DKMTPresent);
-DEXPORTD(hLibD3D11, D3DKMTQueryAllocationResidency);
-DEXPORTD(hLibD3D11, D3DKMTRender);
-DEXPORTD(hLibD3D11, D3DKMTSetAllocationPriority);
-DEXPORTD(hLibD3D11, D3DKMTSetContextSchedulingPriority);
-DEXPORTD(hLibD3D11, D3DKMTSetDisplayMode);
-DEXPORTD(hLibD3D11, D3DKMTSetGammaRamp);
-DEXPORTD(hLibD3D11, D3DKMTQueryResourceInfo);
-DEXPORTD(hLibD3D11, D3DKMTSetVidPnSourceOwner);
-DEXPORTD(hLibD3D11, D3DKMTWaitForVerticalBlankEvent);
-*/
+
 }
 #pragma warning (default : 4731)
 
