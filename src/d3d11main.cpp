@@ -276,11 +276,13 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
                           pFeatureLevel,
                           ppImmediateContext);
 
+  //
   /*IDXGIAdapter1New *anew;
   if(adapter->QueryInterface(IID_IDXGIAdapter, (void**) &anew) == S_OK) {
     adapter = anew->getReal();
     anew->Release();
   }*/
+  //
 
   IDXGIFactory1 *factory;
   //IDXGIFactory1New *fnew;
@@ -292,9 +294,22 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
     dbg("d3d11: Got parent factory");
   }
 
-  //HRESULT ret =  dllD3D10CreateDeviceAndSwapChain(anew, DriverType, Software, Flags, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
+  /*ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
+                                          DriverType,
+                                          Software,
+                                          Flags,
+                                          pFeatureLevels,
+                                          FeatureLevels,
+                                          SDKVersion,
+                                          pSwapChainDesc,
+                                          ppSwapChain,
+                                          ppDevice,
+                                          pFeatureLevel,
+                                          ppImmediateContext);*/
 
   (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);
+
+
 
   /*IDXGISwapChainNew *scnew;
   if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {

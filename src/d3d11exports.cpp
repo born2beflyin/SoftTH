@@ -51,7 +51,61 @@ extern HINSTANCE hLibD3D11;
 
 extern "C" {
 /* Direct3D 11 */
+DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
+DEXPORTD(hLibD3D11, D3D11CoreCreateLayeredDevice);
+DEXPORTD(hLibD3D11, D3D11CoreGetLayeredDeviceSize);
+DEXPORTD(hLibD3D11, D3D11CoreRegisterLayers);
+//DEXPORTD(hLibD3D11, D3D11CreateDevice);
+//DEXPORTD(hLibD3D11, D3D11CreateDeviceAndSwapChain);
 DEXPORTD(hLibD3D11, D3DKMTCloseAdapter);
+DEXPORTD(hLibD3D11, D3DKMTCreateAllocation);
+DEXPORTD(hLibD3D11, D3DKMTCreateContext);
+DEXPORTD(hLibD3D11, D3DKMTCreateDevice);
+DEXPORTD(hLibD3D11, D3DKMTCreateSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTDestroyAllocation);
+DEXPORTD(hLibD3D11, D3DKMTDestroyContext);
+DEXPORTD(hLibD3D11, D3DKMTDestroyDevice);
+DEXPORTD(hLibD3D11, D3DKMTDestroySynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTEscape);
+DEXPORTD(hLibD3D11, D3DKMTGetContextSchedulingPriority);
+DEXPORTD(hLibD3D11, D3DKMTGetDeviceState);
+DEXPORTD(hLibD3D11, D3DKMTGetDisplayModeList);
+DEXPORTD(hLibD3D11, D3DKMTGetMultisampleMethodList);
+DEXPORTD(hLibD3D11, D3DKMTGetRuntimeData);
+DEXPORTD(hLibD3D11, D3DKMTGetSharedPrimaryHandle);
+DEXPORTD(hLibD3D11, D3DKMTLock);
+DEXPORTD(hLibD3D11, D3DKMTOpenAdapterFromHdc);
+DEXPORTD(hLibD3D11, D3DKMTOpenResource);
+DEXPORTD(hLibD3D11, D3DKMTPresent);
+DEXPORTD(hLibD3D11, D3DKMTQueryAdapterInfo);
+DEXPORTD(hLibD3D11, D3DKMTQueryAllocationResidency);
+DEXPORTD(hLibD3D11, D3DKMTQueryResourceInfo);
+DEXPORTD(hLibD3D11, D3DKMTRender);
+DEXPORTD(hLibD3D11, D3DKMTSetAllocationPriority);
+DEXPORTD(hLibD3D11, D3DKMTSetContextSchedulingPriority);
+DEXPORTD(hLibD3D11, D3DKMTSetDisplayMode);
+DEXPORTD(hLibD3D11, D3DKMTSetDisplayPrivateDriverFormat);
+DEXPORTD(hLibD3D11, D3DKMTSetGammaRamp);
+DEXPORTD(hLibD3D11, D3DKMTSetVidPnSourceOwner);
+DEXPORTD(hLibD3D11, D3DKMTSignalSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTUnlock);
+DEXPORTD(hLibD3D11, D3DKMTWaitForSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTWaitForVerticalBlankEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_BeginEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_EndEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_GetStatus);
+DEXPORTD(hLibD3D11, D3DPerformance_SetMarker);
+DEXPORTD(hLibD3D11, EnableFeatureLevelUpgrade);
+DEXPORTD(hLibD3D11, OpenAdapter10);
+DEXPORTD(hLibD3D11, OpenAdapter10_2);
+}
+#pragma warning (default : 4731)
+
+#endif
+
+
+
+/*DEXPORTD(hLibD3D11, D3DKMTCloseAdapter);
 DEXPORTD(hLibD3D11, D3DKMTDestroyAllocation);
 DEXPORTD(hLibD3D11, D3DKMTDestroyContext);
 DEXPORTD(hLibD3D11, D3DKMTDestroyDevice);
@@ -91,8 +145,4 @@ DEXPORTD(hLibD3D11, D3DKMTSetDisplayMode);
 DEXPORTD(hLibD3D11, D3DKMTSetGammaRamp);
 DEXPORTD(hLibD3D11, D3DKMTQueryResourceInfo);
 DEXPORTD(hLibD3D11, D3DKMTSetVidPnSourceOwner);
-DEXPORTD(hLibD3D11, D3DKMTWaitForVerticalBlankEvent);
-}
-#pragma warning (default : 4731)
-
-#endif
+DEXPORTD(hLibD3D11, D3DKMTWaitForVerticalBlankEvent);*/

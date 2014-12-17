@@ -61,13 +61,11 @@
 					<Add option="/DYNAMICBASE" />
 					<Add option="/NXCOMPAT" />
 					<Add option="/MACHINE:X86" />
-					<Add library="D3DX10.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
-					<Add library="d3d10.lib" />
 					<Add library="..\bin\win\x86\dxgi\debug\dxgi.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -142,13 +140,11 @@
 					<Add option="/DYNAMICBASE" />
 					<Add option="/NXCOMPAT" />
 					<Add option="/MACHINE:X86" />
-					<Add library="D3DX10.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
-					<Add library="d3d10.lib" />
 					<Add library="..\bin\win\x86\dxgi\release\dxgi.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
