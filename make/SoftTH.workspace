@@ -3,10 +3,12 @@
 	<Workspace title="SoftTH">
 		<Project filename="SoftTH.cbp">
 			<Depends filename="SoftTH_D3D10.cbp" />
+      <Depends filename="SoftTH_D3D10_1.cbp" />
 			<Depends filename="SoftTH_D3D11.cbp" />
 		</Project>
 		<Project filename="../../SoftTHtester/SoftTHtester.cbp" />
 		<Project filename="SoftTH_D3D10.cbp" />
+		<Project filename="SoftTH_D3D10_1.cbp" />
 		<Project filename="SoftTH_D3D11.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
