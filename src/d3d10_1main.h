@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _D3D10MAIN_H_
-#define _D3D10MAIN_H_
+#ifndef _D3D10_1_MAIN_H_
+#define _D3D10_1_MAIN_H_
 
 #include "main.h"
 #include "module.h"
 
 Module* SoftTHMod;
-Module* D3D10Mod;
+Module* D3D10_1Mod;
 
 HINSTANCE hLibSoftTH;
-HINSTANCE hLibD3D10;
+HINSTANCE hLibD3D10_1;
 
 #endif

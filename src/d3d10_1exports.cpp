@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "helper.h"
 
 
-extern HINSTANCE hLibD3D10;
+extern HINSTANCE hLibD3D10_1;
 
 
 
@@ -50,36 +50,37 @@ extern HINSTANCE hLibD3D10;
 	}
 
 extern "C" {
-/* Direct3D 10 */
-DEXPORTD(hLibD3D10, D3D10CompileEffectFromMemory         );
-DEXPORTD(hLibD3D10, D3D10CreateBlob                      );
-//DEXPORTD(hLibD3D10, D3D10CreateDevice                    );
-//DEXPORTD(hLibD3D10, D3D10CreateDeviceAndSwapChain        );
-DEXPORTD(hLibD3D10, D3D10CreateEffectFromMemory          );
-DEXPORTD(hLibD3D10, D3D10CreateEffectPoolFromMemory      );
-DEXPORTD(hLibD3D10, D3D10CreateStateBlock                );
-DEXPORTD(hLibD3D10, D3D10DisassembleEffect               );
-DEXPORTD(hLibD3D10, D3D10DisassembleShader               );
-DEXPORTD(hLibD3D10, D3D10GetGeometryShaderProfile        );
-DEXPORTD(hLibD3D10, D3D10GetInputAndOutputSignatureBlob  );
-DEXPORTD(hLibD3D10, D3D10GetInputSignatureBlob           );
-DEXPORTD(hLibD3D10, D3D10GetOutputSignatureBlob          );
-DEXPORTD(hLibD3D10, D3D10GetPixelShaderProfile           );
-DEXPORTD(hLibD3D10, D3D10GetShaderDebugInfo              );
-DEXPORTD(hLibD3D10, D3D10GetVersion                      );
-DEXPORTD(hLibD3D10, D3D10GetVertexShaderProfile          );
-DEXPORTD(hLibD3D10, D3D10PreprocessShader                );
-DEXPORTD(hLibD3D10, D3D10ReflectShader                   );
-DEXPORTD(hLibD3D10, D3D10RegisterLayers                  );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskDifference        );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskDisableAll        );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskDisableCapture    );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskEnableAll         );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskEnableCapture     );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskGetSetting        );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskIntersect         );
-DEXPORTD(hLibD3D10, D3D10StateBlockMaskUnion             );
-DEXPORTD(hLibD3D10, RevertToOldImplementation            );
+/* Direct3D 10.1 */
+DEXPORTD(hLibD3D10_1, D3D10CompileEffectFromMemory          );
+DEXPORTD(hLibD3D10_1, D3D10CompileShader                    );
+DEXPORTD(hLibD3D10_1, D3D10CreateBlob                       );
+//DEXPORTD(hLibD3D10_1, D3D10CreateDevice1                    );
+//DEXPORTD(hLibD3D10_1, D3D10CreateDeviceAndSwapChain1        );
+DEXPORTD(hLibD3D10_1, D3D10CreateEffectFromMemory           );
+DEXPORTD(hLibD3D10_1, D3D10CreateEffectPoolFromMemory       );
+DEXPORTD(hLibD3D10_1, D3D10CreateStateBlock                 );
+DEXPORTD(hLibD3D10_1, D3D10DisassembleEffect                );
+DEXPORTD(hLibD3D10_1, D3D10DisassembleShader                );
+DEXPORTD(hLibD3D10_1, D3D10GetGeometryShaderProfile         );
+DEXPORTD(hLibD3D10_1, D3D10GetInputAndOutputSignatureBlob   );
+DEXPORTD(hLibD3D10_1, D3D10GetInputSignatureBlob            );
+DEXPORTD(hLibD3D10_1, D3D10GetOutputSignatureBlob           );
+DEXPORTD(hLibD3D10_1, D3D10GetPixelShaderProfile            );
+DEXPORTD(hLibD3D10_1, D3D10GetShaderDebugInfo               );
+DEXPORTD(hLibD3D10_1, D3D10GetVersion                       );
+DEXPORTD(hLibD3D10_1, D3D10GetVertexShaderProfile           );
+DEXPORTD(hLibD3D10_1, D3D10PreprocessShader                 );
+DEXPORTD(hLibD3D10_1, D3D10ReflectShader                    );
+DEXPORTD(hLibD3D10_1, D3D10RegisterLayers                   );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDifference         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDisableAll         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDisableCapture     );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskEnableAll          );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskEnableCapture      );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskGetSetting         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskIntersect          );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskUnion              );
+DEXPORTD(hLibD3D10_1, RevertToOldImplementation             );
 }
 #pragma warning (default : 4731)
 

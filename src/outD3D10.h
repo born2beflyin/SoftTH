@@ -39,6 +39,7 @@ private:
   HWND outWin;
   IDXGISwapChain *swapChain;
   ID3D10Device *dev;
+  ID3D10Device1 *dev1;
 
   HMONITOR mId;
   MONITORINFO mInfo;

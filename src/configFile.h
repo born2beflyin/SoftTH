@@ -99,6 +99,7 @@ public:
     char dllPathD3D9[256];  // Overridden path to direct3D DLL, or blank string for auto
     char dllPathDXGI[256];  // Overridden path to DXGI DLL, or blank string for auto
     char dllPathD3D10[256];  // Overridden path to D3D10 DLL, or blank string for auto
+    char dllPathD3D10_1[256];  // Overridden path to D3D10 DLL, or blank string for auto
     char dllPathD3D11[256];  // Overridden path to D3D11 DLL, or blank string for auto
     char screenshotFormat[4];
     bool zClear;  // Use z-clear trick to skip drawing of non-visible screen areas

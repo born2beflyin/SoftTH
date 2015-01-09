@@ -28,17 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dxgiSwapChain.h"
 #include <D3DX10Tex.h>
 
-
-/*#ifdef SOFTTHMAIN
-extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
-                                                                                   D3D10_DRIVER_TYPE DriverType,
-                                                                                   HMODULE Software,
-                                                                                   UINT Flags,
-                                                                                   UINT SDKVersion,
-                                                                                   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
-                                                                                   IDXGISwapChain **ppSwapChain,
-                                                                                   ID3D10Device **ppDevice);
-#else*/
+#ifdef D3D10
 extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                              D3D10_DRIVER_TYPE DriverType,
                                                              HMODULE Software,
@@ -47,7 +37,17 @@ extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
                                                              IDXGISwapChain **ppSwapChain,
                                                              ID3D10Device **ppDevice);
-/*#endif  //SOFTTHMAIN*/
+#else
+extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
+                                                              D3D10_DRIVER_TYPE DriverType,
+                                                              HMODULE Software,
+                                                              UINT Flags,
+                                                              D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                                              UINT SDKVersion,
+                                                              DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                              IDXGISwapChain **ppSwapChain,
+                                                              ID3D10Device1 **ppDevice);
+#endif
 
 
 outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)
@@ -118,7 +118,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     ++i;
   }
 
-  // Init Direct3D 10
+  // Init Direct3D 10/10.1
   DXGI_SWAP_CHAIN_DESC sd;
   ZeroMemory( &sd, sizeof(sd) );
   sd.BufferCount = 1;
@@ -139,11 +139,16 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   DWORD flags = 0;
   // TODO: verify devID match!
   //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
+  #ifdef D3D10
   if(dllD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
     dbg("D3D10CreateDeviceAndSwapChain FAILED");
+  #else
+  if(dllD3D10CreateDeviceAndSwapChain1(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_FEATURE_LEVEL_10_1, D3D10_1_SDK_VERSION, &sd, &swapChain, &dev1) != S_OK) {
+    dbg("D3D10CreateDeviceAndSwapChain1 FAILED");
+  #endif // D3D10
     exit(0);
   }
-  dbg("Created D3D10 device & swap chain...");
+  dbg("Created D3D10/10.1 device & swap chain...");
 
   // Get true swapchain
   IDXGISwapChainNew *scnew;
@@ -161,7 +166,11 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
   // Create shared buffer
   CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D10_BIND_SHADER_RESOURCE|D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, 0, 1, 0, D3D10_RESOURCE_MISC_SHARED);
+  #ifdef D3D10
   if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
+  #else
+  if(dev1->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
+  #endif // D3D10
     dbg("OutD3D10: CreateTexture2D failed :("), exit(0);
 
   // Get share handle
@@ -172,16 +181,28 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
   dbg("Share handle: 0x%08X", shareHandle);
 
+  #ifdef D3D10
   HRESULT ret = dev->CreateRenderTargetView(bb, NULL, &rttView);
+  #else
+  HRESULT ret = dev1->CreateRenderTargetView(bb, NULL, &rttView);
+  #endif // D3D10
   bb->Release();
   if(FAILED(ret)) {
     dbg("dev->CreateRenderTargetView FAILED");
     exit(0);
   }
+  #ifdef D3D10
   dev->OMSetRenderTargets(1, &rttView, NULL);
+  #else
+  dev1->OMSetRenderTargets(1, &rttView, NULL);
+  #endif // D3D10
 
   D3D10_VIEWPORT vp = {0, 0, bbWidth, bbHeight, 0, 1};
+  #ifdef D3D10
   dev->RSSetViewports(1, &vp);
+  #else
+  dev1->RSSetViewports(1, &vp);
+  #endif // D3D10
 
   dbg("outDirect3D10: Initialize COMPLETE");
   /*
@@ -318,12 +339,21 @@ void outDirect3D10::present()
 {
   // Copy from share surface to backbuffer & present
   dbg("CopySubresourceRegion...");
+  #ifdef D3D10
   dev->Flush();
+  #else
+  dev1->Flush();
+  #endif
 
   if(GetKeyState('U') < 0)
     D3DX10SaveTextureToFile(sharedSurface, D3DX10_IFF_JPG, "d:\\pelit\\_sharedSurface.jpg");
 
+
+  #ifdef D3D10
   dev->CopyResource(bb, sharedSurface);
+  #else
+  dev1->CopyResource(bb, sharedSurface);
+  #endif
   /*D3D10_BOX sb = {0, 0, 0, 1920, 1200, 1};
   dev->CopySubresourceRegion(bb, 0, 0, 0, 0, sharedSurface, 0, &sb);
 

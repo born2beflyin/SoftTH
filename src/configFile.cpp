@@ -181,6 +181,12 @@ void configFile::loadConfigFile()
   else
     strcpy(main.dllPathD3D10, "");
 
+  GetPrivateProfileString("main", "dllPathD3D10_1", "auto", (LPSTR) &temp, 256, cfgPath);
+  if(_stricmp(temp, "auto") && strlen(temp) > 2)
+    strcpy(main.dllPathD3D10_1, temp);
+  else
+    strcpy(main.dllPathD3D10_1, "");
+
   GetPrivateProfileString("main", "dllPathD3D11", "auto", (LPSTR) &temp, 256, cfgPath);
   if(_stricmp(temp, "auto") && strlen(temp) > 2)
     strcpy(main.dllPathD3D11, temp);
@@ -253,6 +259,7 @@ screenshotFormat=jpg\n\
 dllPathD3D9=auto\n\
 dllPathDXGI=auto\n\
 dllPathD3D10=auto\n\
+dllPathD3D10_1=auto\n\
 dllPathD3D11=auto\n\
 \n\
 [overrides]\n\

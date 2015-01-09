@@ -48,6 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 HINSTANCE hLibD3D9 = NULL; // Real d3d9.dll
 HINSTANCE hLibDXGI = NULL; // Real dxgi.dll
 HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
+HINSTANCE hLibD3D10_1 = NULL; // Real d3d10.dll
 HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
 HINSTANCE hLibD3D12 = NULL; // Real d3d12.dll
 HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
@@ -88,6 +89,26 @@ extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChai
                                                                                    DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
                                                                                    IDXGISwapChain **ppSwapChain,
                                                                                    ID3D10Device **ppDevice) = NULL;
+
+/* D3D 10.1 */
+HRESULT (WINAPI*dllD3D10CreateDevice1)(IDXGIAdapter *adapter,
+                                       D3D10_DRIVER_TYPE DriverType,
+                                       HMODULE Software,
+                                       UINT Flags,
+                                       D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                       UINT SDKVersion,
+                                       ID3D10Device1** ppDevice) = NULL;
+
+extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
+                                                                                    D3D10_DRIVER_TYPE DriverType,
+                                                                                    HMODULE Software,
+                                                                                    UINT Flags,
+                                                                                    D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                                                                    UINT SDKVersion,
+                                                                                    DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                    IDXGISwapChain **ppSwapChain,
+                                                                                    ID3D10Device1 **ppDevice) = NULL;
+
 
 /* D3D 11 */
 HRESULT (WINAPI*dllD3D11CreateDevice)(IDXGIAdapter *adapter,
@@ -277,6 +298,44 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("D3D10CreateDevice not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
         if(!dllD3D10CreateDeviceAndSwapChain)
 		      ShowMessage("D3D10CreateDeviceAndSwapChain not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
+      }
+
+      /* Load D3D10.1 Library */
+      {
+        char path[256];
+        if(strlen(config.main.dllPathD3D10_1) < 2)
+          sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "d3d10_1.dll");
+        else
+          strcpy(path, config.main.dllPathD3D10_1);
+        dbg("D3D10.1 DLL Path: <%s>", path);
+        hLibD3D10_1 = LoadLibrary(path);
+	      if(!hLibD3D10_1)
+		      ShowMessage("D3D10.1 DLL not found!\n'%s'", path), exit(0);
+
+        dllD3D10CreateDevice1 = (HRESULT(__stdcall *)(IDXGIAdapter*,
+                                                      D3D10_DRIVER_TYPE,
+                                                      HMODULE,
+                                                      UINT,
+                                                      D3D10_FEATURE_LEVEL1,
+                                                      UINT,
+                                                      ID3D10Device1**))
+                                                      GetProcAddress(hLibD3D10_1, "D3D10CreateDevice1");
+
+        dllD3D10CreateDeviceAndSwapChain1 = (HRESULT(__stdcall *)(IDXGIAdapter*,
+                                                                  D3D10_DRIVER_TYPE,
+                                                                  HMODULE,
+                                                                  UINT,
+                                                                  D3D10_FEATURE_LEVEL1,
+                                                                  UINT,
+                                                                  DXGI_SWAP_CHAIN_DESC *,
+                                                                  IDXGISwapChain **,
+                                                                  ID3D10Device1 **))
+                                                                  GetProcAddress(hLibD3D10_1, "D3D10CreateDeviceAndSwapChain1");
+
+        if(!dllD3D10CreateDevice1)
+		      ShowMessage("D3D10CreateDevice1 not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
+        if(!dllD3D10CreateDeviceAndSwapChain1)
+		      ShowMessage("D3D10CreateDeviceAndSwapChain1 not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
       }
 
       /* Load D3D11 LIbrary */

@@ -118,6 +118,7 @@ private:
   IDXGIFactory1 *parent;
   IDXGIFactory1 *dxgif;
   ID3D10Device *dev10;
+  ID3D10Device1 *dev10_1;
   ID3D11Device *dev11;
   HWND win;
 
@@ -135,8 +136,8 @@ private:
   void updateBB();  // Updates backbuffer data
 
   int numDevs;
-  OUTDEVICE10 *outDevs10;
-  OUTDEVICE11 *outDevs11;
+  OUTDEVICE10   *outDevs10;
+  OUTDEVICE11   *outDevs11;
 
 };
 
