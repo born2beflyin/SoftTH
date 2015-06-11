@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define __DXGIFACTORY_H__
 
 #include <dxgi.h>
+//#include <dxgi1_2.h>
 #include "helper.h"
 
 DEFINE_GUID(IID_IDXGIFactory1New, 0xc1bbaf12, 0x70f6, 0x4c47, 0xa3, 0x92, 0x2b, 0xc4, 0xf1, 0xc6, 0xf0, 0x49);
@@ -64,5 +65,21 @@ public:
 private:
   IDXGIFactory1 *dxgif;
 };
+
+
+DEFINE_GUID(IID_IDXGIFactory2New, 0xee85e851, 0x1363, 0x440d, 0x89, 0x82, 0xac, 0x5c, 0x56, 0x5a, 0x6, 0xea); // {EE85E851-1363-440d-8982-AC5C565A06EA}
+/*
+TODO: Need to add GUID for IDXGIFactory2New
+and create interface IDXGIFactory2New that extends
+IDXGIFactory2. Then for QueryInterface, detect the
+IDXGIFactory2New RIID also.
+
+
+interface IDXGIFactory2New : IDXGIFactory2
+{
+public:
+private:
+};
+*/
 
 #endif

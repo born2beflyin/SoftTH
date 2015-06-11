@@ -106,3 +106,12 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
   }
   return ret;*/
 }
+
+
+DEFINE_GUID(IID_IDXGIFactory2New, 0xee85e851, 0x1363, 0x440d, 0x89, 0x82, 0xac, 0x5c, 0x56, 0x5a, 0x6, 0xea); // {EE85E851-1363-440d-8982-AC5C565A06EA}
+
+
+/*
+TODO: Need to add all the IDXGIFactory2New
+functions, especially CreateSwapChainFor[XXXX] methods.
+*/

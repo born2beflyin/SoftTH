@@ -72,6 +72,7 @@ HRESULT (WINAPI*dllDXGID3D10CreateDevice)(HMODULE d3d10core,
 /* DXGI */
 HRESULT (WINAPI*dllCreateDXGIFactory)(REFIID riid, void **ppFactory) = NULL;
 HRESULT (WINAPI*dllCreateDXGIFactory1)(REFIID riid, void **ppFactory) = NULL;
+//HRESULT (WINAPI*dllCreateDXGIFactory2)(UINT Flags, REFIID riid, void **ppFactory) = NULL;
 
 /* D3D 10 */
 HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
@@ -385,6 +386,9 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       if(hooks) {
         if(hLibD3D9) addNoHookModule(hLibD3D9);
         if(hLibDXGI) addNoHookModule(hLibDXGI);
+        if(hLibD3D10) addNoHookModule(hLibD3D10);
+        if(hLibD3D10_1) addNoHookModule(hLibD3D10_1);
+        if(hLibD3D11) addNoHookModule(hLibD3D11);
         // Don't do "addNoHookModule" here for D3D10/11
         // "addNoHookModule" will occur within the D3D10/11 SoftTH DLLs
       }
@@ -423,6 +427,10 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 			if(hLibD3D10) {
 				FreeLibrary(hLibD3D10);
 				hLibD3D10 = NULL;
+			}
+			if(hLibD3D10_1) {
+				FreeLibrary(hLibD3D10_1);
+				hLibD3D10_1 = NULL;
 			}
 			if(hLibD3D11) {
 				FreeLibrary(hLibD3D11);

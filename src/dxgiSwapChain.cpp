@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dxgi.h>
 #include "main.h"
-#include <D3DX11Tex.h>
-#include <D3DX10Tex.h>
+//#include <D3DX11Tex.h>
+//#include <D3DX10Tex.h>
 
 #include "InputHandler.h"
 
@@ -204,10 +204,10 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
     dev10_1->CopySubresourceRegion(realbb10, 0, 0, 0, 0, newbb10, 0, &sb);
 
-    if(GetKeyState('O') < 0)
+    /*if(GetKeyState('O') < 0)
       D3DX10SaveTextureToFile(realbb10, D3DX10_IFF_JPG, "d:\\pelit\\_realbb.jpg");
     if(GetKeyState('P') < 0)
-      D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");
+      D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
 
     // Copy & Present secondary heads
     for(int i=0;i<numDevs;i++)
@@ -239,10 +239,10 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
     dev10->CopySubresourceRegion(realbb10, 0, 0, 0, 0, newbb10, 0, &sb);
 
-    if(GetKeyState('O') < 0)
+    /*if(GetKeyState('O') < 0)
       D3DX10SaveTextureToFile(realbb10, D3DX10_IFF_JPG, "d:\\pelit\\_realbb.jpg");
     if(GetKeyState('P') < 0)
-      D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");
+      D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
 
     // Copy & Present secondary heads
     for(int i=0;i<numDevs;i++)
