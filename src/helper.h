@@ -30,6 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAKERECT(re,l,r,t,b)	re.left=l;re.right=r;re.top=t;re.bottom=b;
 
+// Added by CJR for SDK 8.1 - 9 Aug 2015
+// Global helpers
+bool isSoftTHmode(int w, int h); // Return true if resolution is SoftTH mode
+volatile extern int SoftTHActive; // >0 if SoftTH is currently active and resolution is overridden
+extern bool *SoftTHActiveSquashed; // Pointer to latest SoftTH device squash variable (TODO: this is horrible)
+
 // Common interfaces for DXGI objects
 #define DECALE_DXGICOMMONIF(type)\
   /*STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj)*/\

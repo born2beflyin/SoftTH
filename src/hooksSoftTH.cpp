@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "globalHooker.h"
 #include "main.h"
 #include "inputHandler.h"
-#include "d3dSoftTH.h"
+//#include "d3dSoftTH.h" // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 #include <intrin.h>
 #pragma intrinsic(_ReturnAddress)

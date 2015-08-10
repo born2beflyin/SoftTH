@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "dxgiFactory.h"
 #include "dxgiSwapChain.h"
-#include <D3DX10Tex.h>
+//#include <D3DX10Tex.h> // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 #ifdef D3D10
 extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
@@ -345,8 +345,9 @@ void outDirect3D10::present()
   dev1->Flush();
   #endif
 
-  if(GetKeyState('U') < 0)
-    D3DX10SaveTextureToFile(sharedSurface, D3DX10_IFF_JPG, "d:\\pelit\\_sharedSurface.jpg");
+  // Removed by CJR for SDK 8.1 - 9 Aug 2015
+  //if(GetKeyState('U') < 0)
+  //  D3DX10SaveTextureToFile(sharedSurface, D3DX10_IFF_JPG, "d:\\pelit\\_sharedSurface.jpg");
 
 
   #ifdef D3D10

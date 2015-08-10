@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main.h"
 #include <math.h>
 
-#include "d3dSoftTH.h"
+//#include "d3dSoftTH.h" // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 #include <list>
 

@@ -464,6 +464,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 #pragma comment(lib, "Dbghelp.lib")
 #endif
 
+#if !DXGI
 IDirect3D9Ex *riil;
 
 extern "C" _declspec(dllexport) IDirect3D9 * __stdcall Direct3DCreate9(UINT SDKVersion)
@@ -511,6 +512,7 @@ extern "C" _declspec(dllexport) HRESULT __stdcall Direct3DCreate9Ex(UINT SDKVers
   *ptr = (IDirect3D9Ex*) d3dhNew;
   return S_OK;
 }
+#endif
 
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory(REFIID riid, void **ppFactory)
 {
@@ -622,6 +624,14 @@ DEXPORTD(hLibDXGI, DXGIDumpJournal);
 DEXPORTD(hLibDXGI, DXGIReportAdapterConfiguration);
 DEXPORTD(hLibDXGI, OpenAdapter10);
 DEXPORTD(hLibDXGI, OpenAdapter10_2);
+
+// D3D 10
+
+
+// D3D 10.1
+
+
+// D3D 11
 
 
 }

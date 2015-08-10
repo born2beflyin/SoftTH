@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "d3dDrawing.h"
 #include "shcopy.h"
 
-#define USE_D3DX
+//#define USE_D3DX // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 #define NUM_FPS_GRAPH 175
 

@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // USE_D3DEX Disabled: Do not use Direct3D9Ex
 // For debug only, SoftTH device wont work with it
-#define USE_D3DEX 1
+//#define USE_D3DEX 1 // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 // Debug settings for non-ex device (enable various Ex device emulation features)
 #define MANAGE_DEBUG_IB         0

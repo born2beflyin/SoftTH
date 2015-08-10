@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "dxgiFactory.h"
 #include "dxgiSwapChain.h"
-#include <D3DX11tex.h>
+//#include <D3DX11tex.h> // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 
 /*#ifdef SOFTTHMAIN

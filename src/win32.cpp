@@ -28,20 +28,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "overlay_interface.h"
 
-#include "d3dSoftTH.h"
+//#include "d3dSoftTH.h" // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 HWND createWindow(int x, int y, int w, int h, HWND rootWindow, DWORD flags, bool show);
 
 // Thread that creates window and handles its messages
 void __cdecl windowHandler(void* a) {
   WINDOWPARAMS *wp = (WINDOWPARAMS*) a;
-	HWND appWindow = createWindow(wp->x, wp->y, wp->width, wp->height, wp->parent, wp->flags, wp->show);  
+	HWND appWindow = createWindow(wp->x, wp->y, wp->width, wp->height, wp->parent, wp->flags, wp->show);
   wp->hWnd = appWindow;
 	MSG msg;
-	while(GetMessage(&msg, appWindow, 0, 0)) {    
+	while(GetMessage(&msg, appWindow, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-	} 
+	}
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -77,7 +77,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if(!SoftTHActive)
           break;
 
-        int x = GET_X_LPARAM(lParam); 
+        int x = GET_X_LPARAM(lParam);
         int y = GET_Y_LPARAM(lParam);
 
         POINT op = {x, y};
@@ -152,7 +152,7 @@ HWND createWindow(int x, int y, int w, int h, HWND rootWindow, DWORD flags, bool
 		}
   }
 
-  hWnd = CreateWindowEx(flags, className, 
+  hWnd = CreateWindowEx(flags, className,
                              "SoftTH",
                              /*WS_OVERLAPPEDWINDOW*/ WS_POPUP,
                              x, y, w, h, rootWindow, NULL, hInstance, NULL);
