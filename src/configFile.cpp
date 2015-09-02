@@ -193,6 +193,12 @@ void configFile::loadConfigFile()
   else
     strcpy(main.dllPathD3D11, "");
 
+  GetPrivateProfileString("main", "dllPathD3D12", "auto", (LPSTR) &temp, 256, cfgPath);
+  if(_stricmp(temp, "auto") && strlen(temp) > 2)
+    strcpy(main.dllPathD3D12, temp);
+  else
+    strcpy(main.dllPathD3D12, "");
+
   GetPrivateProfileString("main", "nonlocalFormat", "RGB16D", (LPSTR) &temp, 256, cfgPath);
   if(!_stricmp(temp, "RGB16D")) nonlocalMethodDefault = OUTMETHOD_NONLOCAL_16bDither;
   else if(!_stricmp(temp, "RGB16")) nonlocalMethodDefault = OUTMETHOD_NONLOCAL_16b;
@@ -261,6 +267,7 @@ dllPathDXGI=auto\n\
 dllPathD3D10=auto\n\
 dllPathD3D10_1=auto\n\
 dllPathD3D11=auto\n\
+dllPathD3D12=auto\n\
 \n\
 [overrides]\n\
 forceResolution=0\n\

@@ -64,6 +64,7 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
   dev10 = NULL;
   dev10_1 = NULL;
   dev11 = NULL;
+  //dev12 = NULL;
   dxgsc = NULL;
   dxgif = dxgifNew;
   parent = parentNew;

@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "win32.h"
 #include <process.h>
 #include <vector>
-#include <d3d9.h>
+//#include <d3d9.h>
 #include "main.h"
 
 #include "dxgiFactory.h"

@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "win32.h"
 #include <process.h>
 #include <vector>
-#include <d3d9.h>
+//#include <d3d9.h>
 #include "main.h"
 
 #include "dxgiFactory.h"
@@ -31,7 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#include <D3DX11tex.h> // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
 
-/*#ifdef SOFTTHMAIN
+//#ifdef SOFTTHMAIN
+/*
 extern "C" __declspec(dllimport)HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                                                   D3D_DRIVER_TYPE DriverType,
                                                                                   HMODULE Software,
@@ -44,7 +45,8 @@ extern "C" __declspec(dllimport)HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain
                                                                                   ID3D11Device** ppDevice,
                                                                                   D3D_FEATURE_LEVEL *pFeatureLevel,
                                                                                   ID3D11DeviceContext **ppImmediateContext);
-#else*/
+*/
+//#else
 extern "C" HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                              D3D_DRIVER_TYPE DriverType,
                                                              HMODULE Software,
@@ -57,7 +59,7 @@ extern "C" HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              ID3D11Device** ppDevice,
                                                              D3D_FEATURE_LEVEL *pFeatureLevel,
                                                              ID3D11DeviceContext **ppImmediateContext);
-/*#endif  //SOFTTHMAIN*/
+//#endif  //SOFTTHMAIN
 
 
 outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)

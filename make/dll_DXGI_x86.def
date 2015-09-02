@@ -2,4 +2,11 @@ LIBRARY dxgi
 EXPORTS
 	CreateDXGIFactory=_newCreateDXGIFactory@8
 	CreateDXGIFactory1=_newCreateDXGIFactory1@8
+  CreateDXGIFactory2=_newCreateDXGIFactory2@12
 	DXGID3D10CreateDevice=_DXGID3D10CreateDevice@24
+	D3D10CreateDevice=_newD3D10CreateDevice@24
+	D3D10CreateDeviceAndSwapChain=_newD3D10CreateDeviceAndSwapChain@32
+	D3D10CreateDevice1=_newD3D10CreateDevice1@28
+	D3D10CreateDeviceAndSwapChain1=_newD3D10CreateDeviceAndSwapChain1@36
+	D3D11CreateDevice=_newD3D11CreateDevice@40
+	D3D11CreateDeviceAndSwapChain=_newD3D11CreateDeviceAndSwapChain@48

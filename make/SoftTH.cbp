@@ -202,6 +202,7 @@
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
+					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
@@ -272,6 +273,7 @@
 					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
+					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />

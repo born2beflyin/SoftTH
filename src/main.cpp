@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "d3d.h"
 #include "dxgiFactory.h"
 #include "dxgiAdapterOutput.h"
+#include "dxgiSwapChain.h"
 #include "configFile.h"
 #include "InputHandler.h"
 #include "Dwmapi.h"
@@ -72,7 +73,7 @@ HRESULT (WINAPI*dllDXGID3D10CreateDevice)(HMODULE d3d10core,
 /* DXGI */
 HRESULT (WINAPI*dllCreateDXGIFactory)(REFIID riid, void **ppFactory) = NULL;
 HRESULT (WINAPI*dllCreateDXGIFactory1)(REFIID riid, void **ppFactory) = NULL;
-//HRESULT (WINAPI*dllCreateDXGIFactory2)(UINT Flags, REFIID riid, void **ppFactory) = NULL;
+HRESULT (WINAPI*dllCreateDXGIFactory2)(UINT Flags, REFIID riid, void **ppFactory) = NULL; // TODO: add this for Win 8.1+
 
 /* D3D 10 */
 HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
@@ -82,14 +83,15 @@ HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
                                       UINT SDKVersion,
                                       ID3D10Device** ppDevice) = NULL;
 
+// extern "C" __declspec(dllexport)
 extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
-                                                                                   D3D10_DRIVER_TYPE DriverType,
-                                                                                   HMODULE Software,
-                                                                                   UINT Flags,
-                                                                                   UINT SDKVersion,
-                                                                                   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
-                                                                                   IDXGISwapChain **ppSwapChain,
-                                                                                   ID3D10Device **ppDevice) = NULL;
+                                                  D3D10_DRIVER_TYPE DriverType,
+                                                  HMODULE Software,
+                                                  UINT Flags,
+                                                  UINT SDKVersion,
+                                                  DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                  IDXGISwapChain **ppSwapChain,
+                                                  ID3D10Device **ppDevice) = NULL;
 
 /* D3D 10.1 */
 HRESULT (WINAPI*dllD3D10CreateDevice1)(IDXGIAdapter *adapter,
@@ -100,15 +102,16 @@ HRESULT (WINAPI*dllD3D10CreateDevice1)(IDXGIAdapter *adapter,
                                        UINT SDKVersion,
                                        ID3D10Device1** ppDevice) = NULL;
 
+// extern "C" __declspec(dllexport)
 extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
-                                                                                    D3D10_DRIVER_TYPE DriverType,
-                                                                                    HMODULE Software,
-                                                                                    UINT Flags,
-                                                                                    D3D10_FEATURE_LEVEL1 HardwareLevel,
-                                                                                    UINT SDKVersion,
-                                                                                    DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
-                                                                                    IDXGISwapChain **ppSwapChain,
-                                                                                    ID3D10Device1 **ppDevice) = NULL;
+                                                   D3D10_DRIVER_TYPE DriverType,
+                                                   HMODULE Software,
+                                                   UINT Flags,
+                                                   D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                                   UINT SDKVersion,
+                                                   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                   IDXGISwapChain **ppSwapChain,
+                                                   ID3D10Device1 **ppDevice) = NULL;
 
 
 /* D3D 11 */
@@ -123,18 +126,19 @@ HRESULT (WINAPI*dllD3D11CreateDevice)(IDXGIAdapter *adapter,
                                       D3D_FEATURE_LEVEL *pFeatureLevel,
                                       ID3D11DeviceContext **ppImmediateContext) = NULL;
 
+// extern "C" __declspec(dllexport)
 extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
-                                                                                   D3D_DRIVER_TYPE DriverType,
-                                                                                   HMODULE Software,
-                                                                                   UINT Flags,
-                                                                                   const D3D_FEATURE_LEVEL *pFeatureLevels,
-                                                                                   UINT FeatureLevels,
-                                                                                   UINT SDKVersion,
-                                                                                   const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
-                                                                                   IDXGISwapChain **ppSwapChain,
-                                                                                   ID3D11Device** ppDevice,
-                                                                                   D3D_FEATURE_LEVEL *pFeatureLevel,
-                                                                                   ID3D11DeviceContext **ppImmediateContext) = NULL;
+                                                  D3D_DRIVER_TYPE DriverType,
+                                                  HMODULE Software,
+                                                  UINT Flags,
+                                                  const D3D_FEATURE_LEVEL *pFeatureLevels,
+                                                  UINT FeatureLevels,
+                                                  UINT SDKVersion,
+                                                  const DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                  IDXGISwapChain **ppSwapChain,
+                                                  ID3D11Device** ppDevice,
+                                                  D3D_FEATURE_LEVEL *pFeatureLevel,
+                                                  ID3D11DeviceContext **ppImmediateContext) = NULL;
 
 DLL configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
@@ -254,11 +258,14 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
         dllCreateDXGIFactory = (HRESULT(__stdcall *)(REFIID, void**)) GetProcAddress(hLibDXGI, "CreateDXGIFactory");
         dllCreateDXGIFactory1 = (HRESULT(__stdcall *)(REFIID, void**)) GetProcAddress(hLibDXGI, "CreateDXGIFactory1");
+        dllCreateDXGIFactory2 = (HRESULT(__stdcall *)(UINT, REFIID, void**)) GetProcAddress(hLibDXGI, "CreateDXGIFactory2");
 
         if(!dllCreateDXGIFactory)
 		      ShowMessage("CreateDXGIFactory not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
         if(!dllCreateDXGIFactory1)
 		      ShowMessage("CreateDXGIFactory1 not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
+        if(!dllCreateDXGIFactory2)
+		      ShowMessage("CreateDXGIFactory2 not in DLL!\nMust be running Windows 7.\n'%s'", path);//, exit(0);
 
         dllDXGID3D10CreateDevice = (HRESULT(__stdcall *)(HMODULE, IDXGIFactory*, IDXGIAdapter*, UINT, DWORD, void**)) GetProcAddress(hLibDXGI, "DXGID3D10CreateDevice");
         if(!dllDXGID3D10CreateDevice)
@@ -383,14 +390,18 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("D3D11CreateDeviceAndSwapChain not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
       }
 
+      /* Load D3D12 LIbrary */
+      {
+        // TODO: Load D3D12 Library
+      }
+
       if(hooks) {
         if(hLibD3D9) addNoHookModule(hLibD3D9);
         if(hLibDXGI) addNoHookModule(hLibDXGI);
         if(hLibD3D10) addNoHookModule(hLibD3D10);
         if(hLibD3D10_1) addNoHookModule(hLibD3D10_1);
         if(hLibD3D11) addNoHookModule(hLibD3D11);
-        // Don't do "addNoHookModule" here for D3D10/11
-        // "addNoHookModule" will occur within the D3D10/11 SoftTH DLLs
+        if(hLibD3D12) addNoHookModule(hLibD3D12);
       }
 
       break;
@@ -465,6 +476,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 #endif
 
 #if !DXGI
+/*    Direct3D 9    */
 IDirect3D9Ex *riil;
 
 extern "C" _declspec(dllexport) IDirect3D9 * __stdcall Direct3DCreate9(UINT SDKVersion)
@@ -514,16 +526,18 @@ extern "C" _declspec(dllexport) HRESULT __stdcall Direct3DCreate9Ex(UINT SDKVers
 }
 #endif
 
+/*       DXGI        */
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory(REFIID riid, void **ppFactory)
 {
   dbg("CreateDXGIFactory");
 
-  //HRESULT ret = dllCreateDXGIFactory(riid, ppFactory);
-  HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
+  HRESULT ret = dllCreateDXGIFactory(riid, ppFactory);
+  //HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
   dbg("CreateDXGIFactory 0x%08X", *ppFactory);
   if(ret == S_OK) {
-    IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
-    *ppFactory = new IDXGIFactory1New(dxgifNew);
+    IDXGIFactory *dxgifNew = (IDXGIFactory *) *ppFactory;
+    *ppFactory = new IDXGIFactoryNew(dxgifNew);
+    dbg("main - here");
   } else
     dbg("CreateDXGIFactory failed!");
   return ret;
@@ -544,6 +558,21 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid
   return ret;
 }
 
+extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory2(UINT Flags, REFIID riid, void **ppFactory)
+{
+  dbg("CreateDXGIFactory2");
+
+  HRESULT ret = dllCreateDXGIFactory2(Flags, riid, ppFactory);
+  dbg("CreateDXGIFactory2 0x%08X", *ppFactory);
+  if(ret == S_OK) {
+    //IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
+    //*ppFactory = new IDXGIFactory1New(dxgifNew);
+    dbg(" *** TODO: still need to add IDXGIFactory2!!! ***");
+  } else
+    dbg("CreateDXGIFactory2 failed!");
+  return ret;
+}
+
 extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d10core, IDXGIFactory *factory, IDXGIAdapter *adapter, UINT flags, DWORD unknown0, void **device)
 {
   dbg("DXGID3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
@@ -560,6 +589,325 @@ extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d
   }
 
   return dllDXGID3D10CreateDevice(d3d10core, factory, adapter, flags, unknown0, device);
+}
+
+/*    Direct3D 10     */
+//D3D10CreateDevice
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDevice(IDXGIAdapter *adapter,
+                                                                    D3D10_DRIVER_TYPE DriverType,
+                                                                    HMODULE Software,
+                                                                    UINT Flags,
+                                                                    UINT SDKVersion,
+                                                                    ID3D10Device** ppDevice)
+{
+  dbg("d3d10: D3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+
+  HRESULT ret = dllD3D10CreateDevice(adapter, DriverType, Software, Flags, SDKVersion, ppDevice);
+
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+
+  return ret;
+}
+
+//D3D10CreateDeviceAndSwapChain
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDeviceAndSwapChain(IDXGIAdapter *adapter,
+                                                                                D3D10_DRIVER_TYPE DriverType,
+                                                                                HMODULE Software,
+                                                                                UINT Flags,
+                                                                                UINT SDKVersion,
+                                                                                DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                IDXGISwapChain **ppSwapChain,
+                                                                                ID3D10Device **ppDevice)
+{
+  dbg("d3d10: D3D10CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
+
+  /*dbg("Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
+  dbg("Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
+  dbg("Buffers: %d (Usage %s), Swapeffect: %s", pSwapChainDesc->BufferCount, getUsageDXGI(pSwapChainDesc->BufferUsage), pSwapChainDesc->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+
+  dbg("Flags: %s %s %s", pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");*/
+
+  HRESULT ret;
+
+  /*ret = D3D10CreateDevice(adapter,
+                          D3D10_DRIVER_TYPE_HARDWARE,
+                          NULL,
+                          0,
+                          D3D10_SDK_VERSION,
+                          ppDevice
+                          );*/
+
+  ret = D3D10CreateDevice(adapter,
+                          DriverType,
+                          Software,
+                          Flags,
+                          SDKVersion,
+                          ppDevice
+                          );
+
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+
+  IDXGIFactory1 *factory;
+  //IDXGIFactory1New *fnew;
+  //CreateDXGIFactory1()
+  if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)
+  {
+    //factory = fnew->getReal();
+    //fnew->Release();
+    dbg("d3d10: Got parent factory");
+  }
+
+  //ret =  dllD3D10CreateDeviceAndSwapChain(anew, DriverType, Software, Flags, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
+
+  (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);
+
+  /*IDXGISwapChainNew *scnew;
+  if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {
+    (*ppSwapChain) = scnew->getReal();
+    scnew->Release();
+  } else dbg("Booh! No real swap chain!");*/
+
+  /*if(fnew)
+  {
+    fnew->Release();
+    delete fnew;
+    fnew = NULL;
+  }*/
+
+  return ret;
+}
+
+/*    Direct3D 10.1     */
+//D3D10CreateDevice1
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDevice1(IDXGIAdapter *adapter,
+                                                                     D3D10_DRIVER_TYPE DriverType,
+                                                                     HMODULE Software,
+                                                                     UINT Flags,
+                                                                     D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                                                     UINT SDKVersion,
+                                                                     ID3D10Device1** ppDevice)
+{
+  dbg("d3d10.1: D3D10CreateDevice1 0x%08X 0x%08X", adapter, *adapter);
+
+  HRESULT ret = dllD3D10CreateDevice1(adapter, DriverType, Software, Flags, HardwareLevel, SDKVersion, ppDevice);
+
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+
+  return ret;
+}
+
+//D3D10CreateDeviceAndSwapChain1
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D10CreateDeviceAndSwapChain1(IDXGIAdapter *adapter,
+                                                                                 D3D10_DRIVER_TYPE DriverType,
+                                                                                 HMODULE Software,
+                                                                                 UINT Flags,
+                                                                                 D3D10_FEATURE_LEVEL1 HardwareLevel,
+                                                                                 UINT SDKVersion,
+                                                                                 DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                 IDXGISwapChain **ppSwapChain,
+                                                                                 ID3D10Device1 **ppDevice)
+{
+  dbg("d3d10.1: D3D10CreateDeviceAndSwapChain1 0x%08X 0x%08X", adapter, *adapter);
+
+  /*dbg("Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
+  dbg("Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
+  dbg("Buffers: %d (Usage %s), Swapeffect: %s", pSwapChainDesc->BufferCount, getUsageDXGI(pSwapChainDesc->BufferUsage), pSwapChainDesc->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+
+  dbg("Flags: %s %s %s", pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");*/
+
+  HRESULT ret;
+
+  /*ret = D3D10CreateDevice1(adapter,
+                          D3D10_DRIVER_TYPE_HARDWARE,
+                          NULL,
+                          0,
+                          D3D10_FEATURE_LEVEL_10_1,
+                          D3D10_SDK_VERSION,
+                          ppDevice
+                          );*/
+
+  ret = D3D10CreateDevice1(adapter,
+                          DriverType,
+                          Software,
+                          Flags,
+                          HardwareLevel,
+                          SDKVersion,
+                          ppDevice
+                          );
+
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+
+  IDXGIFactory1 *factory;
+  //IDXGIFactory1New *fnew;
+  //CreateDXGIFactory1()
+  if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)
+  {
+    //factory = fnew->getReal();
+    //fnew->Release();
+    dbg("d3d10.1: Got parent factory");
+  }
+
+  //ret =  dllD3D10CreateDeviceAndSwapChain1(anew, DriverType, Software, Flags, HardwareLevel, SDKVersion, pSwapChainDesc, ppSwapChain, ppDevice);
+
+  (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);
+
+  /*IDXGISwapChainNew *scnew;
+  if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {
+    (*ppSwapChain) = scnew->getReal();
+    scnew->Release();
+  } else dbg("Booh! No real swap chain!");*/
+
+  /*if(fnew)
+  {
+    fnew->Release();
+    delete fnew;
+    fnew = NULL;
+  }*/
+
+  return ret;
+}
+
+/*    Direct3D 11     */
+//D3D11CreateDevice
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDevice(IDXGIAdapter *adapter,
+                                                                    D3D_DRIVER_TYPE DriverType,
+                                                                    HMODULE Software,
+                                                                    UINT Flags,
+                                                                    const D3D_FEATURE_LEVEL *pFeatureLevels,
+                                                                    UINT FeatureLevels,
+                                                                    UINT SDKVersion,
+                                                                    ID3D11Device** ppDevice,
+                                                                    D3D_FEATURE_LEVEL *pFeatureLevel,
+                                                                    ID3D11DeviceContext **ppImmediateContext)
+{
+  dbg("d3d11: D3D11CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+
+  HRESULT ret = dllD3D11CreateDevice(adapter,
+                                     DriverType,
+                                     Software,
+                                     Flags,
+                                     pFeatureLevels,
+                                     FeatureLevels,
+                                     SDKVersion,
+                                     ppDevice,
+                                     pFeatureLevel,
+                                     ppImmediateContext);
+
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+
+  return ret;
+}
+
+//D3D11CreateDeviceAndSwapChain
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(IDXGIAdapter *adapter,
+                                                                                D3D_DRIVER_TYPE DriverType,
+                                                                                HMODULE Software,
+                                                                                UINT Flags,
+                                                                                const D3D_FEATURE_LEVEL *pFeatureLevels,
+                                                                                UINT FeatureLevels,
+                                                                                UINT SDKVersion,
+                                                                                DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                                                                                IDXGISwapChain **ppSwapChain,
+                                                                                ID3D11Device** ppDevice,
+                                                                                D3D_FEATURE_LEVEL *pFeatureLevel,
+                                                                                ID3D11DeviceContext **ppImmediateContext)
+{
+  dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
+
+  /*dbg("Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
+  dbg("Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
+  dbg("Buffers: %d (Usage %s), Swapeffect: %s", pSwapChainDesc->BufferCount, getUsageDXGI(pSwapChainDesc->BufferUsage), pSwapChainDesc->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+
+  dbg("Flags: %s %s %s", pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");*/
+
+  HRESULT ret;
+
+  ret = D3D11CreateDevice(adapter,
+                          DriverType,
+                          Software,
+                          Flags,
+                          pFeatureLevels,
+                          FeatureLevels,
+                          SDKVersion,
+                          ppDevice,
+                          pFeatureLevel,
+                          ppImmediateContext);
+
+  //
+  /*IDXGIAdapter1New *anew;
+  if(adapter->QueryInterface(IID_IDXGIAdapter, (void**) &anew) == S_OK) {
+    adapter = anew->getReal();
+    anew->Release();
+  }*/
+  //
+
+  IDXGIFactory1 *factory;
+  //IDXGIFactory1New *fnew;
+  //CreateDXGIFactory1()
+  if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)
+  {
+    //factory = fnew->getReal();
+    //fnew->Release();
+    dbg("d3d11: Got parent factory");
+  }
+
+  /*ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
+                                          DriverType,
+                                          Software,
+                                          Flags,
+                                          pFeatureLevels,
+                                          FeatureLevels,
+                                          SDKVersion,
+                                          pSwapChainDesc,
+                                          ppSwapChain,
+                                          ppDevice,
+                                          pFeatureLevel,
+                                          ppImmediateContext);*/
+
+  (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);
+
+
+
+  /*IDXGISwapChainNew *scnew;
+  if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {
+    (*ppSwapChain) = scnew->getReal();
+    scnew->Release();
+  } else dbg("Booh! No real swap chain!");*/
+
+  /*if(fnew)
+  {
+    fnew->Release();
+    delete fnew;
+    fnew = NULL;
+  }*/
+
+  return ret;
 }
 
 #ifndef _WIN64
@@ -612,27 +960,135 @@ DEXPORT(hLibD3D9, LoadDebugRuntime          );
 // DXGI
 //DEXPORTD(hLibDXGI, CreateDXGIFactory);
 //DEXPORTD(hLibDXGI, CreateDXGIFactory1);
-DEXPORTD(hLibDXGI, D3DKMTGetDeviceState);
-DEXPORTD(hLibDXGI, D3DKMTOpenAdapterFromHdc);
-DEXPORTD(hLibDXGI, D3DKMTQueryAdapterInfo);
-DEXPORTD(hLibDXGI, D3DKMTWaitForVerticalBlankEvent);
+//DEXPORTD(hLibDXGI, CreateDXGIFactory2);
+////DEXPORTD(hLibDXGI, D3DKMTGetDeviceState);
+////DEXPORTD(hLibDXGI, D3DKMTOpenAdapterFromHdc);
+////DEXPORTD(hLibDXGI, D3DKMTQueryAdapterInfo);
+////DEXPORTD(hLibDXGI, D3DKMTWaitForVerticalBlankEvent);
 //DEXPORTD(hLibDXGI, DXGID3D10CreateDevice);
 DEXPORTD(hLibDXGI, DXGID3D10CreateLayeredDevice);
 DEXPORTD(hLibDXGI, DXGID3D10GetLayeredDeviceSize);
 DEXPORTD(hLibDXGI, DXGID3D10RegisterLayers);
 DEXPORTD(hLibDXGI, DXGIDumpJournal);
 DEXPORTD(hLibDXGI, DXGIReportAdapterConfiguration);
-DEXPORTD(hLibDXGI, OpenAdapter10);
-DEXPORTD(hLibDXGI, OpenAdapter10_2);
+////DEXPORTD(hLibDXGI, OpenAdapter10);
+////DEXPORTD(hLibDXGI, OpenAdapter10_2);
 
 // D3D 10
-
+/*
+DEXPORTD(hLibD3D10, D3D10CompileEffectFromMemory         );
+DEXPORTD(hLibD3D10, D3D10CreateBlob                      );
+//DEXPORTD(hLibD3D10, D3D10CreateDevice                    );
+//DEXPORTD(hLibD3D10, D3D10CreateDeviceAndSwapChain        );
+DEXPORTD(hLibD3D10, D3D10CreateEffectFromMemory          );
+DEXPORTD(hLibD3D10, D3D10CreateEffectPoolFromMemory      );
+DEXPORTD(hLibD3D10, D3D10CreateStateBlock                );
+DEXPORTD(hLibD3D10, D3D10DisassembleEffect               );
+DEXPORTD(hLibD3D10, D3D10DisassembleShader               );
+DEXPORTD(hLibD3D10, D3D10GetGeometryShaderProfile        );
+DEXPORTD(hLibD3D10, D3D10GetInputAndOutputSignatureBlob  );
+DEXPORTD(hLibD3D10, D3D10GetInputSignatureBlob           );
+DEXPORTD(hLibD3D10, D3D10GetOutputSignatureBlob          );
+DEXPORTD(hLibD3D10, D3D10GetPixelShaderProfile           );
+DEXPORTD(hLibD3D10, D3D10GetShaderDebugInfo              );
+DEXPORTD(hLibD3D10, D3D10GetVersion                      );
+DEXPORTD(hLibD3D10, D3D10GetVertexShaderProfile          );
+DEXPORTD(hLibD3D10, D3D10PreprocessShader                );
+DEXPORTD(hLibD3D10, D3D10ReflectShader                   );
+DEXPORTD(hLibD3D10, D3D10RegisterLayers                  );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskDifference        );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskDisableAll        );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskDisableCapture    );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskEnableAll         );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskEnableCapture     );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskGetSetting        );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskIntersect         );
+DEXPORTD(hLibD3D10, D3D10StateBlockMaskUnion             );
+DEXPORTD(hLibD3D10, RevertToOldImplementation            );
+*/
 
 // D3D 10.1
-
+/*
+DEXPORTD(hLibD3D10_1, D3D10CompileEffectFromMemory          );
+DEXPORTD(hLibD3D10_1, D3D10CompileShader                    );
+DEXPORTD(hLibD3D10_1, D3D10CreateBlob                       );
+//DEXPORTD(hLibD3D10_1, D3D10CreateDevice1                    );
+//DEXPORTD(hLibD3D10_1, D3D10CreateDeviceAndSwapChain1        );
+DEXPORTD(hLibD3D10_1, D3D10CreateEffectFromMemory           );
+DEXPORTD(hLibD3D10_1, D3D10CreateEffectPoolFromMemory       );
+DEXPORTD(hLibD3D10_1, D3D10CreateStateBlock                 );
+DEXPORTD(hLibD3D10_1, D3D10DisassembleEffect                );
+DEXPORTD(hLibD3D10_1, D3D10DisassembleShader                );
+DEXPORTD(hLibD3D10_1, D3D10GetGeometryShaderProfile         );
+DEXPORTD(hLibD3D10_1, D3D10GetInputAndOutputSignatureBlob   );
+DEXPORTD(hLibD3D10_1, D3D10GetInputSignatureBlob            );
+DEXPORTD(hLibD3D10_1, D3D10GetOutputSignatureBlob           );
+DEXPORTD(hLibD3D10_1, D3D10GetPixelShaderProfile            );
+DEXPORTD(hLibD3D10_1, D3D10GetShaderDebugInfo               );
+DEXPORTD(hLibD3D10_1, D3D10GetVersion                       );
+DEXPORTD(hLibD3D10_1, D3D10GetVertexShaderProfile           );
+DEXPORTD(hLibD3D10_1, D3D10PreprocessShader                 );
+DEXPORTD(hLibD3D10_1, D3D10ReflectShader                    );
+DEXPORTD(hLibD3D10_1, D3D10RegisterLayers                   );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDifference         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDisableAll         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskDisableCapture     );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskEnableAll          );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskEnableCapture      );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskGetSetting         );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskIntersect          );
+DEXPORTD(hLibD3D10_1, D3D10StateBlockMaskUnion              );
+DEXPORTD(hLibD3D10_1, RevertToOldImplementation             );
+*/
 
 // D3D 11
-
+DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
+DEXPORTD(hLibD3D11, D3D11CoreCreateLayeredDevice);
+DEXPORTD(hLibD3D11, D3D11CoreGetLayeredDeviceSize);
+DEXPORTD(hLibD3D11, D3D11CoreRegisterLayers);
+//DEXPORTD(hLibD3D11, D3D11CreateDevice);
+//DEXPORTD(hLibD3D11, D3D11CreateDeviceAndSwapChain);
+DEXPORTD(hLibD3D11, D3DKMTCloseAdapter);
+DEXPORTD(hLibD3D11, D3DKMTCreateAllocation);
+DEXPORTD(hLibD3D11, D3DKMTCreateContext);
+DEXPORTD(hLibD3D11, D3DKMTCreateDevice);
+DEXPORTD(hLibD3D11, D3DKMTCreateSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTDestroyAllocation);
+DEXPORTD(hLibD3D11, D3DKMTDestroyContext);
+DEXPORTD(hLibD3D11, D3DKMTDestroyDevice);
+DEXPORTD(hLibD3D11, D3DKMTDestroySynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTEscape);
+DEXPORTD(hLibD3D11, D3DKMTGetContextSchedulingPriority);
+DEXPORTD(hLibD3D11, D3DKMTGetDeviceState);
+DEXPORTD(hLibD3D11, D3DKMTGetDisplayModeList);
+DEXPORTD(hLibD3D11, D3DKMTGetMultisampleMethodList);
+DEXPORTD(hLibD3D11, D3DKMTGetRuntimeData);
+DEXPORTD(hLibD3D11, D3DKMTGetSharedPrimaryHandle);
+DEXPORTD(hLibD3D11, D3DKMTLock);
+DEXPORTD(hLibD3D11, D3DKMTOpenAdapterFromHdc);
+DEXPORTD(hLibD3D11, D3DKMTOpenResource);
+DEXPORTD(hLibD3D11, D3DKMTPresent);
+DEXPORTD(hLibD3D11, D3DKMTQueryAdapterInfo);
+DEXPORTD(hLibD3D11, D3DKMTQueryAllocationResidency);
+DEXPORTD(hLibD3D11, D3DKMTQueryResourceInfo);
+DEXPORTD(hLibD3D11, D3DKMTRender);
+DEXPORTD(hLibD3D11, D3DKMTSetAllocationPriority);
+DEXPORTD(hLibD3D11, D3DKMTSetContextSchedulingPriority);
+DEXPORTD(hLibD3D11, D3DKMTSetDisplayMode);
+DEXPORTD(hLibD3D11, D3DKMTSetDisplayPrivateDriverFormat);
+DEXPORTD(hLibD3D11, D3DKMTSetGammaRamp);
+DEXPORTD(hLibD3D11, D3DKMTSetVidPnSourceOwner);
+DEXPORTD(hLibD3D11, D3DKMTSignalSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTUnlock);
+DEXPORTD(hLibD3D11, D3DKMTWaitForSynchronizationObject);
+DEXPORTD(hLibD3D11, D3DKMTWaitForVerticalBlankEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_BeginEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_EndEvent);
+DEXPORTD(hLibD3D11, D3DPerformance_GetStatus);
+DEXPORTD(hLibD3D11, D3DPerformance_SetMarker);
+DEXPORTD(hLibD3D11, EnableFeatureLevelUpgrade);
+DEXPORTD(hLibD3D11, OpenAdapter10);
+DEXPORTD(hLibD3D11, OpenAdapter10_2);
 
 }
 #pragma warning (default : 4731)

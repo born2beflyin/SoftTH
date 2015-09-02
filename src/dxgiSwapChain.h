@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <d3d11.h>
 #include "outD3D11.h"
-#include <d3d10_1.h>
+//#include <d3d10_1.h>
 #include "outD3D10.h"
 //#include "d3dSoftTH.h"
 #include "dxgiAdapterOutput.h"
@@ -120,6 +120,7 @@ private:
   ID3D10Device *dev10;
   ID3D10Device1 *dev10_1;
   ID3D11Device *dev11;
+  //ID3D12Device *dev12;
   HWND win;
 
   ID3D10Texture2D *newbb10; // New backbuffer (full size)
@@ -132,12 +133,18 @@ private:
   ID3D11Texture2D *realbb11; // Real backbuffer (one monitor)
   D3D11_TEXTURE2D_DESC realbbDesc11;
 
+  //ID3D12Texture2D *newbb12; // New backbuffer (full size)
+  //D3D12_TEXTURE2D_DESC newbbDesc12;
+  //ID3D12Texture2D *realbb12; // Real backbuffer (one monitor)
+  //D3D12_TEXTURE2D_DESC realbbDesc12;
+
   void preUpdateBB(UINT *width, UINT *height);
   void updateBB();  // Updates backbuffer data
 
   int numDevs;
   OUTDEVICE10   *outDevs10;
   OUTDEVICE11   *outDevs11;
+  //OUTDEVICE12   *outDevs12;
 
 };
 

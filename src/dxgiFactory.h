@@ -19,11 +19,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __DXGIFACTORY_H__
 #define __DXGIFACTORY_H__
 
-#include <dxgi.h>
-//#include <dxgi1_2.h>
+#include <dxgi1_3.h>
+
 #include "helper.h"
 
+DEFINE_GUID(IID_IDXGIFactoryNew, 0xd9d267c0, 0x52d, 0x4a8f, 0x98, 0xf4, 0xbe, 0x28, 0xb2, 0xcc, 0x32, 0x74); // {D9D267C0-052D-4a8f-98F4-BE28B2CC3274}
 DEFINE_GUID(IID_IDXGIFactory1New, 0xc1bbaf12, 0x70f6, 0x4c47, 0xa3, 0x92, 0x2b, 0xc4, 0xf1, 0xc6, 0xf0, 0x49);
+DEFINE_GUID(IID_IDXGIFactory2New, 0xee85e851, 0x1363, 0x440d, 0x89, 0x82, 0xac, 0x5c, 0x56, 0x5a, 0x6, 0xea); // {EE85E851-1363-440d-8982-AC5C565A06EA}
+
+interface IDXGIFactoryNew : IDXGIFactory
+{
+public:
+  IDXGIFactoryNew(IDXGIFactory *dxgifNew);
+  ~IDXGIFactoryNew();
+
+  STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
+      dbg("dxgif: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
+      if(riid == IID_IDXGIFactoryNew) {
+        this->AddRef();
+        *ppvObj = this;
+        return S_OK;
+      } else
+      return dxgif->QueryInterface(riid, ppvObj);
+  };
+
+  DECALE_DXGICOMMONIF(dxgif);
+
+  HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
+    {dbg("dxgif: GetParent %s", matchRiid(riid));return dxgif->GetParent(riid, ppParent);};
+
+  HRESULT STDMETHODCALLTYPE EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
+    ;//{dbg("dxgif: EnumAdapters");return dxgif->EnumAdapters(Adapter, ppAdapter);};
+  HRESULT STDMETHODCALLTYPE MakeWindowAssociation(HWND WindowHandle, UINT Flags)
+    {dbg("dxgif: MakeWindowAssociation");return dxgif->MakeWindowAssociation(WindowHandle, Flags);};
+  HRESULT STDMETHODCALLTYPE GetWindowAssociation(HWND *pWindowHandle)
+    {dbg("dxgif: GetWindowAssociation");return dxgif->GetWindowAssociation(pWindowHandle);};
+  HRESULT STDMETHODCALLTYPE CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *pDesc, IDXGISwapChain **ppSwapChain)
+    ;//{dbg("dxgif: CreateSwapChain");return dxgif->CreateSwapChain(pDevice, pDesc, ppSwapChain);};
+  HRESULT STDMETHODCALLTYPE CreateSoftwareAdapter(HMODULE Module, IDXGIAdapter **ppAdapter)
+    {dbg("dxgif: CreateSoftwareAdapter");return dxgif->CreateSoftwareAdapter(Module, ppAdapter);};
+
+  IDXGIFactory* getReal() {dbg("Get real factory 0x%08X", dxgif);return dxgif;};
+private:
+  IDXGIFactory  *dxgif;
+};
 
 interface IDXGIFactory1New : IDXGIFactory1
 {
@@ -67,10 +106,8 @@ private:
 };
 
 
-DEFINE_GUID(IID_IDXGIFactory2New, 0xee85e851, 0x1363, 0x440d, 0x89, 0x82, 0xac, 0x5c, 0x56, 0x5a, 0x6, 0xea); // {EE85E851-1363-440d-8982-AC5C565A06EA}
 /*
-TODO: Need to add GUID for IDXGIFactory2New
-and create interface IDXGIFactory2New that extends
+TODO: Need to create interface IDXGIFactory2New that extends
 IDXGIFactory2. Then for QueryInterface, detect the
 IDXGIFactory2New RIID also.
 
