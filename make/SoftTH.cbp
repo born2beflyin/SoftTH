@@ -153,11 +153,11 @@
 			<Target title="DXGI Debug Win x86">
 				<Option platforms="Windows;" />
 				<Option output="../bin/win/x86/dxgi/debug/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../SoftTHtester" />
+				<Option working_dir="D:/Steam/steamapps/common/Just Cause 2" />
 				<Option object_output="../obj/win/x86/dxgi/debug/" />
 				<Option type="3" />
 				<Option compiler="microsoft_visual_c_2013_express_x86" />
-				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
+				<Option host_application="D:/Steam/steamapps/common/Just Cause 2/JustCause2.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MDd" />
@@ -199,11 +199,11 @@
 					<Add library="zlibstat.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
-					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
 					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
+					<Add library="d3d9.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
 					<Add library="Gdi32.lib" />
@@ -217,17 +217,18 @@
 				<ExtraCommands>
 					<Add after='&quot;$(#psdk.bin)\x86\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\debug\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
 			<Target title="DXGI Release Win x86">
 				<Option platforms="Windows;" />
 				<Option output="../bin/win/x86/dxgi/release/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../SoftTHtester" />
+				<Option working_dir="D:/Steam/steamapps/common/Just Cause 2" />
 				<Option object_output="../obj/win/x86/dxgi/release/" />
 				<Option type="3" />
 				<Option compiler="microsoft_visual_c_2013_express_x86" />
-				<Option host_application="D:/Development/SoftTHtester/bin/release/SoftTHtester.exe" />
+				<Option host_application="D:/Steam/steamapps/common/Just Cause 2/JustCause2.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MD" />
@@ -270,11 +271,11 @@
 					<Add library="zlibstat.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
-					<Add library="d3d9.lib" />
 					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
 					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
+					<Add library="d3d9.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
 					<Add library="Gdi32.lib" />
@@ -288,6 +289,7 @@
 				<ExtraCommands>
 					<Add after='&quot;$(#psdk.bin)\x86\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\release\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -430,6 +432,7 @@
 				<search_path add="..\bin\win\x86\dx9\debug" />
 				<search_path add="..\bin\win\x86\dx10\debug" />
 				<search_path add="..\src" />
+				<search_path add="..\bin\win\x86\dxgi\debug" />
 			</debugger>
 			<lib_finder disable_auto="1" />
 		</Extensions>

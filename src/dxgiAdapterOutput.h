@@ -24,8 +24,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <dxgi.h>
 #include "helper.h"
 
+
+DEFINE_GUID(IID_IDXGIAdapterNew, 0xd2d40e93, 0xbb8f, 0x41df, 0x9b, 0x9c, 0x86, 0xc, 0x67, 0x44, 0x48, 0x3d); // {D2D40E93-BB8F-41df-9B9C-860C6744483D}
 DEFINE_GUID(IID_IDXGIAdapter1New, 0x6a07d623, 0x9a07, 0x48e8, 0x98, 0xea, 0x1, 0x19, 0x91, 0x40, 0x94, 0x9c);
 DEFINE_GUID(IID_IDXGIOutputNew, 0xd76d1fc1, 0x206e, 0x455e, 0x94, 0x3c, 0x69, 0xca, 0x30, 0x2d, 0x5e, 0xe3);
+
+interface IDXGIAdapterNew : IDXGIAdapter
+{
+public:
+  IDXGIAdapterNew(IDXGIAdapter *dxgaNew, IDXGIFactory *parentNew);
+  ~IDXGIAdapterNew();
+
+  DECALE_DXGICOMMONIF(dxga);
+
+  STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
+      dbg("dxga: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
+      if(riid == IID_IDXGIAdapterNew || riid == IID_IDXGIAdapter) {
+        this->AddRef();
+        *ppvObj = this;
+        return S_OK;
+      } else
+        return dxga->QueryInterface(riid, ppvObj);
+  };
+
+  HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
+    {dbg("dxga: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
+      if(riid == IID_IDXGIFactory) {
+        *ppParent = parent;
+        parent->AddRef();
+        return S_OK;
+      }
+      return dxga->GetParent(riid, ppParent);
+    };
+
+  HRESULT STDMETHODCALLTYPE EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
+    ;//{dbg("dxga: EnumOutputs");return dxga->EnumOutputs(Output, ppOutput);};
+  HRESULT STDMETHODCALLTYPE GetDesc(DXGI_ADAPTER_DESC *pDesc)
+    ;//{dbg("dxga: GetDesc");return dxga->GetDesc(pDesc);};
+  HRESULT STDMETHODCALLTYPE CheckInterfaceSupport(REFGUID InterfaceName, LARGE_INTEGER *pUMDVersion)
+    {dbg("dxga: CheckInterfaceSupport");return dxga->CheckInterfaceSupport(InterfaceName, pUMDVersion);};
+
+  IDXGIAdapter* getReal() {dbg("Get real adapter 0x%08X", dxga);return dxga;};
+
+private:
+  IDXGIAdapter *dxga;
+  IDXGIFactory *parent;
+};
 
 interface IDXGIAdapter1New : IDXGIAdapter1
 {
@@ -37,7 +81,7 @@ public:
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
       dbg("dxga: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
-      if(riid == IID_IDXGIAdapter1New || riid == IID_IDXGIAdapter1 || riid == IID_IDXGIAdapter) {
+      if(riid == IID_IDXGIAdapter1New || riid == IID_IDXGIAdapter1) {
         this->AddRef();
         *ppvObj = this;
         return S_OK;
@@ -47,7 +91,7 @@ public:
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
     {dbg("dxga: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
-      if(riid == IID_IDXGIFactory || riid == IID_IDXGIFactory1) {
+      if(riid == IID_IDXGIFactory1) {
         *ppParent = parent;
         parent->AddRef();
         return S_OK;
@@ -74,6 +118,7 @@ private:
 interface IDXGIOutputNew : IDXGIOutput
 {
 public:
+  IDXGIOutputNew(IDXGIAdapterNew *parentNew, IDXGIOutput *dxgoNew);
   IDXGIOutputNew(IDXGIAdapter1New *parentNew, IDXGIOutput *dxgoNew);
   ~IDXGIOutputNew();
 

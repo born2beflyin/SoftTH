@@ -140,6 +140,20 @@ extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChai
                                                   D3D_FEATURE_LEVEL *pFeatureLevel,
                                                   ID3D11DeviceContext **ppImmediateContext) = NULL;
 
+
+extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(IDXGIAdapter *adapter,
+                              D3D_DRIVER_TYPE DriverType,
+                              HMODULE Software,
+                              UINT Flags,
+                              const D3D_FEATURE_LEVEL *pFeatureLevels,
+                              UINT FeatureLevels,
+                              UINT SDKVersion,
+                              DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+                              IDXGISwapChain **ppSwapChain,
+                              ID3D11Device** ppDevice,
+                              D3D_FEATURE_LEVEL *pFeatureLevel,
+                              ID3D11DeviceContext **ppImmediateContext);
+
 DLL configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
 std::list<GAMMARAMP*> restoreGammaRamps; // Stores default gamma ramps for emergency restore on DLL release
@@ -265,7 +279,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         if(!dllCreateDXGIFactory1)
 		      ShowMessage("CreateDXGIFactory1 not in DLL!\nWindows 7 or newer required!\n'%s'", path), exit(0);
         if(!dllCreateDXGIFactory2)
-		      ShowMessage("CreateDXGIFactory2 not in DLL!\nMust be running Windows 7.\n'%s'", path);//, exit(0);
+		      dbg("CreateDXGIFactory2 not in DLL! Must be running Windows 7. - '%s'", path);//, exit(0);
 
         dllDXGID3D10CreateDevice = (HRESULT(__stdcall *)(HMODULE, IDXGIFactory*, IDXGIAdapter*, UINT, DWORD, void**)) GetProcAddress(hLibDXGI, "DXGID3D10CreateDevice");
         if(!dllDXGID3D10CreateDevice)
@@ -537,7 +551,6 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory(REFIID riid,
   if(ret == S_OK) {
     IDXGIFactory *dxgifNew = (IDXGIFactory *) *ppFactory;
     *ppFactory = new IDXGIFactoryNew(dxgifNew);
-    dbg("main - here");
   } else
     dbg("CreateDXGIFactory failed!");
   return ret;

@@ -25,9 +25,65 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "main.h"
 
 #include <INITGUID.H>
+DEFINE_GUID(IID_IDXGIAdapterNew, 0xd2d40e93, 0xbb8f, 0x41df, 0x9b, 0x9c, 0x86, 0xc, 0x67, 0x44, 0x48, 0x3d); // {D2D40E93-BB8F-41df-9B9C-860C6744483D}
 DEFINE_GUID(IID_IDXGIAdapter1New, 0x6a07d623, 0x9a07, 0x48e8, 0x98, 0xea, 0x1, 0x19, 0x91, 0x40, 0x94, 0x9c);
 DEFINE_GUID(IID_IDXGIOutputNew, 0xd76d1fc1, 0x206e, 0x455e, 0x94, 0x3c, 0x69, 0xca, 0x30, 0x2d, 0x5e, 0xe3);
 
+
+
+static void tamperDesc(DXGI_ADAPTER_DESC *desc)
+{
+  // Change device name to SoftTH device
+  wcscpy(desc->Description, SOFTTH_VERSIONW);
+}
+
+
+
+/* IDXGIAdapterNew */
+IDXGIAdapterNew::IDXGIAdapterNew(IDXGIAdapter *dxgaNew, IDXGIFactory *parentNew)
+{
+  dbg("IDXGIAdapterNew 0x%08X", this);
+  dxga = dxgaNew;
+  parent = parentNew;
+};
+
+IDXGIAdapterNew::~IDXGIAdapterNew()
+{
+  dbg("~IDXGIAdapterNew 0x%08X", this);
+}
+
+HRESULT IDXGIAdapterNew::GetDesc(DXGI_ADAPTER_DESC *pDesc)
+{
+  dbg("dxga: GetDesc");
+  HRESULT ret = dxga->GetDesc(pDesc);
+  tamperDesc(pDesc);
+  return ret;
+};
+
+HRESULT IDXGIAdapterNew::EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
+{
+  dbg("dxga: EnumOutputs");
+  // Hide all but the primary output
+  if(Output > 0)
+    return DXGI_ERROR_NOT_FOUND;
+  else {
+    IDXGIOutput *o;
+    HRESULT ret = dxga->EnumOutputs(Output, &o);
+    if(ret == S_OK)
+    {
+      *ppOutput = new IDXGIOutputNew(this, o);
+      /*DXGI_OUTPUT_DESC *pDesc = NULL;
+      dbg("dxga: Booyah");
+      ppOutput[0]->GetDesc(pDesc);
+      dbg((char *)pDesc->DeviceName);*/
+    }
+
+    return ret;
+  }
+}
+
+
+/*   IDXGIAdapter1New   */
 IDXGIAdapter1New::IDXGIAdapter1New(IDXGIAdapter1 *dxgaNew, IDXGIFactory1 *parentNew)
 {
   dbg("IDXGIAdapter1New 0x%08X", this);
@@ -38,12 +94,6 @@ IDXGIAdapter1New::IDXGIAdapter1New(IDXGIAdapter1 *dxgaNew, IDXGIFactory1 *parent
 IDXGIAdapter1New::~IDXGIAdapter1New()
 {
   dbg("~IDXGIAdapter1New 0x%08X", this);
-}
-
-static void tamperDesc(DXGI_ADAPTER_DESC *desc)
-{
-  // Change device name to SoftTH device
-  wcscpy(desc->Description, SOFTTH_VERSIONW);
 }
 
 HRESULT IDXGIAdapter1New::GetDesc(DXGI_ADAPTER_DESC *pDesc)
@@ -85,7 +135,12 @@ HRESULT IDXGIAdapter1New::EnumOutputs(UINT Output, IDXGIOutput **ppOutput)
 }
 
 
-
+IDXGIOutputNew::IDXGIOutputNew(IDXGIAdapterNew *parentNew, IDXGIOutput *dxgoNew)
+{
+  dbg("IDXGIOutputNew 0x%08X %d", this, dxgoNew);
+  dxgo = dxgoNew;
+  parent = (IDXGIAdapter1New*)parentNew;
+}
 
 IDXGIOutputNew::IDXGIOutputNew(IDXGIAdapter1New *parentNew, IDXGIOutput *dxgoNew)
 {

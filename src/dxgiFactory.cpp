@@ -96,12 +96,12 @@ HRESULT IDXGIFactoryNew::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC
     ID3D10Device *d3d10 = NULL;
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &d3d10) == S_OK)
       dbg("Got Direct3D 10 device");
-    if(d3d10)
-      *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
+    //if(d3d10)
+    //  *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else
       dbg("ERROR: Unknown swapchain device type!");
   }
-  return ret;*/
+  return ret;
 }
 
 
@@ -174,8 +174,8 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
     ID3D10Device *d3d10 = NULL;
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &d3d10) == S_OK)
       dbg("Got Direct3D 10 device");
-    if(d3d10)
-      *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
+    //if(d3d10)
+    //  *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else
       dbg("ERROR: Unknown swapchain device type!");
   }

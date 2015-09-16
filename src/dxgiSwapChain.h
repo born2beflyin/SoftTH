@@ -51,6 +51,7 @@ interface IDXGISwapChainNew : IDXGISwapChain
 {
 public:
   //IDXGISwapChainNew(IDXGISwapChain *scApp, IDXGIFactory1 *parentNew, ID3D10Device *deviceNew, HWND winNew);
+  IDXGISwapChainNew(IDXGIFactory *parentNew, IDXGIFactory *dxgifNew, IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd);
   IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dxgifNew, IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd);
   ~IDXGISwapChainNew();
 

@@ -40,7 +40,7 @@ public:
         *ppvObj = this;
         return S_OK;
       } else
-      return dxgif->QueryInterface(riid, ppvObj);
+        return dxgif->QueryInterface(riid, ppvObj);
   };
 
   DECALE_DXGICOMMONIF(dxgif);

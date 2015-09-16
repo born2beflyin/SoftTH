@@ -52,6 +52,54 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGISwapChain *dxgscNew, IDXGIFactory1 *pa
   ihGlobal.hookRemoteThread(pid);
 }*/
 
+IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory *parentNew, IDXGIFactory *dxgifNew, IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd)
+{
+  // Creating new swapchain
+  dbg("IDXGISwapChainNew 0x%08X 0x%08X", this, pDevice);
+
+
+  win = scd->OutputWindow;
+  newbb10 = NULL;
+  newbb11 = NULL;
+  dev10 = NULL;
+  dev10_1 = NULL;
+  dev11 = NULL;
+  //dev12 = NULL;
+  dxgsc = NULL;
+  dxgif = (IDXGIFactory1*)dxgifNew;
+  parent = (IDXGIFactory1*)parentNew;
+  realbb10 = NULL;
+  realbb11 = NULL;
+
+  if(!pDevice)
+    dbg("ERROR: NULL device!");
+  else {
+    // Check for D3D10/11 device
+    /*if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &dev10) == S_OK)
+      dbg("Got Direct3D 10 device");
+    else */if(pDevice->QueryInterface(__uuidof(ID3D10Device1), (void**) &dev10_1) == S_OK)
+      dbg("Got Direct3D 10.1 device");
+    else if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &dev11) == S_OK)
+      dbg("Got Direct3D 11 device");
+    else
+      dbg("ERROR: Unknown swapchain device type!");
+
+    if(dev11 || dev10_1 || dev10)
+    {
+      // Check for TH mode and create bb texture
+      preUpdateBB(&scd->BufferDesc.Width, &scd->BufferDesc.Height);
+    }
+  }
+
+  // Create the swapchain
+  HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &dxgsc);
+  if(ret != S_OK)
+    dbg("CreateSwapChain failed!");
+  else
+    updateBB();
+
+}
+
 IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dxgifNew, IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd)
 {
   // Creating new swapchain
