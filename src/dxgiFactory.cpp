@@ -75,7 +75,7 @@ HRESULT IDXGIFactoryNew::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC
 
   *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
 
-  if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
+  /*if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
     dbg("dxgi_f: Multihead swapchain mode detected");
     HEAD *h = config.getPrimaryHead();
     scd->BufferDesc.Width = h->screenMode.x;
@@ -100,7 +100,8 @@ HRESULT IDXGIFactoryNew::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC
     //  *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else
       dbg("dxgi_f: ERROR: Unknown swapchain device type!");
-  }
+  }*/
+  HRESULT ret = S_OK;
   return ret;
 }
 
