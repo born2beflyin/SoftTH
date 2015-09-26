@@ -32,6 +32,7 @@ public:
   //void presentFromBuffer();
   void present();
   HANDLE GetShareHandle() {return shareHandle;};
+  ID3D11Texture2D* GetSharedSurface() {return sharedSurface;};
 
 private:
   IDXGIFactory *dxgf;

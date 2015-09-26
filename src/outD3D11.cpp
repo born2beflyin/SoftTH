@@ -47,7 +47,7 @@ extern "C" __declspec(dllimport)HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain
                                                                                   ID3D11DeviceContext **ppImmediateContext);
 */
 //#else
-extern "C" HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+extern "C" __declspec(dllimport) HRESULT (WINAPI newD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                              D3D_DRIVER_TYPE DriverType,
                                                              HMODULE Software,
                                                              UINT Flags,
@@ -59,12 +59,14 @@ extern "C" HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              ID3D11Device** ppDevice,
                                                              D3D_FEATURE_LEVEL *pFeatureLevel,
                                                              ID3D11DeviceContext **ppImmediateContext);
+
 //#endif  //SOFTTHMAIN
+
 
 
 outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)
 {
-  dbg("outDirect3D11: Initialize");
+  dbg("outD3D11: Initialize Head (DevID: %d)",devID);
 
   // Get monitor info with D3D9
   IDirect3D9Ex *d3d9;
@@ -72,6 +74,9 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   mInfo.cbSize = sizeof(MONITORINFO);
   mId = d3d9->GetAdapterMonitor(devID);
   GetMonitorInfo(mId, &mInfo);
+  D3DADAPTER_IDENTIFIER9 ai;
+  d3d9->GetAdapterIdentifier(devID, 0, &ai);
+  dbg("outD3D11: This head's output is %s on <%s>", ai.DeviceName, ai.Description);
   d3d9->Release();
 
   // Get our head
@@ -114,11 +119,11 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   }
 
   UINT i = 0;
-  IDXGIAdapter *pAdapter;
-  IDXGIAdapter *vAdapters[64];
-  dbg("Enum adapters...");
+  IDXGIAdapter* pAdapter = NULL;
+  //IDXGIAdapter *vAdapters[64];
+  dbg("outD3D11: Getting the correct adapter for this head ...");
   while(dxgf->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
-    vAdapters[i] = pAdapter;
+    //vAdapters[i] = pAdapter;
 
     DXGI_ADAPTER_DESC desc;
     pAdapter->GetDesc(&desc);
@@ -126,9 +131,13 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
     char *name = new char[128];
     WideCharToMultiByte(CP_ACP, 0, desc.Description, -1, name, 128, NULL, NULL);
 
-    dbg("Adapter %d: <%s>", i, name);
+    if (_strcmpi(name,ai.Description) == 0) {
+      dbg("outD3D11: Got the adapter! Adapter %d: <%s>", i, name);
+      break;
+    }
     ++i;
   }
+  //pAdapter = vAdapters[i];
 
   // Init Direct3D 11
   DXGI_SWAP_CHAIN_DESC sd;
@@ -151,12 +160,12 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   DWORD flags = 0;
   // TODO: verify devID match!
   //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
-  if(dllD3D11CreateDeviceAndSwapChain(NULL,
-                                      D3D_DRIVER_TYPE_HARDWARE,
+  if(newD3D11CreateDeviceAndSwapChain(pAdapter,
+                                      D3D_DRIVER_TYPE_UNKNOWN,
                                       NULL,
                                       flags,
                                       NULL,
-                                      6,
+                                      0,
                                       D3D11_SDK_VERSION,
                                       &sd,
                                       &swapChain,
@@ -164,10 +173,10 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
                                       &featureLevel,
                                       &devContext) != S_OK)
   {
-    dbg("D3D11CreateDeviceAndSwapChain FAILED");
+    dbg("outD3D11: D3D11CreateDeviceAndSwapChain FAILED");
     exit(0);
   }
-  dbg("Created D3D11 device & swap chain...");
+  dbg("outD3D11: Created D3D11 device & swap chain...");
 
   // Get true swapchain
   IDXGISwapChainNew *scnew;
@@ -175,32 +184,33 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
     swapChain = scnew->getReal();
     scnew->Release();
   } else
-    dbg("Cannot get true swapchain!");
+    dbg("outD3D11: Cannot get true swapchain!");
 
   // Get device backbuffer
-  if(swapChain->GetBuffer( 0, __uuidof(ID3D10Texture2D), (LPVOID*) &bb) != S_OK) {
-    dbg("swapChain->GetBuffer FAILED");
+  if(swapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (LPVOID*) &bb) != S_OK) {
+    dbg("outD3D11: swapChain->GetBuffer FAILED");
     exit(0);
   }
 
   // Create shared buffer
-  //CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D10_BIND_SHADER_RESOURCE|D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, 0, 1, 0, D3D10_RESOURCE_MISC_SHARED);
+  dbg("outD3D11: Creating secondary head (DevID %d) backbuffer for D3D11 Device",devID);
   CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, 0, 1, 0, D3D11_RESOURCE_MISC_SHARED);
   if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
-    dbg("OutD3D11: CreateTexture2D failed :("), exit(0);
+    dbg("outD3D11: CreateTexture2D failed!"), exit(0);
 
   // Get share handle
   IDXGIResource* texRes(NULL);
   sharedSurface->QueryInterface( __uuidof(IDXGIResource), (void**)&texRes);
-  texRes->GetSharedHandle(&shareHandle);
+  if (texRes->GetSharedHandle(&shareHandle) != S_OK)
+    dbg("outD3D11: GetSharedHandle failed!");
   texRes->Release();
 
-  dbg("Share handle: 0x%08X", shareHandle);
+  dbg("outD3D11: Share handle: 0x%08X", shareHandle);
 
   HRESULT ret = dev->CreateRenderTargetView(bb, NULL, &rttView);
   bb->Release();
   if(FAILED(ret)) {
-    dbg("dev->CreateRenderTargetView FAILED");
+    dbg("outD3D11: dev->CreateRenderTargetView FAILED");
     exit(0);
   }
   devContext->OMSetRenderTargets(1, &rttView, NULL);
@@ -208,7 +218,7 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   D3D11_VIEWPORT vp = {0, 0, bbWidth, bbHeight, 0, 1};
   devContext->RSSetViewports(1, &vp);
 
-  dbg("outDirect3D11: Initialize COMPLETE");
+  dbg("outD3D11: Initialize Head (DevID: %d) COMPLETE",devID);
   /*
   d3d9Surface = sourceSurface;
 

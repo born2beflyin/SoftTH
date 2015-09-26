@@ -35,18 +35,18 @@ DEFINE_GUID(IID_IDXGIFactory2New, 0xee85e851, 0x1363, 0x440d, 0x89, 0x82, 0xac, 
 /* IDXGIFactoryNew */
 IDXGIFactoryNew::IDXGIFactoryNew(IDXGIFactory *dxgifNew)
 {
-  dbg("IDXGIFactoryNew 0x%08X",dxgifNew);
+  dbg("dxgi_f: IDXGIFactoryNew 0x%08X",dxgifNew);
   dxgif = dxgifNew;
 }
 
 IDXGIFactoryNew::~IDXGIFactoryNew()
 {
-  dbg("~IDXGIFactoryNew");
+  dbg("dxgi_f: ~IDXGIFactoryNew");
 }
 
 HRESULT IDXGIFactoryNew::EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
 {
-  dbg("dxgif: EnumAdapters %d", Adapter);
+  dbg("dxgi_f: EnumAdapters %d", Adapter);
 
   // Pretend only one adapter exists
   if(Adapter > 0)
@@ -63,62 +63,62 @@ HRESULT IDXGIFactoryNew::EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
 
 HRESULT IDXGIFactoryNew::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd, IDXGISwapChain **ppSwapChain)
 {
-  dbg("dxgif: CreateSwapChain");
+  dbg("dxgi_f: CreateSwapChain");
 
-  dbg("Mode: %dx%d %d.%dHz %s", scd->BufferDesc.Width, scd->BufferDesc.Height, scd->BufferDesc.RefreshRate.Numerator, scd->BufferDesc.RefreshRate.Denominator, scd->Windowed?"Windowed":"Fullscreen");
-  dbg("Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
-  dbg("Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+  dbg("dxgi_f: Mode: %dx%d %d.%dHz %s", scd->BufferDesc.Width, scd->BufferDesc.Height, scd->BufferDesc.RefreshRate.Numerator, scd->BufferDesc.RefreshRate.Denominator, scd->Windowed?"Windowed":"Fullscreen");
+  dbg("dxgi_f: Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
+  dbg("dxgi_f: Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
 
-  dbg("Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+  dbg("dxgi_f: Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
 
   *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
 
   if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
-    dbg("Multihead swapchain mode detected");
+    dbg("dxgi_f: Multihead swapchain mode detected");
     HEAD *h = config.getPrimaryHead();
     scd->BufferDesc.Width = h->screenMode.x;
     scd->BufferDesc.Height = h->screenMode.y;
   } else
-    dbg("Singlehead swapchain mode");
+    dbg("dxgi_f: Singlehead swapchain mode");
 
   IDXGISwapChain *sc = NULL;
   HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &sc);
   if(ret != S_OK)
-    dbg("CreateSwapChain failed!");
+    dbg("dxgi_f: CreateSwapChain failed!");
   else {
     *ppSwapChain = sc;
     if(!pDevice)
-      dbg("NULL device!");
+      dbg("dxgi_f: NULL device!");
 
     // TODO: check for other devices
     ID3D10Device *d3d10 = NULL;
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &d3d10) == S_OK)
-      dbg("Got Direct3D 10 device");
+      dbg("dxgi_f: Got Direct3D 10 device");
     //if(d3d10)
     //  *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
     else
-      dbg("ERROR: Unknown swapchain device type!");
+      dbg("dxgi_f: ERROR: Unknown swapchain device type!");
   }
   return ret;
 }
 
-
+/* IDXGIFactory1New */
 IDXGIFactory1New::IDXGIFactory1New(IDXGIFactory1 *dxgifNew)
 {
-  dbg("IDXGIFactory1New 0x%08X",dxgifNew);
+  dbg("dxgi_f1: IDXGIFactory1New 0x%08X",dxgifNew);
   dxgif = dxgifNew;
 }
 
 IDXGIFactory1New::~IDXGIFactory1New()
 {
-  dbg("~IDXGIFactory1New");
+  dbg("dxgi_f1: ~IDXGIFactory1New");
 }
 
 HRESULT IDXGIFactory1New::EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
 {
-  dbg("dxgif: EnumAdapters %d", Adapter);
+  dbg("dxgi_f1: EnumAdapters %d", Adapter);
 
   // Pretend only one adapter exists
   if(Adapter > 0)
@@ -135,50 +135,54 @@ HRESULT IDXGIFactory1New::EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
 
 HRESULT IDXGIFactory1New::EnumAdapters1(UINT Adapter, IDXGIAdapter1 **ppAdapter)
 {
-  dbg("dxgif: EnumAdapters1 %d", Adapter);
+  dbg("dxgi_f1: EnumAdapters1 %d", Adapter);
   return EnumAdapters(Adapter, (IDXGIAdapter**)ppAdapter);  // EnumAdapters will handle this just fine - it creates Adapter1 anyway
 }
 
 HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd, IDXGISwapChain **ppSwapChain)
 {
-  dbg("dxgif: CreateSwapChain");
+  dbg("dxgi_f1: CreateSwapChain");
 
-  dbg("Mode: %dx%d %d.%dHz %s", scd->BufferDesc.Width, scd->BufferDesc.Height, scd->BufferDesc.RefreshRate.Numerator, scd->BufferDesc.RefreshRate.Denominator, scd->Windowed?"Windowed":"Fullscreen");
-  dbg("Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
-  dbg("Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+  dbg("dxgi_f1: Mode: %dx%d %d.%dHz %s", scd->BufferDesc.Width, scd->BufferDesc.Height, scd->BufferDesc.RefreshRate.Numerator, scd->BufferDesc.RefreshRate.Denominator, scd->Windowed?"Windowed":"Fullscreen");
+  dbg("dxgi_f1: Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
+  dbg("dxgi_f1: Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
 
-  dbg("Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+  dbg("dxgi_f1: Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
                          scd->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
 
-  *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
-
-  if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
-    dbg("Multihead swapchain mode detected");
+  /*if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
+    dbg("dxgi_f1: Multihead swapchain mode detected");
     HEAD *h = config.getPrimaryHead();
     scd->BufferDesc.Width = h->screenMode.x;
     scd->BufferDesc.Height = h->screenMode.y;
   } else
-    dbg("Singlehead swapchain mode");
+    dbg("dxgi_f1: Singlehead swapchain mode");*/
 
-  IDXGISwapChain *sc = NULL;
+  *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
+
+  /*IDXGISwapChain *sc = NULL;
   HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &sc);
   if(ret != S_OK)
-    dbg("CreateSwapChain failed!");
+    dbg("dxgi_f1: CreateSwapChain failed!");
   else {
     *ppSwapChain = sc;
     if(!pDevice)
-      dbg("NULL device!");
+      dbg("dxgi_f1: NULL device!");
+
+    *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
 
     // TODO: check for other devices
-    ID3D10Device *d3d10 = NULL;
-    if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &d3d10) == S_OK)
-      dbg("Got Direct3D 10 device");
-    //if(d3d10)
-    //  *ppSwapChain = new IDXGISwapChainNew(sc, this, d3d10, scd->OutputWindow);
+    ID3D11Device *d3d11 = NULL;
+    if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &d3d11) == S_OK)
+      dbg("dxgi_f1: Got Direct3D 11 device");
+    if(d3d11)
+      *ppSwapChain = new IDXGISwapChainNew(dxgif, dxgif, d3d11, scd);
     else
-      dbg("ERROR: Unknown swapchain device type!");
-  }
+      dbg("dxgi_f1: ERROR: Unknown swapchain device type!");
+  }*/
+  HRESULT ret = S_OK;
+
   return ret;
 }
 

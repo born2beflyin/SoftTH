@@ -87,14 +87,13 @@ public:
     ;//{dbg("dxgsc: GetBuffer");HRESULT ret = dxgsc->GetBuffer(Buffer, riid, ppSurface);dbg("joo-o"); return ret;};
   HRESULT STDMETHODCALLTYPE SetFullscreenState(BOOL Fullscreen, IDXGIOutput *pTarget)
     {dbg("dxgsc: SetFullscreenState 0x%08X", pTarget);
-    /*if(pTarget) {
-      dbg("test here");
+    if(pTarget) {
       IDXGIOutputNew *onew;
       if(pTarget->QueryInterface(IID_IDXGIOutputNew, (void**) &onew) == S_OK) {
         pTarget = onew->getReal();
         onew->Release();
       }
-    }*/
+    }
     return dxgsc->SetFullscreenState(Fullscreen, pTarget);
     };
   HRESULT STDMETHODCALLTYPE GetFullscreenState(BOOL *pFullscreen,IDXGIOutput **ppTarget)

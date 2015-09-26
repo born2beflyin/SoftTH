@@ -38,7 +38,7 @@ extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              IDXGISwapChain **ppSwapChain,
                                                              ID3D10Device **ppDevice);
 #else
-extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
+extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
                                                               D3D10_DRIVER_TYPE DriverType,
                                                               HMODULE Software,
                                                               UINT Flags,

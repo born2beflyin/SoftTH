@@ -54,6 +54,8 @@ HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
 HINSTANCE hLibD3D12 = NULL; // Real d3d12.dll
 HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
 
+GHOOK D3DHooks[];
+
 //#define PREHOOKING
 
 char hLibD3D9_path[256]; // Path to real d3d9.dll
@@ -83,8 +85,8 @@ HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
                                       UINT SDKVersion,
                                       ID3D10Device** ppDevice) = NULL;
 
-// extern "C" __declspec(dllexport)
-extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+
+HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                   D3D10_DRIVER_TYPE DriverType,
                                                   HMODULE Software,
                                                   UINT Flags,
@@ -102,7 +104,7 @@ HRESULT (WINAPI*dllD3D10CreateDevice1)(IDXGIAdapter *adapter,
                                        UINT SDKVersion,
                                        ID3D10Device1** ppDevice) = NULL;
 
-// extern "C" __declspec(dllexport)
+
 extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
                                                    D3D10_DRIVER_TYPE DriverType,
                                                    HMODULE Software,
@@ -126,7 +128,7 @@ HRESULT (WINAPI*dllD3D11CreateDevice)(IDXGIAdapter *adapter,
                                       D3D_FEATURE_LEVEL *pFeatureLevel,
                                       ID3D11DeviceContext **ppImmediateContext) = NULL;
 
-// extern "C" __declspec(dllexport)
+
 extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                   D3D_DRIVER_TYPE DriverType,
                                                   HMODULE Software,
@@ -141,7 +143,7 @@ extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChai
                                                   ID3D11DeviceContext **ppImmediateContext) = NULL;
 
 
-extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(IDXGIAdapter *adapter,
+/*HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(IDXGIAdapter *adapter,
                               D3D_DRIVER_TYPE DriverType,
                               HMODULE Software,
                               UINT Flags,
@@ -152,7 +154,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
                               IDXGISwapChain **ppSwapChain,
                               ID3D11Device** ppDevice,
                               D3D_FEATURE_LEVEL *pFeatureLevel,
-                              ID3D11DeviceContext **ppImmediateContext);
+                              ID3D11DeviceContext **ppImmediateContext);*/
 
 DLL configFile config; // Main configuration
 bool emergencyRelease = false;  // If true, releasing is being done from dll detach (Releasing D3D stuff is already too late)
@@ -416,6 +418,8 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         if(hLibD3D10_1) addNoHookModule(hLibD3D10_1);
         if(hLibD3D11) addNoHookModule(hLibD3D11);
         if(hLibD3D12) addNoHookModule(hLibD3D12);
+
+        //setHooks(D3DHooks); // Can't do this, creates a loop
       }
 
       break;
@@ -543,52 +547,52 @@ extern "C" _declspec(dllexport) HRESULT __stdcall Direct3DCreate9Ex(UINT SDKVers
 /*       DXGI        */
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory(REFIID riid, void **ppFactory)
 {
-  dbg("CreateDXGIFactory");
+  dbg("dxgi: CreateDXGIFactory");
 
   HRESULT ret = dllCreateDXGIFactory(riid, ppFactory);
   //HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
-  dbg("CreateDXGIFactory 0x%08X", *ppFactory);
+  dbg("dxgi: CreateDXGIFactory 0x%08X", *ppFactory);
   if(ret == S_OK) {
     IDXGIFactory *dxgifNew = (IDXGIFactory *) *ppFactory;
     *ppFactory = new IDXGIFactoryNew(dxgifNew);
   } else
-    dbg("CreateDXGIFactory failed!");
+    dbg("dxgi: CreateDXGIFactory failed!");
   return ret;
 }
 
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid, void **ppFactory)
 {
-  dbg("CreateDXGIFactory1");
+  dbg("dxgi: CreateDXGIFactory1");
 
   //HRESULT ret = dllCreateDXGIFactory(riid, ppFactory);
   HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
-  dbg("CreateDXGIFactory1 0x%08X", *ppFactory);
+  dbg("dxgi: CreateDXGIFactory1 0x%08X", *ppFactory);
   if(ret == S_OK) {
     IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
     *ppFactory = new IDXGIFactory1New(dxgifNew);
   } else
-    dbg("CreateDXGIFactory1 failed!");
+    dbg("dxgi: CreateDXGIFactory1 failed!");
   return ret;
 }
 
 extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory2(UINT Flags, REFIID riid, void **ppFactory)
 {
-  dbg("CreateDXGIFactory2");
+  dbg("dxgi: CreateDXGIFactory2");
 
   HRESULT ret = dllCreateDXGIFactory2(Flags, riid, ppFactory);
   dbg("CreateDXGIFactory2 0x%08X", *ppFactory);
   if(ret == S_OK) {
     //IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
     //*ppFactory = new IDXGIFactory1New(dxgifNew);
-    dbg(" *** TODO: still need to add IDXGIFactory2!!! ***");
+    dbg("dxgi:  *** TODO: still need to add IDXGIFactory2!!! ***");
   } else
-    dbg("CreateDXGIFactory2 failed!");
+    dbg("dxgi: CreateDXGIFactory2 failed!");
   return ret;
 }
 
 extern "C" _declspec(dllexport) HRESULT WINAPI DXGID3D10CreateDevice(HMODULE d3d10core, IDXGIFactory *factory, IDXGIAdapter *adapter, UINT flags, DWORD unknown0, void **device)
 {
-  dbg("DXGID3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+  dbg("dxgi: DXGID3D10CreateDevice 0x%08X 0x%08X", adapter, *adapter);
 
   IDXGIFactory1New *fnew;
   if(factory->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
@@ -826,6 +830,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDevice(IDXGIAdapter
                                      pFeatureLevel,
                                      ppImmediateContext);
 
+
   /*IDXGIAdapter1New *anew;
   if(adapter->QueryInterface(IID_IDXGIAdapter1New, (void**) &anew) == S_OK) {
     adapter = anew->getReal();
@@ -851,77 +856,48 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
 {
   dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
 
-  /*dbg("Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
-  dbg("Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
-  dbg("Buffers: %d (Usage %s), Swapeffect: %s", pSwapChainDesc->BufferCount, getUsageDXGI(pSwapChainDesc->BufferUsage), pSwapChainDesc->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+  HRESULT ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
+                                        DriverType,
+                                        Software,
+                                        Flags,
+                                        pFeatureLevels,
+                                        FeatureLevels,
+                                        SDKVersion,
+                                        pSwapChainDesc,
+                                        ppSwapChain,
+                                        ppDevice,
+                                        pFeatureLevel,
+                                        ppImmediateContext);
 
-  dbg("Flags: %s %s %s", pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+  dbg("d3d11: Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
+  dbg("d3d11: Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
+  dbg("d3d11: Buffers: %d (Usage %s), Swapeffect: %s", pSwapChainDesc->BufferCount, getUsageDXGI(pSwapChainDesc->BufferUsage), pSwapChainDesc->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+
+  dbg("d3d11: Flags: %s %s %s", pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
                          pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
-                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");*/
+                         pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
 
-  HRESULT ret;
 
-  ret = D3D11CreateDevice(adapter,
-                          DriverType,
-                          Software,
-                          Flags,
-                          pFeatureLevels,
-                          FeatureLevels,
-                          SDKVersion,
-                          ppDevice,
-                          pFeatureLevel,
-                          ppImmediateContext);
-
-  //
-  /*IDXGIAdapter1New *anew;
-  if(adapter->QueryInterface(IID_IDXGIAdapter, (void**) &anew) == S_OK) {
-    adapter = anew->getReal();
-    anew->Release();
-  }*/
-  //
-
-  IDXGIFactory1 *factory;
-  //IDXGIFactory1New *fnew;
-  //CreateDXGIFactory1()
+  IDXGIFactory *factory;
   if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)
   {
-    //factory = fnew->getReal();
-    //fnew->Release();
     dbg("d3d11: Got parent factory");
   }
 
-  /*ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
-                                          DriverType,
-                                          Software,
-                                          Flags,
-                                          pFeatureLevels,
-                                          FeatureLevels,
-                                          SDKVersion,
-                                          pSwapChainDesc,
-                                          ppSwapChain,
-                                          ppDevice,
-                                          pFeatureLevel,
-                                          ppImmediateContext);*/
-
   (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);
-
-
-
-  /*IDXGISwapChainNew *scnew;
-  if((*ppSwapChain)->QueryInterface(IID_IDXGISwapChainNew, (void**) &scnew) == S_OK) {
-    (*ppSwapChain) = scnew->getReal();
-    scnew->Release();
-  } else dbg("Booh! No real swap chain!");*/
-
-  /*if(fnew)
-  {
-    fnew->Release();
-    delete fnew;
-    fnew = NULL;
-  }*/
 
   return ret;
 }
+
+// D3D hook function table
+GHOOK D3DHooks[] = {
+  //HOOK(NewD3DXMatrixPerspectiveOffCenterRH, d3dx9_42.dll, D3DXMatrixPerspectiveOffCenterRH)
+  //HOOK(NewD3DXMatrixPerspectiveFovLH, d3dx9_38.dll, D3DXMatrixPerspectiveFovLH)
+
+  HOOK(newD3D11CreateDevice, d3d11.dll, D3D11CreateDevice)
+  HOOK(newD3D11CreateDeviceAndSwapChain, d3d11.dll, D3D11CreateDeviceAndSwapChain)
+  HOOKEND
+};
 
 #ifndef _WIN64
 //#if 1

@@ -832,10 +832,6 @@ GHOOK SoftTHHooks[] = {
   HOOK(NewClientToScreen, user32.dll, ClientToScreen)
   HOOK(NewScreenToClient, user32.dll, ScreenToClient)
 
-  //HOOK(NewD3DXMatrixPerspectiveOffCenterRH, d3dx9_42.dll, D3DXMatrixPerspectiveOffCenterRH)
-  //HOOK(NewD3DXMatrixPerspectiveFovLH, d3dx9_38.dll, D3DXMatrixPerspectiveFovLH)
-
-  //HOOK(newD3D11CreateDeviceAndSwapChain, d3d10_1.dll, D3D11CreateDeviceAndSwapChain)
 #else
   HOOK(NewGetClientRect, user32.dll, GetClientRect)
 #endif
