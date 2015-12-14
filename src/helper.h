@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _HELPER_H_
 
 #include <windows.h>
+#include <stdio.h>
 #include <d3d9.h>
 #include <dxgi.h>
 
@@ -90,7 +91,6 @@ extern bool emergencyRelease;
 #define dbgf if(0)
 #define dbg_input if(0)
 //#define dbg_input dbg
-//#define dbgf dbg
 
 void ShowMessage(char *first, ...);
 void __cdecl odprintf(const char *format, ...);

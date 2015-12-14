@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <INITGUID.H>
 DEFINE_GUID(IID_IDXGISwapChainNew, 0x41ba0075, 0xbc7b, 0x4eee, 0x99, 0x8d, 0xb6, 0xdb, 0xb7, 0xba, 0xeb, 0x46);
 
-volatile extern int SoftTHActive; // >0 if SoftTH is currently active and resolution is overridden
+//volatile extern int SoftTHActive; // >0 if SoftTH is currently active and resolution is overridden
 /*
 IDXGISwapChainNew::IDXGISwapChainNew(IDXGISwapChain *dxgscNew, IDXGIFactory1 *parentNew, ID3D10Device *dev10new, HWND winNew)
 {
@@ -61,6 +61,7 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory *parentNew, IDXGIFactory *dxgi
   win = scd->OutputWindow;
   newbb10 = NULL;
   newbb11 = NULL;
+  //stagedSurfs11 = NULL;
   dev10 = NULL;
   dev10_1 = NULL;
   dev11 = NULL;
@@ -109,6 +110,7 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
   win = scd->OutputWindow;
   newbb10 = NULL;
   newbb11 = NULL;
+  //stagedSurfs11 = NULL;
   dev10 = NULL;
   dev10_1 = NULL;
   dev11 = NULL;
@@ -161,17 +163,20 @@ HRESULT IDXGISwapChainNew::GetBuffer(UINT Buffer, REFIID riid, void **ppSurface)
     // Return our fake buffer
     if(newbb11)
     {
+      dbg("Got new D3D11 buffer");
       *ppSurface = newbb11;
       newbb11->AddRef();
     }
     else
     {
+      dbg("Got new D3D10 buffer");
       *ppSurface = newbb10;
       newbb10->AddRef();
     }
     return S_OK;
   } else {
     // Return real backbuffer
+    dbg("FAILED to get a new buffer!");
     return dxgsc->GetBuffer(Buffer, riid, ppSurface);
   }
 }
@@ -209,9 +214,10 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     realbb11->GetDesc(&dt);
     newbb11->GetDesc(&ds);
 
-    dbg("dxgi_sc: Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
-    dbg("dxgi_sc: Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+    dbg("dxgi_sc: Source           : %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
+    dbg("dxgi_sc: Primary Head     : %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
 
+    // Copy and Present the Primary Head
     HEAD *h = config.getPrimaryHead();
     D3D11_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
     ID3D11DeviceContext *dev11context;
@@ -223,14 +229,66 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     if(GetKeyState('P') < 0)
       D3DX11SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
 
-    // Copy & Present secondary heads
+    // If we have non-local adapters, stage a copy of the buffer for non-local access
+    /*if (has_nonlocal) {
+      // Copy from the main backbuffer to the main staged texture
+      dev11context->CopyResource(newbb11staged,newbb11);
+      // Map the main staged texture
+      D3D11_MAPPED_SUBRESOURCE submain;
+      dev11context->Map(newbb11staged, 0, D3D11_MAP_READ, 0, &submain);
+    }*/
+
+
+
+
+    // Copy and Present Secondary Heads
     for(int i=0;i<numDevs;i++)
     {
-      OUTDEVICE11 *o = &outDevs11[i];
-      D3D11_BOX sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
-      dev11context->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb11, 0, &sb);
-      dev11context->Flush();
+      OUTDEVICE11 *o  = &outDevs11[i];
+      STAGEDOUT11 *so = &stagedOuts11[i];
 
+      o->localSurf->GetDesc(&dt);
+      dbg("dxgi_sc: Secondary Head %d : %dx%d ms%d %s", i+1, dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+      sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
+
+      // Check if the head is local and copy accordingly
+      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+        /* Local head (on the primary video adapter) */
+        // - just copy the region directly to the head's localSurf
+        dbg("dxgi_sc: Local head: CopySubresourceRegion");
+        dev11context->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb11, 0, &sb);
+      } else {
+        /* Non-local head (on a secondary adapter */
+        dbg("dxgi_sc: Non-local head: Map/Unmap");
+        // Copy from the main backbuffer to the main staged texture
+        dev11context->CopySubresourceRegion(so->stagedSurf, 0, 0, 0, 0, newbb11, 0, &sb);
+        // Map the main staged texture
+        D3D11_MAPPED_SUBRESOURCE submain;
+        dev11context->Map(so->stagedSurf, 0, D3D11_MAP_READ, 0, &submain);
+        // Map the head's staged texture
+        D3D11_MAPPED_SUBRESOURCE subhead;
+        o->output->devContext->Map(o->localSurf, 0, D3D11_MAP_WRITE, 0, &subhead);
+        // Copy from the main staged texture to the head's staged texture
+        memcpy(subhead.pData, submain.pData, sizeof(submain.pData));
+        // Unmap the head's staged texture
+        o->output->devContext->Unmap(o->localSurf, 0);
+        // Unmap the main staged texture
+        dev11context->Unmap(so->stagedSurf, 0);
+        // Copy from head's staged texture to the head's localSurf
+        //o->output->devContext->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, mainstaged, 0, &sb);
+        // Release the main staged texture
+        //so->stagedSurf->Release();
+      }
+
+      /*if (has_nonlocal) {
+        // Unmap the main staged texture
+        dev11context->Unmap(newbb11staged, 0);
+      }*/
+
+      // Flush the main render pipeline (full SoftTH buffer)
+      dev11context->Flush(); // DOESN'T APPEAR TO BE A NEED TO DO THIS MANUALLY!!!
+
+      // Draw each secondary output
       o->output->present();
     }
   }
@@ -342,8 +400,10 @@ HRESULT IDXGISwapChainNew::ResizeBuffers(UINT BufferCount,UINT Width,UINT Height
 void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 {
   dbg("dxgi_sc: preUpdateBB");
+
   int rrx = config.main.renderResolution.x;
   int rry = config.main.renderResolution.y;
+
   if(*width == rrx && *height == rry) {
     dbg("dxgi_sc: Multihead swapchain mode detected");
     HEAD *h = config.getPrimaryHead();
@@ -361,6 +421,7 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
     #if defined(SOFTTHMAIN) || defined(D3D11)
     if(dev11)
     {
+      // Create the full backbuffer render texture
       dbg("dxgi_sc: Creating FULL backbuffer for D3D11 Device");
       //CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, NULL);
       CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, NULL);
@@ -376,16 +437,39 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
       bool fpuPreserve = true; // TODO: does this exist in d3d10?
 
       outDevs11 = new OUTDEVICE11[numDevs];
+      stagedOuts11 = new STAGEDOUT11[numDevs];
       for(int i=0;i<numDevs;i++)
       {
-        OUTDEVICE11 *o = &outDevs11[i];
+        OUTDEVICE11 *o  = &outDevs11[i];
+        STAGEDOUT11 *so = &stagedOuts11[i];
+        so->headID = i+1;
+        so->devID = h->devID;
+        so->stagedSurf = NULL;
 
         // Create the output device
         HEAD *h = config.getHead(i);
-        bool local = h->transportMethod==OUTMETHOD_LOCAL;
-        dbg("dxgi_sc: Initializing Head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
+        dbg("dxgi_sc: Initializing Head %d (DevID: %d)",i+1,h->devID);
         o->output = new outDirect3D11(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
         o->cfg = h;
+        bool local = h->transportMethod==OUTMETHOD_LOCAL;
+        if (!local) has_nonlocal = true;
+        dbg("dxgi_sc: Head %d is %s", i+1, local?"local":"non-local");
+
+        // Create a main staging buffer sized for this head if non-local
+        if (!local) {
+          dbg("dxgi_sc: Creating a main non-local staging buffer for Head %d (DevID %d)",i+1,h->devID);
+          CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, h->transportRes.x, h->transportRes.y, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ|D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
+          WORD *fillbuf = new WORD[h->transportRes.x*h->transportRes.y];
+          for (int ii = 0; ii < h->transportRes.y; ii++)
+            for (int jj = 0; jj < h->transportRes.x; jj++)
+              fillbuf[ii*h->transportRes.x + jj] = (WORD) 0xffffffff;
+          D3D11_SUBRESOURCE_DATA fillsr;
+          fillsr.pSysMem = (void *)fillbuf;
+          fillsr.SysMemPitch = h->transportRes.x * 4;
+          fillsr.SysMemSlicePitch = h->transportRes.x * h->transportRes.y * 4;
+          if(dev11->CreateTexture2D(&dss, &fillsr, &so->stagedSurf) != S_OK)
+            dbg("dxgi_sc: CreateTexture2D staged for Head %d (DevID %d) failed :(",i+1,h->devID), exit(0);
+        }
 
         // Create shared surfaces
         HANDLE sha = o->output->GetShareHandle();
@@ -394,8 +478,17 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 
           { // Open surfA share handle
             ID3D11Resource *tr;
-            if(dev11->OpenSharedResource(sha, __uuidof(ID3D11Resource), (void**)(&tr)) != S_OK)
-              dbg("dxgi_sc: OpenSharedResource A failed!"), exit(0);
+			      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+              // Local output
+			        if (dev11->OpenSharedResource(sha, __uuidof(ID3D11Resource), (void**)(&tr)) != S_OK)
+				        dbg("dxgi_sc: Local OpenSharedResource A failed!"), exit(0);
+			      }
+			      else
+			      {
+              // Non-local output
+				      if (o->output->dev->OpenSharedResource(sha, __uuidof(ID3D11Resource), (void**)(&tr)) != S_OK)
+					      dbg("dxgi_sc: Non-local OpenSharedResource A failed!"), exit(0);
+			      }
             if(tr->QueryInterface(__uuidof(ID3D11Texture2D), (void**)(&o->localSurf)) != S_OK)
               dbg("dxgi_sc: Shared surface QueryInterface failed!"), exit(0);
             tr->Release();
@@ -404,6 +497,14 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
         } else
           dbg("dxgi_sc: ERROR: Head %d: No share handle!", i+1), exit(0);
       }
+
+      // Create the full backbuffer staged texture if we have non-local head
+      /*if (has_nonlocal) {
+        CD3D11_TEXTURE2D_DESC ds(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, NULL, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ, 1, 0, D3D11_RESOURCE_MISC_SHARED);
+        newbbDesc11staged = ds;
+        if(dev11->CreateTexture2D(&newbbDesc11staged, NULL, &newbb11staged) != S_OK)
+          dbg("dxgi_sc: CreateTexture2D staged failed :("), exit(0);
+      }*/
     }
     #endif
     #ifdef SOFTTHMAIN

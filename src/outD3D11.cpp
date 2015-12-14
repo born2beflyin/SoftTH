@@ -97,16 +97,16 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   if(!head->screenMode.y)
     head->screenMode.y = bbHeight;
 
-  // Create output window
+  /* Create output window */
   int wflags = NULL;
   WINDOWPARAMS wp = {mInfo.rcMonitor.left, mInfo.rcMonitor.top, bbWidth, bbHeight, NULL, wflags, true, NULL}; // TODO: parent window?
-
+  // Initialize the window
   wp.hWnd = NULL;
   _beginthread(windowHandler, 0, (void*) &wp);
   while(!wp.hWnd)
     Sleep(10);
   outWin = wp.hWnd;
-
+  // Set this head's window
   head->hwnd = outWin;
   ShowWindow(outWin, SW_SHOWNA);
 
@@ -118,26 +118,36 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
     fnew->Release();
   }
 
+  // Get the adapter for this head
   UINT i = 0;
   IDXGIAdapter* pAdapter = NULL;
   //IDXGIAdapter *vAdapters[64];
   dbg("outD3D11: Getting the correct adapter for this head ...");
   while(dxgf->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
-    //vAdapters[i] = pAdapter;
-
+    // Get the adapter description
     DXGI_ADAPTER_DESC desc;
     pAdapter->GetDesc(&desc);
 
+    // Check the adapter name
     char *name = new char[128];
     WideCharToMultiByte(CP_ACP, 0, desc.Description, -1, name, 128, NULL, NULL);
 
+    // Compare the name to the name we got above
     if (_strcmpi(name,ai.Description) == 0) {
       dbg("outD3D11: Got the adapter! Adapter %d: <%s>", i, name);
+      /* Set this head's transport method */
+      // Local if i == 0
+      if (i == 0)
+        head->transportMethod = OUTMETHOD_LOCAL;
+      // Otherwise non-local
+      else
+        head->transportMethod = OUTMETHOD_NONLOCAL;
+
+      // We found the adapter, so break out of the loop
       break;
     }
     ++i;
   }
-  //pAdapter = vAdapters[i];
 
   // Init Direct3D 11
   DXGI_SWAP_CHAIN_DESC sd;
@@ -156,9 +166,9 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
 
   //D3D10_RESOURCE_MISC_SHARED
 
+  // Create the device and swap chain
   //DWORD flags = D3D10_CREATE_DEVICE_BGRA_SUPPORT;
   DWORD flags = 0;
-  // TODO: verify devID match!
   //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
   if(newD3D11CreateDeviceAndSwapChain(pAdapter,
                                       D3D_DRIVER_TYPE_UNKNOWN,
@@ -187,16 +197,32 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
     dbg("outD3D11: Cannot get true swapchain!");
 
   // Get device backbuffer
+  dbg("outD3D11: Creating secondary head (DevID %d) render backbuffer for D3D11 Device",devID);
   if(swapChain->GetBuffer( 0, __uuidof(ID3D11Texture2D), (LPVOID*) &bb) != S_OK) {
     dbg("outD3D11: swapChain->GetBuffer FAILED");
     exit(0);
   }
 
-  // Create shared buffer
-  dbg("outD3D11: Creating secondary head (DevID %d) backbuffer for D3D11 Device",devID);
-  CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, 0, 1, 0, D3D11_RESOURCE_MISC_SHARED);
-  if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
-    dbg("outD3D11: CreateTexture2D failed!"), exit(0);
+  // Create the shared buffer
+  dbg("outD3D11: Creating secondary head (DevID %d) shared transport buffer for D3D11 Device",devID);
+
+  if (head->transportMethod != OUTMETHOD_LOCAL) {
+    CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ|D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
+    WORD *fillbuf = new WORD[transX*transY];
+    for (int ii = 0; ii < transY; ii++)
+      for (int jj = 0; jj < transX; jj++)
+        fillbuf[ii*transX + jj] = (WORD) 0xffffffff;
+    D3D11_SUBRESOURCE_DATA fillsr;
+    fillsr.pSysMem = (void *)fillbuf;
+    fillsr.SysMemPitch = transX * 4;
+    fillsr.SysMemSlicePitch = transX * transY * 4;
+    if(dev->CreateTexture2D(&dss, &fillsr, &sharedSurface) != S_OK)
+      dbg("outD3D11: CreateTexture2D staged failed!"), exit(0);
+  } else {
+    CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, 0, 1, 0, D3D11_RESOURCE_MISC_SHARED);
+    if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
+      dbg("outD3D11: CreateTexture2D failed!"), exit(0);
+  }
 
   // Get share handle
   IDXGIResource* texRes(NULL);
@@ -352,13 +378,11 @@ outDirect3D11::~outDirect3D11()
 void outDirect3D11::present()
 {
   // Copy from share surface to backbuffer & present
-  dbg("CopySubresourceRegion...");
-  devContext->Flush();
-
-  //if(GetKeyState('U') < 0)
-  //  D3DX11SaveTextureToFile(sharedSurface, D3DX11_IFF_JPG, "d:\\pelit\\_sharedSurface.jpg");
+  dbg("outD3D11: Present - CopyResource...");
 
   devContext->CopyResource(bb, sharedSurface);
+  devContext->Flush(); // DOESN'T APPEAR TO BE A NEED TO DO THIS MANUALLY!!!
+
   /*D3D10_BOX sb = {0, 0, 0, 1920, 1200, 1};
   dev->CopySubresourceRegion(bb, 0, 0, 0, 0, sharedSurface, 0, &sb);
 
@@ -371,7 +395,7 @@ void outDirect3D11::present()
 */
   HRESULT r = swapChain->Present(0, 0);
   if(r != S_OK)
-    dbg("Present failed 0x%08X", r);
+    dbg("outD3D11: Present failed 0x%08X", r);
 }
 
 /*

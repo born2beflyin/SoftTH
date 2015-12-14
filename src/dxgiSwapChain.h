@@ -45,6 +45,11 @@ typedef struct {
   HEAD *cfg;  // Pointer to configuration data
 } OUTDEVICE11;
 
+typedef struct {
+  int headID, devID;
+  ID3D11Texture2D *stagedSurf;
+} STAGEDOUT11;
+
 DEFINE_GUID(IID_IDXGISwapChainNew, 0x41ba0075, 0xbc7b, 0x4eee, 0x99, 0x8d, 0xb6, 0xdb, 0xb7, 0xba, 0xeb, 0x46);
 
 interface IDXGISwapChainNew : IDXGISwapChain
@@ -114,6 +119,8 @@ public:
   IDXGISwapChain* getReal() {dbg("Get real swapchain 0x%08X", &dxgsc);return dxgsc;};
 
 private:
+  bool has_nonlocal = false;
+
   IDXGISwapChain *dxgsc;
   IDXGIFactory1 *parent;
   IDXGIFactory1 *dxgif;
@@ -132,6 +139,7 @@ private:
   D3D11_TEXTURE2D_DESC newbbDesc11;
   ID3D11Texture2D *realbb11; // Real backbuffer (one monitor)
   D3D11_TEXTURE2D_DESC realbbDesc11;
+  ID3D11Texture2D *stagedSurfs11; // staging surfaces for each non-local output
 
   //ID3D12Texture2D *newbb12; // New backbuffer (full size)
   //D3D12_TEXTURE2D_DESC newbbDesc12;
@@ -145,6 +153,9 @@ private:
   OUTDEVICE10   *outDevs10;
   OUTDEVICE11   *outDevs11;
   //OUTDEVICE12   *outDevs12;
+
+  STAGEDOUT11   *stagedOuts11;
+
 
 };
 

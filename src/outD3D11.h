@@ -34,14 +34,15 @@ public:
   HANDLE GetShareHandle() {return shareHandle;};
   ID3D11Texture2D* GetSharedSurface() {return sharedSurface;};
 
-private:
-  IDXGIFactory *dxgf;
-
-  HWND outWin;
   IDXGISwapChain *swapChain;
   ID3D11Device *dev;
   D3D_FEATURE_LEVEL featureLevel;
   ID3D11DeviceContext *devContext;
+
+private:
+  IDXGIFactory *dxgf;
+
+  HWND outWin;
 
   HMONITOR mId;
   MONITORINFO mInfo;

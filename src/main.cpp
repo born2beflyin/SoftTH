@@ -856,7 +856,20 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
 {
   dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
 
-  HRESULT ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
+  //D3D_FEATURE_LEVEL pFeatureLevelsUpdated[1] = { D3D_FEATURE_LEVEL_11_0 };
+
+  HRESULT ret = dllD3D11CreateDevice(adapter,
+                                     DriverType,
+                                     Software,
+                                     Flags,
+                                     pFeatureLevels,
+                                     FeatureLevels,
+                                     SDKVersion,
+                                     ppDevice,
+                                     pFeatureLevel,
+                                     ppImmediateContext);
+
+  /*HRESULT ret =  dllD3D11CreateDeviceAndSwapChain(adapter,
                                         DriverType,
                                         Software,
                                         Flags,
@@ -867,7 +880,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
                                         ppSwapChain,
                                         ppDevice,
                                         pFeatureLevel,
-                                        ppImmediateContext);
+                                        ppImmediateContext);*/
 
   dbg("d3d11: Mode: %dx%d %d.%dHz %s", pSwapChainDesc->BufferDesc.Width, pSwapChainDesc->BufferDesc.Height, pSwapChainDesc->BufferDesc.RefreshRate.Numerator, pSwapChainDesc->BufferDesc.RefreshRate.Denominator, pSwapChainDesc->Windowed?"Windowed":"Fullscreen");
   dbg("d3d11: Multisample: %d samples, quality %d", pSwapChainDesc->SampleDesc.Count, pSwapChainDesc->SampleDesc.Quality);
@@ -894,7 +907,7 @@ GHOOK D3DHooks[] = {
   //HOOK(NewD3DXMatrixPerspectiveOffCenterRH, d3dx9_42.dll, D3DXMatrixPerspectiveOffCenterRH)
   //HOOK(NewD3DXMatrixPerspectiveFovLH, d3dx9_38.dll, D3DXMatrixPerspectiveFovLH)
 
-  HOOK(newD3D11CreateDevice, d3d11.dll, D3D11CreateDevice)
+  //HOOK(newD3D11CreateDevice, d3d11.dll, D3D11CreateDevice)
   HOOK(newD3D11CreateDeviceAndSwapChain, d3d11.dll, D3D11CreateDeviceAndSwapChain)
   HOOKEND
 };

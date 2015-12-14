@@ -218,6 +218,7 @@
 					<Add after='&quot;$(#psdk.bin)\x86\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\debug\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Assassin&apos;s Creed 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -290,6 +291,7 @@
 					<Add after='&quot;$(#psdk.bin)\x86\mt.exe&quot; -manifest ..\make\CUSTOM_MANIFEST_x86.manifest -outputresource:$(TARGET_OUTPUT_FILE)' />
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\release\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Assassin&apos;s Creed 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>

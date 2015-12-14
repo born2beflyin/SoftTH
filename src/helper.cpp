@@ -190,7 +190,7 @@ void dbg(char *first, ...) {
 
 
 		//char temp[2048];
-		odprintf("<%s:%d> %s", processName(), GetCurrentThreadId(), Message);
+		odprintf("<%s:%d> %s\n", processName(), GetCurrentThreadId(), Message);
     //sprintf(temp, "<%s:%d> %s", processName(), GetCurrentThreadId(), Message);
 		//OutputDebugString(temp);
     //backLogAdd(temp);
