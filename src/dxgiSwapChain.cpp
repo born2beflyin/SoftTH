@@ -245,7 +245,7 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     for(int i=0;i<numDevs;i++)
     {
       OUTDEVICE11 *o  = &outDevs11[i];
-      STAGEDOUT11 *so = &stagedOuts11[i];
+      STAGINGOUT11 *so = &stagingOuts11[i];
 
       o->localSurf->GetDesc(&dt);
       dbg("dxgi_sc: Secondary Head %d : %dx%d ms%d %s", i+1, dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
@@ -253,31 +253,34 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
 
       // Check if the head is local and copy accordingly
       if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
-        /* Local head (on the primary video adapter) */
+        // Local head (on the primary video adapter)
         // - just copy the region directly to the head's localSurf
         dbg("dxgi_sc: Local head: CopySubresourceRegion");
         dev11context->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb11, 0, &sb);
       } else {
-        /* Non-local head (on a secondary adapter */
+        // Non-local head (on a secondary adapter
         dbg("dxgi_sc: Non-local head: Map/Unmap");
         // Copy from the main backbuffer to the main staged texture
-        dev11context->CopySubresourceRegion(so->stagedSurf, 0, 0, 0, 0, newbb11, 0, &sb);
+        dev11context->CopySubresourceRegion(so->stagingSurf, 0, 0, 0, 0, newbb11, 0, &sb);
         // Map the main staged texture
         D3D11_MAPPED_SUBRESOURCE submain;
-        dev11context->Map(so->stagedSurf, 0, D3D11_MAP_READ, 0, &submain);
+        if (dev11context->Map(so->stagingSurf, 0, D3D11_MAP_READ, 0, &submain) != S_OK)
+          dbg("Mapping Main staging surface failed!");
         // Map the head's staged texture
         D3D11_MAPPED_SUBRESOURCE subhead;
-        o->output->devContext->Map(o->localSurf, 0, D3D11_MAP_WRITE, 0, &subhead);
+        if (o->output->devContext->Map(o->output->stagingSurface, 0, D3D11_MAP_WRITE, 0, &subhead) != S_OK)
+          dbg("Mapping Head %d staging surface failed!",i+1);
         // Copy from the main staged texture to the head's staged texture
-        memcpy(subhead.pData, submain.pData, sizeof(submain.pData));
+        memcpy(subhead.pData, submain.pData, dt.Width*dt.Height*4);
         // Unmap the head's staged texture
-        o->output->devContext->Unmap(o->localSurf, 0);
+        o->output->devContext->Unmap(o->output->stagingSurface, 0);
         // Unmap the main staged texture
-        dev11context->Unmap(so->stagedSurf, 0);
+        dev11context->Unmap(so->stagingSurf, 0);
         // Copy from head's staged texture to the head's localSurf
-        //o->output->devContext->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, mainstaged, 0, &sb);
+        o->output->devContext->CopyResource(o->localSurf, o->output->stagingSurface);
+        //o->output->devContext->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, o->output->stagingSurface, 0, NULL);
         // Release the main staged texture
-        //so->stagedSurf->Release();
+        //so->stagingSurf->Release();
       }
 
       /*if (has_nonlocal) {
@@ -437,14 +440,14 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
       bool fpuPreserve = true; // TODO: does this exist in d3d10?
 
       outDevs11 = new OUTDEVICE11[numDevs];
-      stagedOuts11 = new STAGEDOUT11[numDevs];
+      stagingOuts11 = new STAGINGOUT11[numDevs];
       for(int i=0;i<numDevs;i++)
       {
         OUTDEVICE11 *o  = &outDevs11[i];
-        STAGEDOUT11 *so = &stagedOuts11[i];
+        STAGINGOUT11 *so = &stagingOuts11[i];
         so->headID = i+1;
         so->devID = h->devID;
-        so->stagedSurf = NULL;
+        so->stagingSurf = NULL;
 
         // Create the output device
         HEAD *h = config.getHead(i);
@@ -457,18 +460,26 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 
         // Create a main staging buffer sized for this head if non-local
         if (!local) {
-          dbg("dxgi_sc: Creating a main non-local staging buffer for Head %d (DevID %d)",i+1,h->devID);
-          CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, h->transportRes.x, h->transportRes.y, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ|D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
-          WORD *fillbuf = new WORD[h->transportRes.x*h->transportRes.y];
+          dbg("dxgi_sc: Creating a main non-local staging buffer for Head %d (DevID %d)", i + 1, h->devID);
+          CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, h->transportRes.x, h->transportRes.y, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
+          /*DWORD32 *fillbuf = new DWORD32[h->transportRes.x*h->transportRes.y];
           for (int ii = 0; ii < h->transportRes.y; ii++)
             for (int jj = 0; jj < h->transportRes.x; jj++)
-              fillbuf[ii*h->transportRes.x + jj] = (WORD) 0xffffffff;
+            {
+              if ((ii&32)==(jj&32))
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0x0000ff00;
+              else
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0xffffffff;
+            }
           D3D11_SUBRESOURCE_DATA fillsr;
+          ZeroMemory(&fillsr, sizeof(fillsr));
           fillsr.pSysMem = (void *)fillbuf;
           fillsr.SysMemPitch = h->transportRes.x * 4;
           fillsr.SysMemSlicePitch = h->transportRes.x * h->transportRes.y * 4;
-          if(dev11->CreateTexture2D(&dss, &fillsr, &so->stagedSurf) != S_OK)
+          if (dev11->CreateTexture2D(&dss, &fillsr, &so->stagingSurf) != S_OK) {*/
+          if (dev11->CreateTexture2D(&dss, NULL, &so->stagingSurf) != S_OK) {
             dbg("dxgi_sc: CreateTexture2D staged for Head %d (DevID %d) failed :(",i+1,h->devID), exit(0);
+          }
         }
 
         // Create shared surfaces

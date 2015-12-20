@@ -206,22 +206,31 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   // Create the shared buffer
   dbg("outD3D11: Creating secondary head (DevID %d) shared transport buffer for D3D11 Device",devID);
 
+  CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, 0, 1, 0, D3D11_RESOURCE_MISC_SHARED);
+  if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
+    dbg("outD3D11: CreateTexture2D shared surface failed!"), exit(0);
+
+  // Create the staging surface
   if (head->transportMethod != OUTMETHOD_LOCAL) {
-    CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ|D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
-    WORD *fillbuf = new WORD[transX*transY];
+    CD3D11_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, 0, D3D11_USAGE_STAGING, D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE, 1, 0, 0);
+    DWORD32 *fillbuf = new DWORD32[transX*transY];
     for (int ii = 0; ii < transY; ii++)
       for (int jj = 0; jj < transX; jj++)
-        fillbuf[ii*transX + jj] = (WORD) 0xffffffff;
+      {
+        if ((ii&32)==(jj&32))
+          fillbuf[ii*transX + jj] = (DWORD32) 0x00ff0000;
+        else
+          fillbuf[ii*transX + jj] = (DWORD32) 0xffffffff;
+      }
     D3D11_SUBRESOURCE_DATA fillsr;
+    ZeroMemory(&fillsr, sizeof(fillsr));
     fillsr.pSysMem = (void *)fillbuf;
     fillsr.SysMemPitch = transX * 4;
     fillsr.SysMemSlicePitch = transX * transY * 4;
-    if(dev->CreateTexture2D(&dss, &fillsr, &sharedSurface) != S_OK)
-      dbg("outD3D11: CreateTexture2D staged failed!"), exit(0);
-  } else {
-    CD3D11_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_RENDER_TARGET, D3D11_USAGE_DEFAULT, 0, 1, 0, D3D11_RESOURCE_MISC_SHARED);
-    if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
-      dbg("outD3D11: CreateTexture2D failed!"), exit(0);
+    if (dev->CreateTexture2D(&dss, &fillsr, &stagingSurface) != S_OK) {
+    //if (dev->CreateTexture2D(&dss, NULL, &stagingSurface) != S_OK) {
+      dbg("outD3D11: CreateTexture2D staging surface failed!"), exit(0);
+    }
   }
 
   // Get share handle
@@ -230,7 +239,6 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   if (texRes->GetSharedHandle(&shareHandle) != S_OK)
     dbg("outD3D11: GetSharedHandle failed!");
   texRes->Release();
-
   dbg("outD3D11: Share handle: 0x%08X", shareHandle);
 
   HRESULT ret = dev->CreateRenderTargetView(bb, NULL, &rttView);

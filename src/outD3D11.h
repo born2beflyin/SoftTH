@@ -32,12 +32,15 @@ public:
   //void presentFromBuffer();
   void present();
   HANDLE GetShareHandle() {return shareHandle;};
+  HANDLE GetStagingHandle() {return stagingHandle;};
   ID3D11Texture2D* GetSharedSurface() {return sharedSurface;};
+  ID3D11Texture2D* GetStagingSurface() {return stagingSurface;};
 
   IDXGISwapChain *swapChain;
   ID3D11Device *dev;
   D3D_FEATURE_LEVEL featureLevel;
   ID3D11DeviceContext *devContext;
+  ID3D11Texture2D *stagingSurface; // Staging surface if non-local
 
 private:
   IDXGIFactory *dxgf;
@@ -55,6 +58,7 @@ private:
   ID3D11RenderTargetView *rttView;
 
   HANDLE shareHandle;
+  HANDLE stagingHandle;
 };
 
 #endif // __OUTD3D11_H__

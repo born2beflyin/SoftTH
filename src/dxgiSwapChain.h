@@ -47,8 +47,8 @@ typedef struct {
 
 typedef struct {
   int headID, devID;
-  ID3D11Texture2D *stagedSurf;
-} STAGEDOUT11;
+  ID3D11Texture2D *stagingSurf;
+} STAGINGOUT11;
 
 DEFINE_GUID(IID_IDXGISwapChainNew, 0x41ba0075, 0xbc7b, 0x4eee, 0x99, 0x8d, 0xb6, 0xdb, 0xb7, 0xba, 0xeb, 0x46);
 
@@ -139,7 +139,7 @@ private:
   D3D11_TEXTURE2D_DESC newbbDesc11;
   ID3D11Texture2D *realbb11; // Real backbuffer (one monitor)
   D3D11_TEXTURE2D_DESC realbbDesc11;
-  ID3D11Texture2D *stagedSurfs11; // staging surfaces for each non-local output
+  ID3D11Texture2D *stagingSurfs11; // staging surfaces for each non-local output
 
   //ID3D12Texture2D *newbb12; // New backbuffer (full size)
   //D3D12_TEXTURE2D_DESC newbbDesc12;
@@ -154,7 +154,7 @@ private:
   OUTDEVICE11   *outDevs11;
   //OUTDEVICE12   *outDevs12;
 
-  STAGEDOUT11   *stagedOuts11;
+  STAGINGOUT11   *stagingOuts11;
 
 
 };
