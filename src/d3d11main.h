@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _D3D11MAIN_H_
 #define _D3D11MAIN_H_
 
-#include "main.h"
+#include "configFile.h"
+
+#define DLL __declspec(dllimport)
+
+extern "C" DLL configFile config; // Main configuration
+
 #include "module.h"
 
 Module* SoftTHMod;

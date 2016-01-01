@@ -1044,7 +1044,7 @@ DEXPORTD(hLibD3D10_1, RevertToOldImplementation             );
 */
 
 // D3D 11
-DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
+/*DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
 DEXPORTD(hLibD3D11, D3D11CoreCreateLayeredDevice);
 DEXPORTD(hLibD3D11, D3D11CoreGetLayeredDeviceSize);
 DEXPORTD(hLibD3D11, D3D11CoreRegisterLayers);
@@ -1090,7 +1090,7 @@ DEXPORTD(hLibD3D11, D3DPerformance_GetStatus);
 DEXPORTD(hLibD3D11, D3DPerformance_SetMarker);
 DEXPORTD(hLibD3D11, EnableFeatureLevelUpgrade);
 DEXPORTD(hLibD3D11, OpenAdapter10);
-DEXPORTD(hLibD3D11, OpenAdapter10_2);
+DEXPORTD(hLibD3D11, OpenAdapter10_2);*/
 
 }
 #pragma warning (default : 4731)
