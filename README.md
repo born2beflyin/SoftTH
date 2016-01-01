@@ -13,9 +13,15 @@ SoftTH works by rendering the whole scene on one display adapter, which then get
 
 ======
 
-(As of Jan. 2014)
+(Updated Dec. 2015)
 
-Compiles with Code::Blocks 13.12: http://www.codeblocks.org using the Microsoft VC++ 2010 compiler.
+SoftTH contains incomplete code for Direct3D 10 and 11 and has some placeholders for Direct3D 12. D3D10 and D3D11 work for some special cases, but proxy DLLs for D3D10 and 11 still need to be completed and debugged.
+
+======
+
+(As of Dec. 2015)
+
+Compiles with Code::Blocks 13.12: http://www.codeblocks.org using the Microsoft VC++ 2013 Express compiler.
 
 Requires:
 
@@ -24,11 +30,8 @@ Requires:
 - zlib compression library: http://www.zlib.net/ (Currently linking to v1.2.7)
 
 (NOT included with SoftTH)
-- DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
-- Windows SDK v7.1: http://www.microsoft.com/en-us/download/details.aspx?id=8279
-
-(You will not need the following if you have MS Visual Studio 2010 Pro, but you will have to modify the include/lib search folders)
-- Windows DDK v7.1.0: http://www.microsoft.com/en-us/download/details.aspx?id=11800
+- (For DX9) DirectX SDK June 2010: http://www.microsoft.com/en-us/download/details.aspx?id=6812
+- Windows SDK v8.1: https://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx
 
 Modify the project include/lib search directories accordingly.
 
@@ -36,8 +39,6 @@ If you get a link error about "failure during conversion to COFF," it may be rel
 http://stackoverflow.com/questions/10888391/error-link-fatal-error-lnk1123-failure-during-conversion-to-coff-file-inval
 
 If a project target isn't yet in the list, i.e. "Release DX11 Win x64", it's in the works.  It may take a while.
-
-SoftTH contains incomplete code for Direct3D 10 (DXGI) and Direct3D 10.1 support. For Direct3D 11, most functionality is missing, but is under development.
 
 ======
 
