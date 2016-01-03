@@ -273,6 +273,7 @@ char* matchRiid(REFIID riid)
   if(riid == IID_IDXGIObject) return "IID_IDXGIObject";
   if(riid == IID_IDXGIFactory) return "IID_IDXGIFactory";
   if(riid == IID_IDXGIFactory1) return "IID_IDXGIFactory1";
+  if(riid == IID_IDXGIFactory2) return "IID_IDXGIFactory2";
   if(riid == IID_IDXGISwapChain) return "IID_IDXGISwapChain";
   if(riid == IID_IDXGIAdapter) return "IID_IDXGIAdapter";
   if(riid == IID_IDXGIAdapter1) return "IID_IDXGIAdapter1";
@@ -294,7 +295,10 @@ char* matchRiid(REFIID riid)
   if(riid == IID_ID3D11DeviceContext) return "IID_ID3D11DeviceContext";
 
   if(riid == IID_IDXGISwapChainNew) return "IID_IDXGISwapChainNew";
+  if(riid == IID_IDXGIFactoryNew) return "IID_IDXGIFactoryNew";
   if(riid == IID_IDXGIFactory1New) return "IID_IDXGIFactory1New";
+  if(riid == IID_IDXGIFactory2New) return "IID_IDXGIFactory2New";
+  if(riid == IID_IDXGIAdapterNew) return "IID_IDXGIAdapterNew";
   if(riid == IID_IDXGIAdapter1New) return "IID_IDXGIAdapter1New";
   if(riid == IID_IDXGIOutputNew) return "IID_IDXGIOutputNew";
 

@@ -50,7 +50,7 @@ HINSTANCE hLibD3D9 = NULL; // Real d3d9.dll
 HINSTANCE hLibDXGI = NULL; // Real dxgi.dll
 HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
 HINSTANCE hLibD3D10_1 = NULL; // Real d3d10.dll
-HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
+extern "C" DLL HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
 HINSTANCE hLibD3D12 = NULL; // Real d3d12.dll
 HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
 
@@ -207,6 +207,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       config.load();
 
       bool hooks = true;
+
       // Set win32 hooks
       if(hooks) {
         dbg("Initializing win32 hooks...");
@@ -241,7 +242,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
           sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), useDebug?libd:lib);
         else
           strcpy(path, config.main.dllPathD3D9);
-        dbg("Direct3D DLL Path: <%s>", path);
+        dbg("D3D9 DLL Path: <%s>", path);
         strcpy(hLibD3D9_path, path);
         hLibD3D9 = LoadLibrary(path);
 	      if(!hLibD3D9)
@@ -568,8 +569,13 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid
   HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
   dbg("dxgi: CreateDXGIFactory1 0x%08X", *ppFactory);
   if(ret == S_OK) {
-    IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
-    *ppFactory = new IDXGIFactory1New(dxgifNew);
+    if (riid == IID_IDXGIFactory1) {
+      IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
+      *ppFactory = new IDXGIFactory1New(dxgifNew);
+    } else if (riid == IID_IDXGIFactory2) {
+      IDXGIFactory2 *dxgifNew = (IDXGIFactory2 *) *ppFactory;
+      *ppFactory = new IDXGIFactory2New(dxgifNew);
+    }
   } else
     dbg("dxgi: CreateDXGIFactory1 failed!");
   return ret;
@@ -817,7 +823,8 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDevice(IDXGIAdapter
                                                                     D3D_FEATURE_LEVEL *pFeatureLevel,
                                                                     ID3D11DeviceContext **ppImmediateContext)
 {
-  dbg("d3d11: D3D11CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+  //dbg("d3d11: D3D11CreateDevice 0x%08X 0x%08X", adapter, *adapter);
+  dbg("d3d11: D3D11CreateDevice");
 
   HRESULT ret = dllD3D11CreateDevice(adapter,
                                      DriverType,
@@ -854,7 +861,8 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
                                                                                 D3D_FEATURE_LEVEL *pFeatureLevel,
                                                                                 ID3D11DeviceContext **ppImmediateContext)
 {
-  dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
+  //dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
+  dbg("d3d11: D3D11CreateDeviceAndSwapChain");
 
   //D3D_FEATURE_LEVEL pFeatureLevelsUpdated[1] = { D3D_FEATURE_LEVEL_11_0 };
 
@@ -890,6 +898,18 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
                          pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
                          pSwapChainDesc->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
 
+
+  if (!adapter) {
+    HRESULT hr;
+    IDXGIDevice * pDXGIDevice = nullptr;
+    hr = (*ppDevice)->QueryInterface(__uuidof(IDXGIDevice), (void**) &pDXGIDevice);
+
+    IDXGIAdapter * pDXGIAdapter = nullptr;
+    hr = pDXGIDevice->GetParent(IID_IDXGIAdapter, (void **) &pDXGIAdapter);
+
+    if (hr != S_OK) dbg("bad!");
+    adapter = pDXGIAdapter;
+  }
 
   IDXGIFactory *factory;
   if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)

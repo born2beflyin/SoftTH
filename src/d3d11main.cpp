@@ -23,15 +23,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <stdio.h>
-#include <d3d11.h>
+//#include <d3d11.h>
 #include "d3d11main.h"
 
 
 // SoftTH main dll import function/variable prototypes
 void (__stdcall * dbg)(char *first, ...) = NULL;
 void (__stdcall * ShowMessage)(char *first, ...) = NULL;
-void (__stdcall * addNoHookModule)(HMODULE mod) = NULL;
+//void (__stdcall * addNoHookModule)(HMODULE mod) = NULL;
 DLL configFile config; // Main configuration
+DLL HINSTANCE hLibD3D11;
 
 
 /* D3D 11 real function prototypes */
@@ -62,7 +63,7 @@ extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChai
 
 
 /* D3D 11 SoftTH function prototypes */
-extern "C" __declspec(dllexport) HRESULT (WINAPI*newD3D11CreateDevice)(IDXGIAdapter *adapter,
+/*extern "C" __declspec(dllexport) HRESULT (WINAPI*newD3D11CreateDevice)(IDXGIAdapter *adapter,
                                       D3D_DRIVER_TYPE DriverType,
                                       HMODULE Software,
                                       UINT Flags,
@@ -85,15 +86,15 @@ extern "C" __declspec(dllexport) HRESULT (WINAPI*newD3D11CreateDeviceAndSwapChai
                                                                                    ID3D11Device** ppDevice,
                                                                                    D3D_FEATURE_LEVEL *pFeatureLevel,
                                                                                    ID3D11DeviceContext **ppImmediateContext) = NULL;
-
+*/
 
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 {
 
   SoftTHMod = NULL;
-  D3D11Mod = NULL;
+  //D3D11Mod = NULL;
   hLibSoftTH = NULL; // Main SoftTH dll (dxgi.dll)
-  hLibD3D11 = NULL; // Real d3d11.dll
+  //hLibD3D11 = NULL; // Real d3d11.dll
 
   switch (reason)
   {
@@ -113,14 +114,14 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         // Capture functions from main SoftTH library
         dbg = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"dbg");
         ShowMessage = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"ShowMessage");
-        addNoHookModule = (void(__stdcall *)(HMODULE)) GetProcAddress(hLibSoftTH,"addNoHookModule");
+        //addNoHookModule = (void(__stdcall *)(HMODULE)) GetProcAddress(hLibSoftTH,"addNoHookModule");
 
         dbg("d3d11: Main SoftTH functions captured.");
       }
 
       /* Load D3D11 library */
       {
-        char path[256];
+        /*char path[256];
         if(strlen(config.main.dllPathD3D11) < 2)
           sprintf(path, "%s\\system32\\%s", getenv("SystemRoot"), "d3d11.dll");
         else
@@ -128,10 +129,11 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         //dbg("D3D11 DLL Path: <%s>", path);
 
         D3D11Mod = new Module;
-        if(D3D11Mod->SetHandle(path))
+        if(D3D11Mod->SetHandle(path)) {
           hLibD3D11 = D3D11Mod->GetHandle();
-        else
-		      ShowMessage("D3D11 DLL not found!\n'%s'", path), exit(0);
+          dbg("d3d11: Got D3D11 dll: %s, 0x%08X", path, &hLibD3D11);
+        } else
+		      ShowMessage("D3D11 DLL not found!\n'%s'", path), exit(0);*/
 
         /*dllD3D11CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter *,
                                       D3D_DRIVER_TYPE,
@@ -160,7 +162,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
                                                                  GetProcAddress(hLibD3D11, "D3D11CreateDeviceAndSwapChain");
         */
 
-        newD3D11CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter *,
+        /*newD3D11CreateDevice = (HRESULT(__stdcall *)(IDXGIAdapter *,
                                       D3D_DRIVER_TYPE,
                                       HMODULE,
                                       UINT,
@@ -185,12 +187,12 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
                                                                  D3D_FEATURE_LEVEL *,
                                                                  ID3D11DeviceContext **))
                                                                  GetProcAddress(hLibSoftTH, "D3D11CreateDeviceAndSwapChain");
+*/
 
-
-        if(!newD3D11CreateDevice)
+        /*if(!newD3D11CreateDevice)
 		      ShowMessage("D3D11CreateDevice not mapped to SoftTH DLL\n"), exit(0);
         if(!newD3D11CreateDeviceAndSwapChain)
-		      ShowMessage("D3D11CreateDeviceAndSwapChain not mapped to SoftTH DLL"), exit(0);
+		      ShowMessage("D3D11CreateDeviceAndSwapChain not mapped to SoftTH DLL"), exit(0);*/
 
 
 
@@ -208,7 +210,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
           dbg("Pinned DLL: <%s>", fn);
 
         /*if(hLibSoftTH) addNoHookModule(hLibSoftTH);*/
-        if(hLibD3D11) addNoHookModule(hLibD3D11);
+        /*if(hLibD3D11) addNoHookModule(hLibD3D11);*/
       }
 
       break;
@@ -217,21 +219,21 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
     case DLL_PROCESS_DETACH:
     {
 
-			if(hLibD3D11) {
+			/*if(hLibD3D11) {
 				FreeLibrary(hLibD3D11);
 				hLibD3D11 = NULL;
-			}
+			}*/
       if(hLibSoftTH) {
         FreeLibrary(hLibSoftTH);
         hLibSoftTH = NULL;
       }
 
-			if(D3D11Mod)
+			/*if(D3D11Mod)
       {
         D3D11Mod->Release();
         delete D3D11Mod;
         D3D11Mod = NULL;
-      }
+      }*/
       if(SoftTHMod)
       {
         SoftTHMod->Release();
@@ -386,8 +388,10 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 	}
 
 #define DEXPORTD(hLib, x) _declspec(dllexport) void x(void) {\
-  dbg("DEXPORTD: %s - %s", #hLib, #x);\
 	static FARPROC foo = GetProcAddress((HMODULE) hLib, #x);\
+	if (!foo) { dbg("Error getting address (Code: %d)", GetLastError()); }\
+  GetModuleFileName((HMODULE) hLib,libfn,256);\
+  dbg("DEXPORTD: %s, %s, 0x%08X - %s, 0x%08X", #hLib, libfn, &hLib, #x, foo);\
 	__asm {pop STACK_BASE};\
 	__asm {jmp foo};\
 	}
@@ -398,8 +402,10 @@ DEXPORTD(hLibD3D11, D3D11CoreCreateDevice);
 DEXPORTD(hLibD3D11, D3D11CoreCreateLayeredDevice);
 DEXPORTD(hLibD3D11, D3D11CoreGetLayeredDeviceSize);
 DEXPORTD(hLibD3D11, D3D11CoreRegisterLayers);
-//DEXPORTD(hLibD3D11, D3D11CreateDevice);
+DEXPORTD(hLibD3D11, D3D11CreateDevice);
 //DEXPORTD(hLibD3D11, D3D11CreateDeviceAndSwapChain);
+//DEXPORTD(hLibSoftTH, D3D11CreateDevice);
+DEXPORTD(hLibSoftTH, D3D11CreateDeviceAndSwapChain);
 DEXPORTD(hLibD3D11, D3DKMTCloseAdapter);
 DEXPORTD(hLibD3D11, D3DKMTCreateAllocation);
 DEXPORTD(hLibD3D11, D3DKMTCreateContext);

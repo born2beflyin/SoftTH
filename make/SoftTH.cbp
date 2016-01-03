@@ -157,7 +157,7 @@
 				<Option object_output="../obj/win/x86/dxgi/debug/" />
 				<Option type="3" />
 				<Option compiler="microsoft_visual_c_2013_express_x86" />
-				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
+				<Option host_application="D:/Steam/steamapps/common/Assassin&apos;s Creed 3/AC3SP.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MDd" />
@@ -225,11 +225,11 @@
 			<Target title="DXGI Release Win x86">
 				<Option platforms="Windows;" />
 				<Option output="../bin/win/x86/dxgi/release/dxgi" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../SoftTHtester" />
+				<Option working_dir="D:/Steam/steamapps/common/Assassin&apos;s Creed 3" />
 				<Option object_output="../obj/win/x86/dxgi/release/" />
 				<Option type="3" />
 				<Option compiler="microsoft_visual_c_2013_express_x86" />
-				<Option host_application="D:/Development/SoftTHtester/bin/release/SoftTHtester.exe" />
+				<Option host_application="D:/Steam/steamapps/common/Assassin&apos;s Creed 3/AC3SP.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
 					<Add option="/MD" />

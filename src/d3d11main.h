@@ -29,9 +29,11 @@ extern "C" DLL configFile config; // Main configuration
 #include "module.h"
 
 Module* SoftTHMod;
-Module* D3D11Mod;
+//Module* D3D11Mod;
 
 HINSTANCE hLibSoftTH;
-HINSTANCE hLibD3D11;
+extern "C" DLL HINSTANCE hLibD3D11;
+
+char libfn[256];
 
 #endif

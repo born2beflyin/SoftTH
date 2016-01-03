@@ -31,10 +31,12 @@ public:
 
   bool    SetHandle(char*);
   HMODULE GetHandle();
+  char*    GetPath();
 
   void    Release();
 private:
   HMODULE hMod;
+  char*   path;
 };
 
 #endif // _MODULE_H_

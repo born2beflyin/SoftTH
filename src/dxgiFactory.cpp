@@ -105,6 +105,8 @@ HRESULT IDXGIFactoryNew::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC
   return ret;
 }
 
+
+
 /* IDXGIFactory1New */
 IDXGIFactory1New::IDXGIFactory1New(IDXGIFactory1 *dxgifNew)
 {
@@ -194,3 +196,85 @@ HRESULT IDXGIFactory1New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DES
 TODO: Need to add all the IDXGIFactory2New
 functions, especially CreateSwapChainFor[XXXX] methods.
 */
+
+/* IDXGIFactory2New */
+IDXGIFactory2New::IDXGIFactory2New(IDXGIFactory2 *dxgifNew)
+{
+  dbg("dxgi_f2: IDXGIFactory2New 0x%08X",dxgifNew);
+  dxgif = dxgifNew;
+}
+
+IDXGIFactory2New::~IDXGIFactory2New()
+{
+  dbg("dxgi_f2: ~IDXGIFactory2New");
+}
+
+HRESULT IDXGIFactory2New::EnumAdapters(UINT Adapter, IDXGIAdapter **ppAdapter)
+{
+  dbg("dxgi_f2: EnumAdapters %d", Adapter);
+
+  // Pretend only one adapter exists
+  if(Adapter > 0)
+    return DXGI_ERROR_NOT_FOUND;
+  else {
+    // Its a SoftTH adapter!
+    IDXGIAdapter1 *a;
+    HRESULT ret = dxgif->EnumAdapters1(Adapter, &a);
+    *ppAdapter = new IDXGIAdapter1New(a, this);
+    //dbg("adapterit: 0x%08X 0x%08X 0x%08X 0x%08X", *ppAdapter, ppAdapter, *a, a);
+    return ret;
+  }
+}
+
+HRESULT IDXGIFactory2New::EnumAdapters1(UINT Adapter, IDXGIAdapter1 **ppAdapter)
+{
+  dbg("dxgi_f2: EnumAdapters1 %d", Adapter);
+  return EnumAdapters(Adapter, (IDXGIAdapter**)ppAdapter);  // EnumAdapters will handle this just fine - it creates Adapter1 anyway
+}
+
+HRESULT IDXGIFactory2New::CreateSwapChain(IUnknown *pDevice, DXGI_SWAP_CHAIN_DESC *scd, IDXGISwapChain **ppSwapChain)
+{
+  dbg("dxgi_f2: CreateSwapChain");
+
+  dbg("dxgi_f2: Mode: %dx%d %d.%dHz %s", scd->BufferDesc.Width, scd->BufferDesc.Height, scd->BufferDesc.RefreshRate.Numerator, scd->BufferDesc.RefreshRate.Denominator, scd->Windowed?"Windowed":"Fullscreen");
+  dbg("dxgi_f2: Multisample: %d samples, quality %d", scd->SampleDesc.Count, scd->SampleDesc.Quality);
+  dbg("dxgi_f2: Buffers: %d (Usage %s), Swapeffect: %s", scd->BufferCount, getUsageDXGI(scd->BufferUsage), scd->SwapEffect==DXGI_SWAP_EFFECT_DISCARD?"DISCARD":"SEQUENTIAL");
+
+  dbg("dxgi_f2: Flags: %s %s %s", scd->Flags&DXGI_SWAP_CHAIN_FLAG_NONPREROTATED?"NONPREROTATED":"",
+                         scd->Flags&DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH?"ALLOW_MODE_SWITCH":"",
+                         scd->Flags&DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE?"GDI_COMPATIBLE":"");
+
+  /*if(scd->BufferDesc.Width == config.main.renderResolution.x && scd->BufferDesc.Height == config.main.renderResolution.y) {
+    dbg("dxgi_f1: Multihead swapchain mode detected");
+    HEAD *h = config.getPrimaryHead();
+    scd->BufferDesc.Width = h->screenMode.x;
+    scd->BufferDesc.Height = h->screenMode.y;
+  } else
+    dbg("dxgi_f1: Singlehead swapchain mode");*/
+
+  *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
+
+  /*IDXGISwapChain *sc = NULL;
+  HRESULT ret = dxgif->CreateSwapChain(pDevice, scd, &sc);
+  if(ret != S_OK)
+    dbg("dxgi_f1: CreateSwapChain failed!");
+  else {
+    *ppSwapChain = sc;
+    if(!pDevice)
+      dbg("dxgi_f1: NULL device!");
+
+    *ppSwapChain = new IDXGISwapChainNew(this, dxgif, pDevice, scd);
+
+    // TODO: check for other devices
+    ID3D11Device *d3d11 = NULL;
+    if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &d3d11) == S_OK)
+      dbg("dxgi_f1: Got Direct3D 11 device");
+    if(d3d11)
+      *ppSwapChain = new IDXGISwapChainNew(dxgif, dxgif, d3d11, scd);
+    else
+      dbg("dxgi_f1: ERROR: Unknown swapchain device type!");
+  }*/
+  HRESULT ret = S_OK;
+
+  return ret;
+}

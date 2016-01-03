@@ -39,6 +39,7 @@ Module::~Module()
 
 bool Module::SetHandle(char* path)
 {
+  Module::path = path;
   Module::hMod = LoadLibrary(path);
   if(Module::hMod) return true; else return false;
 }
@@ -46,6 +47,11 @@ bool Module::SetHandle(char* path)
 HMODULE Module::GetHandle()
 {
   if(Module::hMod) return Module::hMod; else return NULL;
+}
+
+char* Module::GetPath()
+{
+  if (Module::path) return Module::path; else return NULL;
 }
 
 void Module::Release()
