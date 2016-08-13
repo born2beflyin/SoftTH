@@ -219,6 +219,7 @@
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\debug\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Assassin&apos;s Creed 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Origin Games\Battlefield 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -292,12 +293,15 @@
 					<Add after='cmd.exe /c &quot;copy /Y $(TARGET_OUTPUT_FILE) ..\..\SoftTHtester\bin\release\$(TARGET_OUTPUT_BASENAME).dll&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Just Cause 2\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Steam\steamapps\common\Assassin&apos;s Creed 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
+					<Add after='cmd.exe /s /c &quot;copy /Y &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;D:\Origin Games\Battlefield 3\$(TARGET_OUTPUT_BASENAME).dll&quot;&quot;' />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
 		</Build>
 		<VirtualTargets>
 			<Add alias="All" targets="D3D9 Debug Win x86;D3D9 Release Win x86;DXGI Debug Win x86;DXGI Release Win x86;" />
+			<Add alias="D3D9" targets="D3D9 Debug Win x86;D3D9 Release Win x86;" />
+			<Add alias="DXGI" targets="DXGI Debug Win x86;DXGI Release Win x86;" />
 		</VirtualTargets>
 		<Compiler>
 			<Add option="-DSOFTTHMAIN" />

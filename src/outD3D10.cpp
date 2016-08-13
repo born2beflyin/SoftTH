@@ -38,7 +38,7 @@ extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              IDXGISwapChain **ppSwapChain,
                                                              ID3D10Device **ppDevice);
 #else
-extern "C" __declspec(dllimport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
+extern "C" __declspec(dllimport) HRESULT (WINAPI newD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
                                                               D3D10_DRIVER_TYPE DriverType,
                                                               HMODULE Software,
                                                               UINT Flags,
@@ -140,10 +140,10 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   // TODO: verify devID match!
   //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
   #ifdef D3D10
-  if(dllD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
+  if(newD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
     dbg("D3D10CreateDeviceAndSwapChain FAILED");
   #else
-  if(dllD3D10CreateDeviceAndSwapChain1(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_FEATURE_LEVEL_10_1, D3D10_1_SDK_VERSION, &sd, &swapChain, &dev1) != S_OK) {
+  if(newD3D10CreateDeviceAndSwapChain1(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_FEATURE_LEVEL_10_1, D3D10_1_SDK_VERSION, &sd, &swapChain, &dev1) != S_OK) {
     dbg("D3D10CreateDeviceAndSwapChain1 FAILED");
   #endif // D3D10
     exit(0);

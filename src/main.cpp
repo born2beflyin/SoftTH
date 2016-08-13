@@ -46,13 +46,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Shlobj.h"
 #include "main.h"
 
-HINSTANCE hLibD3D9 = NULL; // Real d3d9.dll
-HINSTANCE hLibDXGI = NULL; // Real dxgi.dll
-HINSTANCE hLibD3D10 = NULL; // Real d3d10.dll
-HINSTANCE hLibD3D10_1 = NULL; // Real d3d10.dll
-extern "C" DLL HINSTANCE hLibD3D11 = NULL; // Real d3d11.dll
-HINSTANCE hLibD3D12 = NULL; // Real d3d12.dll
-HINSTANCE hSelf = NULL; // This d3d9/dxgi.dll
+HINSTANCE hLibD3D9                    = NULL; // Real d3d9.dll
+HINSTANCE hLibDXGI                    = NULL; // Real dxgi.dll
+extern "C" DLL HINSTANCE hLibD3D10    = NULL; // Real d3d10.dll
+extern "C" DLL HINSTANCE hLibD3D10_1  = NULL; // Real d3d10.dll
+extern "C" DLL HINSTANCE hLibD3D11    = NULL; // Real d3d11.dll
+extern "C" DLL HINSTANCE hLibD3D12    = NULL; // Real d3d12.dll
+HINSTANCE hSelf                       = NULL; // This d3d9/dxgi.dll
 
 GHOOK D3DHooks[];
 
@@ -86,7 +86,7 @@ HRESULT (WINAPI*dllD3D10CreateDevice)(IDXGIAdapter *adapter,
                                       ID3D10Device** ppDevice) = NULL;
 
 
-HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+/*extern "C" __declspec(dllexport)*/ HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                   D3D10_DRIVER_TYPE DriverType,
                                                   HMODULE Software,
                                                   UINT Flags,
@@ -105,7 +105,7 @@ HRESULT (WINAPI*dllD3D10CreateDevice1)(IDXGIAdapter *adapter,
                                        ID3D10Device1** ppDevice) = NULL;
 
 
-extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
+/*extern "C" __declspec(dllexport)*/ HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
                                                    D3D10_DRIVER_TYPE DriverType,
                                                    HMODULE Software,
                                                    UINT Flags,
@@ -129,7 +129,7 @@ HRESULT (WINAPI*dllD3D11CreateDevice)(IDXGIAdapter *adapter,
                                       ID3D11DeviceContext **ppImmediateContext) = NULL;
 
 
-extern "C" __declspec(dllexport) HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
+/*extern "C" __declspec(dllexport)*/ HRESULT (WINAPI*dllD3D11CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                   D3D_DRIVER_TYPE DriverType,
                                                   HMODULE Software,
                                                   UINT Flags,
@@ -569,13 +569,13 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory1(REFIID riid
   HRESULT ret = dllCreateDXGIFactory1(riid, ppFactory);
   dbg("dxgi: CreateDXGIFactory1 0x%08X", *ppFactory);
   if(ret == S_OK) {
-    if (riid == IID_IDXGIFactory1) {
+    //if (riid == IID_IDXGIFactory1) {
       IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
       *ppFactory = new IDXGIFactory1New(dxgifNew);
-    } else if (riid == IID_IDXGIFactory2) {
-      IDXGIFactory2 *dxgifNew = (IDXGIFactory2 *) *ppFactory;
-      *ppFactory = new IDXGIFactory2New(dxgifNew);
-    }
+    //} else {
+    //  IDXGIFactory *dxgifNew = (IDXGIFactory *) *ppFactory;
+    //  *ppFactory = new IDXGIFactoryNew(dxgifNew);
+    //}
   } else
     dbg("dxgi: CreateDXGIFactory1 failed!");
   return ret;
@@ -588,9 +588,16 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newCreateDXGIFactory2(UINT Flags,
   HRESULT ret = dllCreateDXGIFactory2(Flags, riid, ppFactory);
   dbg("CreateDXGIFactory2 0x%08X", *ppFactory);
   if(ret == S_OK) {
-    //IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
-    //*ppFactory = new IDXGIFactory1New(dxgifNew);
-    dbg("dxgi:  *** TODO: still need to add IDXGIFactory2!!! ***");
+    //if (riid == IID_IDXGIFactory2) {
+      IDXGIFactory2 *dxgifNew = (IDXGIFactory2 *) *ppFactory;
+      *ppFactory = new IDXGIFactory2New(dxgifNew);
+    //} else if (riid == IID_IDXGIFactory1) {
+    //  IDXGIFactory1 *dxgifNew = (IDXGIFactory1 *) *ppFactory;
+    //  *ppFactory = new IDXGIFactory1New(dxgifNew);
+    //} else {
+    //  IDXGIFactory *dxgifNew = (IDXGIFactory *) *ppFactory;
+    //  *ppFactory = new IDXGIFactoryNew(dxgifNew);
+    //}
   } else
     dbg("dxgi: CreateDXGIFactory2 failed!");
   return ret;
@@ -915,6 +922,8 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
   if(adapter->GetParent(IID_IDXGIFactory, (void**) &factory) == S_OK)
   {
     dbg("d3d11: Got parent factory");
+  } else {
+    dbg("Oh NO!!!");
   }
 
   (*ppSwapChain) = new IDXGISwapChainNew(factory, factory, *ppDevice, pSwapChainDesc);

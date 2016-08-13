@@ -20,13 +20,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _D3D10MAIN_H_
 #define _D3D10MAIN_H_
 
-#include "main.h"
+#include "configFile.h"
+
+#define DLL __declspec(dllimport)
+
+extern "C" DLL configFile config; // Main configuration
+
 #include "module.h"
 
 Module* SoftTHMod;
-Module* D3D10Mod;
+//Module* D3D10Mod;
 
 HINSTANCE hLibSoftTH;
-HINSTANCE hLibD3D10;
+extern "C" DLL HINSTANCE hLibD3D10;
+
+char libfn[256];
 
 #endif

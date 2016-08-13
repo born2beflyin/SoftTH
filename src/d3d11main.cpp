@@ -193,9 +193,6 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 		      ShowMessage("D3D11CreateDevice not mapped to SoftTH DLL\n"), exit(0);
         if(!newD3D11CreateDeviceAndSwapChain)
 		      ShowMessage("D3D11CreateDeviceAndSwapChain not mapped to SoftTH DLL"), exit(0);*/
-
-
-
       }
 
       if(hooks) {

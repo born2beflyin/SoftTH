@@ -539,7 +539,7 @@ HMODULE WINAPI NewGetModuleHandleA(LPCSTR lpModuleName)
   return origFunc(lpModuleName);
 }
 
-/*
+
 HMODULE WINAPI NewGetModuleHandleW(LPCWSTR lpModuleName)
 {
   typedef HMODULE (WINAPI*OCALL)(LPCWSTR);
@@ -566,7 +566,7 @@ HMODULE WINAPI NewGetModuleHandleW(LPCWSTR lpModuleName)
   }
   return origFunc(lpModuleName);
 }
-*/
+
 
 FARPROC WINAPI NewGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
 {
@@ -785,7 +785,7 @@ void WINAPI NullHook()
 // Init hook function table
 GHOOK InitHooks[] = {
   HOOK(NewGetModuleHandleA, kernel32.dll, GetModuleHandleA)
-  //HOOK(NewGetModuleHandleW, kernel32.dll, GetModuleHandleW) // Disabled: doesnt seem to be needed
+  HOOK(NewGetModuleHandleW, kernel32.dll, GetModuleHandleW) // Disabled: doesnt seem to be needed
   HOOKEND
 };
 

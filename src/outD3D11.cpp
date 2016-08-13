@@ -169,7 +169,6 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   // Create the device and swap chain
   //DWORD flags = D3D10_CREATE_DEVICE_BGRA_SUPPORT;
   DWORD flags = 0;
-  //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
   if(newD3D11CreateDeviceAndSwapChain(pAdapter,
                                       D3D_DRIVER_TYPE_UNKNOWN,
                                       NULL,
