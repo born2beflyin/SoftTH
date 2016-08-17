@@ -58,19 +58,19 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory *parentNew, IDXGIFactory *dxgi
   dbg("dxgi_sc: IDXGISwapChainNew 0x%08X 0x%08X", this, pDevice);
 
 
-  win = scd->OutputWindow;
-  newbb10 = NULL;
-  newbb11 = NULL;
+  win       = scd->OutputWindow;
+  newbb10   = NULL;
+  newbb11   = NULL;
   //stagedSurfs11 = NULL;
-  dev10 = NULL;
-  dev10_1 = NULL;
-  dev11 = NULL;
-  //dev12 = NULL;
-  dxgsc = NULL;
-  dxgif = (IDXGIFactory1*)dxgifNew;
-  parent = (IDXGIFactory1*)parentNew;
-  realbb10 = NULL;
-  realbb11 = NULL;
+  dev10     = NULL;
+  dev10_1   = NULL;
+  dev11     = NULL;
+  //dev12     = NULL;
+  dxgsc     = NULL;
+  dxgif     = (IDXGIFactory1*)dxgifNew;
+  parent    = (IDXGIFactory1*)parentNew;
+  realbb10  = NULL;
+  realbb11  = NULL;
 
   if(!pDevice)
     dbg("dxgi_sc: ERROR: NULL device!");
@@ -108,18 +108,18 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory1 *parentNew, IDXGIFactory1 *dx
 
 
   win = scd->OutputWindow;
-  newbb10 = NULL;
-  newbb11 = NULL;
+  newbb10   = NULL;
+  newbb11   = NULL;
   //stagedSurfs11 = NULL;
-  dev10 = NULL;
-  dev10_1 = NULL;
-  dev11 = NULL;
-  //dev12 = NULL;
-  dxgsc = NULL;
-  dxgif = dxgifNew;
-  parent = parentNew;
-  realbb10 = NULL;
-  realbb11 = NULL;
+  dev10     = NULL;
+  dev10_1   = NULL;
+  dev11     = NULL;
+  //dev12     = NULL;
+  dxgsc     = NULL;
+  dxgif     = dxgifNew;
+  parent    = parentNew;
+  realbb10  = NULL;
+  realbb11  = NULL;
 
   if(!pDevice)
     dbg("dxgi_sc: ERROR: NULL device!");

@@ -33,9 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Added by CJR for SDK 8.1 - 9 Aug 2015
 // Global helpers
-bool isSoftTHmode(int w, int h); // Return true if resolution is SoftTH mode
-volatile extern int SoftTHActive; // >0 if SoftTH is currently active and resolution is overridden
-extern bool *SoftTHActiveSquashed; // Pointer to latest SoftTH device squash variable (TODO: this is horrible)
+bool isSoftTHmode(int w, int h);    // Return true if resolution is SoftTH mode
+volatile extern int SoftTHActive;   // >0 if SoftTH is currently active and resolution is overridden
+extern bool *SoftTHActiveSquashed;  // Pointer to latest SoftTH device squash variable (TODO: this is horrible)
 
 // Common interfaces for DXGI objects
 #define DECALE_DXGICOMMONIF(type)\
@@ -68,8 +68,8 @@ static int GetRef(IUnknown *p) {
 }
 
 //#define GETREFCOUNT(x) ((x->AddRef()) +! (x->Release()))
-#define CHECKNULL(x) if(!x) dbg("WARNING! %s == NULL at line %d, %s", #x, __LINE__, __FILE__);
-#define D3DCALL(x)	if(x != D3D_OK) dbg("WARNING! D3DCall fail line %d, %s", __LINE__, __FILE__);
+#define CHECKNULL(x)  if(!x) dbg("WARNING! %s == NULL at line %d, %s", #x, __LINE__, __FILE__);
+#define D3DCALL(x)	  if(x != D3D_OK) dbg("WARNING! D3DCall fail line %d, %s", __LINE__, __FILE__);
 
 extern bool emergencyRelease;
 
@@ -92,41 +92,41 @@ extern bool emergencyRelease;
 #define dbg_input if(0)
 //#define dbg_input dbg
 
-extern "C" __declspec(dllexport) void ShowMessage(char *first, ...);
-void __cdecl odprintf(const char *format, ...);
-extern "C" __declspec(dllexport) void dbg(char *first, ...);
-void dbgSimple(char *first, ...);
-//void dbgf(char *first, ...);
-char* getModuleName(HMODULE mod);
-void startTimer();
-double stopTimer();
-char* getD3DError(int v);
-char* processName(void);
-RECT* isNullRect(RECT *r);
-char* strRect(CONST RECT *r);
-char* getBackLogLine(int line);
-void timeWarn(int start, int limit, char *type);
-char* matchRiid(REFIID riid);
-int getRef(IUnknown *o);
-void dumpPP(D3DPRESENT_PARAMETERS* pp);
+extern "C"  __declspec(dllexport) void ShowMessage(char *first, ...);
+extern "C"  __declspec(dllexport) void dbg(char *first, ...);
+void    __cdecl odprintf(const char *format, ...);
+void    dbgSimple(char *first, ...);
+//void    dbgf(char *first, ...);
+char*   getModuleName(HMODULE mod);
+void    startTimer();
+double  stopTimer();
+char*   getD3DError(int v);
+char*   processName(void);
+RECT*   isNullRect(RECT *r);
+char*   strRect(CONST RECT *r);
+char*   getBackLogLine(int line);
+void    timeWarn(int start, int limit, char *type);
+char*   matchRiid(REFIID riid);
+int     getRef(IUnknown *o);
+void    dumpPP(D3DPRESENT_PARAMETERS* pp);
 
 #define VK_APPLICATION		0x5D // Application key (extended)
 
-void dumpSurfaceDesc(LPDIRECT3DSURFACE9 surf);
-char* getSwapEffect(D3DSWAPEFFECT se);
-char* getPresentationInterval(UINT pi);
-void d3dClearTarget(IDirect3DDevice9Ex *dev, IDirect3DSurface9 *tgt, IDirect3DSurface9 *tgtD);
-char* getMode(D3DFORMAT fmt);
-char* getFormatDXGI(DXGI_FORMAT fmt);
-char* getUsageDXGI(DXGI_USAGE usage);
-char* getUsage(DWORD usage);
-char* getLock(DWORD usage);
-char* getPool(D3DPOOL pool);
-char* getD3DCreate(DWORD usage);
-bool fileExists(char *name);
-void createDirs(char *fname);
+void    dumpSurfaceDesc(LPDIRECT3DSURFACE9 surf);
+char*   getSwapEffect(D3DSWAPEFFECT se);
+char*   getPresentationInterval(UINT pi);
+void    d3dClearTarget(IDirect3DDevice9Ex *dev, IDirect3DSurface9 *tgt, IDirect3DSurface9 *tgtD);
+char*   getMode(D3DFORMAT fmt);
+char*   getFormatDXGI(DXGI_FORMAT fmt);
+char*   getUsageDXGI(DXGI_USAGE usage);
+char*   getUsage(DWORD usage);
+char*   getLock(DWORD usage);
+char*   getPool(D3DPOOL pool);
+char*   getD3DCreate(DWORD usage);
+bool    fileExists(char *name);
+void    createDirs(char *fname);
 
-void memcpyPitched(void* dst, void *src, DWORD size, DWORD pitchDst, DWORD pitchSrc);
+void    memcpyPitched(void* dst, void *src, DWORD size, DWORD pitchDst, DWORD pitchSrc);
 
 BOOL SetPrivilege(
     HANDLE hToken,          // token handle
