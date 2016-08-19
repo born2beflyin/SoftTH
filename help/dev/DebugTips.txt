@@ -1,3 +1,16 @@
+18 Aug 2016
+
+On Windows 10, activating the DX11 Debug layer is not as simple as installing the SDK (it's not in the Win 10 SDK).
+
+    Settings panel -> System -> Apps & features -> Manage optional Features -> Add a feature -> Select "Graphics Tools"
+    
+See this page for more info: 
+http://stackoverflow.com/questions/32809169/use-d3d11-debug-layer-with-vs2013-on-windows-10
+
+---------------------------
+
+Original creation date
+
 From: http://forums.codeblocks.org/index.php/topic,6419.0.html
 
 I use VC2005 Express with C::B, partly because the MSVC debugger is quite good. I have found the easiest is to make a global variable in C::B called VC2005IDE which points to the install dir of VC2005 Express in my case.
