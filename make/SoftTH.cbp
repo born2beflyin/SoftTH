@@ -38,6 +38,7 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="$(#dxsdk.include)" />
+					<Add directory="src" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="$(#dxsdk.include)" />
@@ -111,6 +112,7 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add directory="$(#dxsdk.include)" />
+					<Add directory="src" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="$(#dxsdk.include)" />
@@ -181,6 +183,7 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add option="/DDXGI" />
+					<Add directory="src" />
 				</Compiler>
 				<Linker>
 					<Add option="/DEBUG" />
@@ -256,6 +259,7 @@
 					<Add option="/DZLIB_WINAPI" />
 					<Add option="/D_WINDLL" />
 					<Add option="/DDXGI" />
+					<Add directory="src" />
 				</Compiler>
 				<Linker>
 					<Add option="/NODEFAULTLIB:libcmt" />
@@ -404,6 +408,8 @@
 		<Unit filename="../src/logodata.h" />
 		<Unit filename="../src/main.cpp" />
 		<Unit filename="../src/main.h" />
+		<Unit filename="../src/outD3D.cpp" />
+		<Unit filename="../src/outD3D.h" />
 		<Unit filename="../src/outD3D10.cpp" />
 		<Unit filename="../src/outD3D10.h" />
 		<Unit filename="../src/outD3D11.cpp" />
