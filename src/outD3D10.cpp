@@ -28,7 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dxgiSwapChain.h"
 //#include <D3DX10Tex.h> // Removed by CJR for SDK 8.1 - 9 Aug 2015
 
-#ifdef D3D10
+//#ifdef D3D10
+/*
 extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapter,
                                                              D3D10_DRIVER_TYPE DriverType,
                                                              HMODULE Software,
@@ -37,7 +38,8 @@ extern "C" HRESULT (WINAPI*dllD3D10CreateDeviceAndSwapChain)(IDXGIAdapter *adapt
                                                              DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
                                                              IDXGISwapChain **ppSwapChain,
                                                              ID3D10Device **ppDevice);
-#else
+                                                             */
+//#else
 extern "C" __declspec(dllimport) HRESULT (WINAPI newD3D10CreateDeviceAndSwapChain1)(IDXGIAdapter *adapter,
                                                               D3D10_DRIVER_TYPE DriverType,
                                                               HMODULE Software,
@@ -47,7 +49,7 @@ extern "C" __declspec(dllimport) HRESULT (WINAPI newD3D10CreateDeviceAndSwapChai
                                                               DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
                                                               IDXGISwapChain **ppSwapChain,
                                                               ID3D10Device1 **ppDevice);
-#endif
+//#endif
 
 
 outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HWND primaryFocusWindow)
@@ -60,6 +62,9 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   mInfo.cbSize = sizeof(MONITORINFO);
   mId = d3d9->GetAdapterMonitor(devID);
   GetMonitorInfo(mId, &mInfo);
+  D3DADAPTER_IDENTIFIER9 ai;
+  d3d9->GetAdapterIdentifier(devID, 0, &ai);
+  dbg("outD3D10: This head's output is %s on <%s>", ai.DeviceName, ai.Description);
   d3d9->Release();
 
   // Get our head
@@ -83,13 +88,13 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   // Create output window
   int wflags = NULL;
   WINDOWPARAMS wp = {mInfo.rcMonitor.left, mInfo.rcMonitor.top, bbWidth, bbHeight, NULL, wflags, true, NULL}; // TODO: parent window?
-
+  // Initialize the window
   wp.hWnd = NULL;
   _beginthread(windowHandler, 0, (void*) &wp);
   while(!wp.hWnd)
     Sleep(10);
   outWin = wp.hWnd;
-
+  // Set this head's window
   head->hwnd = outWin;
   ShowWindow(outWin, SW_SHOWNA);
 
@@ -103,18 +108,31 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
   UINT i = 0;
   IDXGIAdapter *pAdapter;
-  IDXGIAdapter *vAdapters[64];
-  dbg("Enum adapters...");
+  //IDXGIAdapter *vAdapters[64];
+  dbg("outD3D10: Getting the correct adapter for this head ...");
   while(dxgf->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
-    vAdapters[i] = pAdapter;
-
+    // Get the adapter description
     DXGI_ADAPTER_DESC desc;
     pAdapter->GetDesc(&desc);
 
+    // Check the adapter name
     char *name = new char[128];
     WideCharToMultiByte(CP_ACP, 0, desc.Description, -1, name, 128, NULL, NULL);
 
-    dbg("Adapter %d: <%s>", i, name);
+    // Compare the name to the name we got above
+    if (_strcmpi(name,ai.Description) == 0) {
+      dbg("outD3D10: Got the adapter! Adapter %d: <%s>", i, name);
+      /* Set this head's transport method */
+      // Local if i == 0
+      if (i == 0)
+        head->transportMethod = OUTMETHOD_LOCAL;
+      // Otherwise non-local
+      else
+        head->transportMethod = OUTMETHOD_NONLOCAL;
+
+      // We found the adapter, so break out of the loop
+      break;
+    }
     ++i;
   }
 
@@ -139,16 +157,24 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   DWORD flags = 0;
   // TODO: verify devID match!
   //if(D3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
-  #ifdef D3D10
-  if(newD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
-    dbg("D3D10CreateDeviceAndSwapChain FAILED");
-  #else
-  if(newD3D10CreateDeviceAndSwapChain1(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_FEATURE_LEVEL_10_1, D3D10_1_SDK_VERSION, &sd, &swapChain, &dev1) != S_OK) {
-    dbg("D3D10CreateDeviceAndSwapChain1 FAILED");
-  #endif // D3D10
+  //#ifdef D3D10
+  //if(newD3D10CreateDeviceAndSwapChain(NULL, D3D10_DRIVER_TYPE_HARDWARE, NULL, flags, D3D10_SDK_VERSION, &sd, &swapChain, &dev) != S_OK) {
+  //  dbg("D3D10CreateDeviceAndSwapChain FAILED");
+  //#else
+  if(newD3D10CreateDeviceAndSwapChain1(pAdapter,
+                                       D3D10_DRIVER_TYPE_HARDWARE,
+                                       NULL,
+                                       flags,
+                                       D3D10_FEATURE_LEVEL_10_1,
+                                       D3D10_1_SDK_VERSION,
+                                       &sd,
+                                       &swapChain,
+                                       &dev1) != S_OK) {
+    dbg("outD3D10: D3D10CreateDeviceAndSwapChain1 FAILED");
+  //#endif // D3D10
     exit(0);
   }
-  dbg("Created D3D10/10.1 device & swap chain...");
+  dbg("outD3D10: Created D3D10/10.1 device & swap chain...");
 
   // Get true swapchain
   IDXGISwapChainNew *scnew;
@@ -156,55 +182,80 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
     swapChain = scnew->getReal();
     scnew->Release();
   } else
-    dbg("Cannot get true swapchain!");
+    dbg("outD3D10: Cannot get true swapchain!");
 
   // Get device backbuffer
+  dbg("outD3D10: Creating secondary head (DevID %d) render backbuffer for D3D10/10.1 Device",devID);
   if(swapChain->GetBuffer( 0, __uuidof(ID3D10Texture2D), (LPVOID*) &bb) != S_OK) {
     dbg("swapChain->GetBuffer FAILED");
     exit(0);
   }
 
   // Create shared buffer
+  dbg("outD3D10: Creating secondary head (DevID %d) shared transport buffer for D3D10/10.1 Device",devID);
   CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, D3D10_BIND_SHADER_RESOURCE|D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, 0, 1, 0, D3D10_RESOURCE_MISC_SHARED);
-  #ifdef D3D10
-  if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
-  #else
+  //#ifdef D3D10
+  //if(dev->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
+  //#else
   if(dev1->CreateTexture2D(&d, NULL, &sharedSurface) != S_OK)
-  #endif // D3D10
+  //#endif // D3D10
     dbg("OutD3D10: CreateTexture2D failed :("), exit(0);
+
+  // Create the staging surface
+  if (head->transportMethod != OUTMETHOD_LOCAL) {
+    CD3D10_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, transX, transY, 1, 1, 0, D3D10_USAGE_STAGING, D3D10_CPU_ACCESS_READ | D3D10_CPU_ACCESS_WRITE, 1, 0, 0);
+    DWORD32 *fillbuf = new DWORD32[transX*transY];
+    for (int ii = 0; ii < transY; ii++)
+      for (int jj = 0; jj < transX; jj++)
+      {
+        if ((ii&32)==(jj&32))
+          fillbuf[ii*transX + jj] = (DWORD32) 0x00ff0000;
+        else
+          fillbuf[ii*transX + jj] = (DWORD32) 0xffffffff;
+      }
+    D3D10_SUBRESOURCE_DATA fillsr;
+    ZeroMemory(&fillsr, sizeof(fillsr));
+    fillsr.pSysMem = (void *)fillbuf;
+    fillsr.SysMemPitch = transX * 4;
+    fillsr.SysMemSlicePitch = transX * transY * 4;
+    if (dev1->CreateTexture2D(&dss, &fillsr, &stagingSurface) != S_OK) {
+    //if (dev->CreateTexture2D(&dss, NULL, &stagingSurface) != S_OK) {
+      dbg("outD3D10: CreateTexture2D staging surface failed!"), exit(0);
+    }
+  }
 
   // Get share handle
   IDXGIResource* texRes(NULL);
   sharedSurface->QueryInterface( __uuidof(IDXGIResource), (void**)&texRes);
-  texRes->GetSharedHandle(&shareHandle);
+  if (texRes->GetSharedHandle(&shareHandle) != S_OK)
+    dbg("outD3D10: GetSharedHandle failed!");
   texRes->Release();
+  dbg("outD3D10: Share handle: 0x%08X", shareHandle);
 
-  dbg("Share handle: 0x%08X", shareHandle);
-
-  #ifdef D3D10
-  HRESULT ret = dev->CreateRenderTargetView(bb, NULL, &rttView);
-  #else
+  //#ifdef D3D10
+  //HRESULT ret = dev->CreateRenderTargetView(bb, NULL, &rttView);
+  //#else
   HRESULT ret = dev1->CreateRenderTargetView(bb, NULL, &rttView);
-  #endif // D3D10
+  //#endif // D3D10
   bb->Release();
   if(FAILED(ret)) {
-    dbg("dev->CreateRenderTargetView FAILED");
+    dbg("outD3D10: dev1->CreateRenderTargetView FAILED");
     exit(0);
   }
-  #ifdef D3D10
-  dev->OMSetRenderTargets(1, &rttView, NULL);
-  #else
+  //#ifdef D3D10
+  //dev->OMSetRenderTargets(1, &rttView, NULL);
+  //#else
   dev1->OMSetRenderTargets(1, &rttView, NULL);
-  #endif // D3D10
+  //#endif // D3D10
 
   D3D10_VIEWPORT vp = {0, 0, bbWidth, bbHeight, 0, 1};
-  #ifdef D3D10
-  dev->RSSetViewports(1, &vp);
-  #else
+  //#ifdef D3D10
+  //dev->RSSetViewports(1, &vp);
+  //#else
   dev1->RSSetViewports(1, &vp);
-  #endif // D3D10
+  //#endif // D3D10
 
-  dbg("outDirect3D10: Initialize COMPLETE");
+  dbg("outD3D10: Initialize  Head (DevID: %d) COMPLETE",devID);
   /*
   d3d9Surface = sourceSurface;
 
@@ -331,30 +382,27 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
 outDirect3D10::~outDirect3D10()
 {
-  dbg("outDirect3D10: destroy");
+  dbg("outD3D10: destroy");
   DestroyWindow(outWin);
 }
 
 void outDirect3D10::present()
 {
   // Copy from share surface to backbuffer & present
-  dbg("CopySubresourceRegion...");
-  #ifdef D3D10
-  dev->Flush();
-  #else
-  dev1->Flush();
-  #endif
+  dbg("outD3D10: Present - CopyResource...");
 
   // Removed by CJR for SDK 8.1 - 9 Aug 2015
   //if(GetKeyState('U') < 0)
   //  D3DX10SaveTextureToFile(sharedSurface, D3DX10_IFF_JPG, "d:\\pelit\\_sharedSurface.jpg");
 
 
-  #ifdef D3D10
-  dev->CopyResource(bb, sharedSurface);
-  #else
+  //#ifdef D3D10
+  //dev->CopyResource(bb, sharedSurface);
+  //dev->Flush();
+  //#else
   dev1->CopyResource(bb, sharedSurface);
-  #endif
+  dev1->Flush();
+  //#endif
   /*D3D10_BOX sb = {0, 0, 0, 1920, 1200, 1};
   dev->CopySubresourceRegion(bb, 0, 0, 0, 0, sharedSurface, 0, &sb);
 
@@ -367,7 +415,7 @@ void outDirect3D10::present()
 */
   HRESULT r = swapChain->Present(0, 0);
   if(r != S_OK)
-    dbg("Present failed 0x%08X", r);
+    dbg("outD3D10: Present failed 0x%08X", r);
 }
 
 /*

@@ -31,27 +31,34 @@ public:
 
   //void presentFromBuffer();
   void present();
-  HANDLE GetShareHandle() {return shareHandle;};
+  HANDLE                   GetShareHandle()    {return shareHandle;};
+  HANDLE                   GetStagingHandle()  {return stagingHandle;};
+  ID3D10Texture2D         *GetSharedSurface()  {return sharedSurface;};
+  ID3D10Texture2D         *GetStagingSurface() {return stagingSurface;};
+
+  IDXGISwapChain          *swapChain;
+  ID3D10Device            *dev;
+  ID3D10Device1           *dev1;
+  D3D10_FEATURE_LEVEL1     featureLevel;
+  ID3D10Texture2D         *stagingSurface; // Staging surface if non-local
 
 private:
-  IDXGIFactory *dxgf;
+  IDXGIFactory            *dxgf;
 
-  HWND outWin;
-  IDXGISwapChain *swapChain;
-  ID3D10Device *dev;
-  ID3D10Device1 *dev1;
+  HWND                     outWin;
 
-  HMONITOR mId;
-  MONITORINFO mInfo;
+  HMONITOR                 mId;
+  MONITORINFO              mInfo;
 
-  int bbWidth, bbHeight;        // Backbuffer size
-  int transWidth, transHeight;  // Transport resolution size
+  int                      bbWidth, bbHeight;        // Backbuffer size
+  int                      transWidth, transHeight;  // Transport resolution size
 
-  ID3D10Texture2D *bb;  // Device backbuffer
-  ID3D10Texture2D *sharedSurface; // Shared render surface
-  ID3D10RenderTargetView *rttView;
+  ID3D10Texture2D         *bb;  // Device backbuffer
+  ID3D10Texture2D         *sharedSurface; // Shared render surface
+  ID3D10RenderTargetView  *rttView;
 
-  HANDLE shareHandle;
+  HANDLE                  shareHandle;
+  HANDLE                  stagingHandle;
 };
 
 #endif

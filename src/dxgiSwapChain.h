@@ -40,6 +40,11 @@ typedef struct {
 } OUTDEVICE10;
 
 typedef struct {
+  int headID, devID;
+  ID3D10Texture2D *stagingSurf;
+} STAGINGOUT10;
+
+typedef struct {
   outDirect3D11  *output;
   ID3D11Texture2D *localSurf; // Local surface bound to shared handle of output
   HEAD *cfg;  // Pointer to configuration data
@@ -63,7 +68,7 @@ public:
   DECALE_DXGICOMMONIF(dxgsc);
 
   HRESULT STDMETHODCALLTYPE GetParent(REFIID riid, void **ppParent)
-    {dbg("dxgsc: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
+    {dbg("dxgi_sc: GetParent %s 0x%08X", matchRiid(riid), *ppParent);
       if(riid == IID_IDXGIFactory) {
         *ppParent = parent;
         parent->AddRef();
@@ -73,7 +78,7 @@ public:
     };
 
   STDMETHOD(QueryInterface)(THIS_ REFIID riid, void** ppvObj) {
-      dbg("dxgsc: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
+      dbg("dxgi_sc: QueryInterface %s 0x%08X", matchRiid(riid), *ppvObj);
       if(riid == IID_IDXGISwapChainNew) {
         this->AddRef();
         *ppvObj = this;
@@ -84,25 +89,39 @@ public:
 
   // IDXGIDeviceSubObject
   HRESULT STDMETHODCALLTYPE GetDevice( REFIID riid, void **ppDevice)
-    {dbg("dxgsc: GetDevice");return dxgsc->GetDevice(riid, ppDevice);};
+    {dbg("dxgi_sc: GetDevice");return dxgsc->GetDevice(riid, ppDevice);};
 
   HRESULT STDMETHODCALLTYPE Present(UINT SyncInterval,UINT Flags)
     ;//{dbg("dxgsc: Present");return dxgsc->Present(SyncInterval, Flags);};
   HRESULT STDMETHODCALLTYPE GetBuffer(UINT Buffer, REFIID riid, void **ppSurface)
     ;//{dbg("dxgsc: GetBuffer");HRESULT ret = dxgsc->GetBuffer(Buffer, riid, ppSurface);dbg("joo-o"); return ret;};
   HRESULT STDMETHODCALLTYPE SetFullscreenState(BOOL Fullscreen, IDXGIOutput *pTarget)
-    {dbg("dxgsc: SetFullscreenState 0x%08X", pTarget);
-    if(pTarget) {
-      IDXGIOutputNew *onew;
-      if(pTarget->QueryInterface(IID_IDXGIOutputNew, (void**) &onew) == S_OK) {
-        pTarget = onew->getReal();
-        onew->Release();
+    {
+      dbg("dxgi_sc: SetFullscreenState 0x%08X", pTarget);
+      if(pTarget) {
+        IDXGIOutputNew *onew;
+        if(pTarget->QueryInterface(IID_IDXGIOutputNew, (void**) &onew) == S_OK) {
+          pTarget = onew->getReal();
+          onew->Release();
+        }
       }
-    }
-    return dxgsc->SetFullscreenState(Fullscreen, pTarget);
+      return dxgsc->SetFullscreenState(Fullscreen, pTarget);
     };
   HRESULT STDMETHODCALLTYPE GetFullscreenState(BOOL *pFullscreen,IDXGIOutput **ppTarget)
-    {dbg("dxgsc: WARNING: GetFullscreenState, not implemented!");return dxgsc->GetFullscreenState(pFullscreen, ppTarget);};
+    {
+      IDXGIOutput *pTarget;
+      pTarget = *ppTarget;
+      dbg("dxgi_sc: GetFullscreenState 0x%08X", pTarget);
+      if(pTarget) {
+        IDXGIOutputNew *onew;
+        if(pTarget->QueryInterface(IID_IDXGIOutputNew, (void**) &onew) == S_OK) {
+          pTarget = onew->getReal();
+          ppTarget = &pTarget;
+          onew->Release();
+        }
+      }
+      return dxgsc->GetFullscreenState(pFullscreen, ppTarget);
+    };
   HRESULT STDMETHODCALLTYPE GetDesc(DXGI_SWAP_CHAIN_DESC *pDesc)
     ;//{dbg("dxgsc: GetDesc");return dxgsc->GetDesc(pDesc);};
   HRESULT STDMETHODCALLTYPE ResizeBuffers(UINT BufferCount,UINT Width,UINT Height,DXGI_FORMAT NewFormat,UINT SwapChainFlags)
@@ -110,9 +129,9 @@ public:
   HRESULT STDMETHODCALLTYPE ResizeTarget(const DXGI_MODE_DESC *tgtp)
     ;//{dbg("dxgsc: ResizeTarget %dx%d", tgtp->Width, tgtp->Height);return dxgsc->ResizeTarget(tgtp);};
   HRESULT STDMETHODCALLTYPE GetContainingOutput(IDXGIOutput **ppOutput)
-    {dbg("dxgsc: GetContainingOutput");return dxgsc->GetContainingOutput(ppOutput);};
+    {dbg("dxgi_sc: GetContainingOutput");return dxgsc->GetContainingOutput(ppOutput);};
   HRESULT STDMETHODCALLTYPE GetFrameStatistics(DXGI_FRAME_STATISTICS *pStats)
-    {dbg("dxgsc: GetFrameStatistics");return dxgsc->GetFrameStatistics(pStats);};
+    {dbg("dxgi_sc: GetFrameStatistics");return dxgsc->GetFrameStatistics(pStats);};
   HRESULT STDMETHODCALLTYPE GetLastPresentCount(UINT *pLastPresentCount)
     {dbg("dxgsc: GetLastPresentCount");return dxgsc->GetLastPresentCount(pLastPresentCount);};
 
@@ -154,6 +173,7 @@ private:
   OUTDEVICE11   *outDevs11;
   //OUTDEVICE12   *outDevs12;
 
+  STAGINGOUT10   *stagingOuts10;
   STAGINGOUT11   *stagingOuts11;
 
 

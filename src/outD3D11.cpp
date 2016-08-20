@@ -378,7 +378,7 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
 
 outDirect3D11::~outDirect3D11()
 {
-  dbg("outDirect3D11: destroy");
+  dbg("outD3D11: destroy");
   DestroyWindow(outWin);
 }
 

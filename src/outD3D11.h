@@ -30,35 +30,35 @@ public:
   ~outDirect3D11();
 
   //void presentFromBuffer();
-  void present();
-  HANDLE GetShareHandle() {return shareHandle;};
-  HANDLE GetStagingHandle() {return stagingHandle;};
-  ID3D11Texture2D* GetSharedSurface() {return sharedSurface;};
-  ID3D11Texture2D* GetStagingSurface() {return stagingSurface;};
+  void                     present();
+  HANDLE                   GetShareHandle()    {return shareHandle;};
+  HANDLE                   GetStagingHandle()  {return stagingHandle;};
+  ID3D11Texture2D         *GetSharedSurface()  {return sharedSurface;};
+  ID3D11Texture2D         *GetStagingSurface() {return stagingSurface;};
 
-  IDXGISwapChain *swapChain;
-  ID3D11Device *dev;
-  D3D_FEATURE_LEVEL featureLevel;
-  ID3D11DeviceContext *devContext;
-  ID3D11Texture2D *stagingSurface; // Staging surface if non-local
+  IDXGISwapChain          *swapChain;
+  ID3D11Device            *dev;
+  D3D_FEATURE_LEVEL        featureLevel;
+  ID3D11DeviceContext     *devContext;
+  ID3D11Texture2D         *stagingSurface; // Staging surface if non-local
 
 private:
-  IDXGIFactory *dxgf;
+  IDXGIFactory            *dxgf;
 
-  HWND outWin;
+  HWND                     outWin;
 
-  HMONITOR mId;
-  MONITORINFO mInfo;
+  HMONITOR                 mId;
+  MONITORINFO              mInfo;
 
-  int bbWidth, bbHeight;        // Backbuffer size
-  int transWidth, transHeight;  // Transport resolution size
+  int                      bbWidth, bbHeight;        // Backbuffer size
+  int                      transWidth, transHeight;  // Transport resolution size
 
-  ID3D11Texture2D *bb;  // Device backbuffer
-  ID3D11Texture2D *sharedSurface; // Shared render surface
-  ID3D11RenderTargetView *rttView;
+  ID3D11Texture2D         *bb;  // Device backbuffer
+  ID3D11Texture2D         *sharedSurface; // Shared render surface
+  ID3D11RenderTargetView  *rttView;
 
-  HANDLE shareHandle;
-  HANDLE stagingHandle;
+  HANDLE                  shareHandle;
+  HANDLE                  stagingHandle;
 };
 
 #endif // __OUTD3D11_H__

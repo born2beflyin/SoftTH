@@ -77,7 +77,7 @@ IDXGISwapChainNew::IDXGISwapChainNew(IDXGIFactory *parentNew, IDXGIFactory *dxgi
   else {
     // Check for D3D10/11 device
     if(pDevice->QueryInterface(__uuidof(ID3D10Device), (void**) &dev10) == S_OK)
-      dbg("Got Direct3D 10 device");
+      dbg("dxgi_sc: Got Direct3D 10 device");
     else if(pDevice->QueryInterface(__uuidof(ID3D10Device1), (void**) &dev10_1) == S_OK)
       dbg("dxgi_sc: Got Direct3D 10.1 device");
     else if(pDevice->QueryInterface(__uuidof(ID3D11Device), (void**) &dev11) == S_OK)
@@ -158,25 +158,25 @@ IDXGISwapChainNew::~IDXGISwapChainNew()
 HRESULT IDXGISwapChainNew::GetBuffer(UINT Buffer, REFIID riid, void **ppSurface)
 {
   // App wants pointer to backbuffer
-  dbg("dxgi_sc: GetBuffer %d %s", Buffer, matchRiid(riid));
+  dbg("dxgi_sc: dxgi_sc: GetBuffer %d %s", Buffer, matchRiid(riid));
   if(newbb10 || newbb11) {
     // Return our fake buffer
     if(newbb11)
     {
-      dbg("Got new D3D11 buffer");
+      dbg("dxgi_sc: Got new D3D11 buffer");
       *ppSurface = newbb11;
       newbb11->AddRef();
     }
     else
     {
-      dbg("Got new D3D10 buffer");
+      dbg("dxgi_sc: Got new D3D10 buffer");
       *ppSurface = newbb10;
       newbb10->AddRef();
     }
     return S_OK;
   } else {
     // Return real backbuffer
-    dbg("FAILED to get a new buffer!");
+    dbg("dxgi_sc: FAILED to get a new buffer!");
     return dxgsc->GetBuffer(Buffer, riid, ppSurface);
   }
 }
@@ -310,6 +310,7 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     dbg("dxgi_sc: Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
     dbg("dxgi_sc: Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
 
+    // Copy and Present the Primary Head
     HEAD *h = config.getPrimaryHead();
     D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
     dev10_1->CopySubresourceRegion(realbb10, 0, 0, 0, 0, newbb10, 0, &sb);
@@ -319,7 +320,7 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     if(GetKeyState('P') < 0)
       D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
 
-    // Copy & Present secondary heads
+    /*// Copy & Present secondary heads
     for(int i=0;i<numDevs;i++)
     {
       OUTDEVICE10 *o = &outDevs10[i];
@@ -327,6 +328,60 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
       dev10_1->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
       dev10_1->Flush();
 
+      o->output->present();
+    }*/
+
+    // Copy and Present Secondary Heads
+    for(int i=0;i<numDevs;i++)
+    {
+      OUTDEVICE10 *o  = &outDevs10[i];
+      STAGINGOUT10 *so = &stagingOuts10[i];
+
+      o->localSurf->GetDesc(&dt);
+      dbg("dxgi_sc: Secondary Head %d : %dx%d ms%d %s", i+1, dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+      sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
+
+      // Check if the head is local and copy accordingly
+      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+        // Local head (on the primary video adapter)
+        // - just copy the region directly to the head's localSurf
+        dbg("dxgi_sc: Local head: CopySubresourceRegion");
+        dev10_1->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+      } else {
+        // Non-local head (on a secondary adapter
+        dbg("dxgi_sc: Non-local head: Map/Unmap");
+        // Copy from the main backbuffer to the main staged texture
+        dev10_1->CopySubresourceRegion(so->stagingSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+        // Map the main staged texture
+        D3D10_MAPPED_TEXTURE2D submain;
+        if (so->stagingSurf->Map(0, D3D10_MAP_READ, 0, &submain) != S_OK)
+          dbg("Mapping Main staging surface failed!");
+        // Map the head's staged texture
+        D3D10_MAPPED_TEXTURE2D subhead;
+        if (o->output->stagingSurface->Map(0, D3D10_MAP_WRITE, 0, &subhead) != S_OK)
+          dbg("Mapping Head %d staging surface failed!",i+1);
+        // Copy from the main staged texture to the head's staged texture
+        memcpy(subhead.pData, submain.pData, dt.Width*dt.Height*4);
+        // Unmap the head's staged texture
+        o->output->stagingSurface->Unmap(0);
+        // Unmap the main staged texture
+        so->stagingSurf->Unmap(0);
+        // Copy from head's staged texture to the head's localSurf
+        o->output->dev1->CopyResource(o->localSurf, o->output->stagingSurface);
+        //o->output->devContext->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, o->output->stagingSurface, 0, NULL);
+        // Release the main staged texture
+        //so->stagingSurf->Release();
+      }
+
+      /*if (has_nonlocal) {
+        // Unmap the main staged texture
+        dev11context->Unmap(newbb11staged, 0);
+      }*/
+
+      // Flush the main render pipeline (full SoftTH buffer)
+      dev10_1->Flush(); // DOESN'T APPEAR TO BE A NEED TO DO THIS MANUALLY!!!
+
+      // Draw each secondary output
       o->output->present();
     }
   }
@@ -338,13 +393,14 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
   if(dev10)
   {
     D3D10_TEXTURE2D_DESC dt, ds;
-    dbg("dxgi_sc: realbbdesc10... %d", realbb10);
+    dbg("dxgi_sc: realbbdesc10.1 ... %d", realbb10);
     realbb10->GetDesc(&dt);
     newbb10->GetDesc(&ds);
 
     dbg("dxgi_sc: Source: %dx%d ms%d %s", ds.Width, ds.Height, ds.SampleDesc.Count, getFormatDXGI(ds.Format));
     dbg("dxgi_sc: Target: %dx%d ms%d %s", dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
 
+    // Copy and Present the Primary Head
     HEAD *h = config.getPrimaryHead();
     D3D10_BOX sb = {h->sourceRect.left, h->sourceRect.top, 0, h->sourceRect.right, h->sourceRect.bottom, 1};
     dev10->CopySubresourceRegion(realbb10, 0, 0, 0, 0, newbb10, 0, &sb);
@@ -354,14 +410,68 @@ HRESULT IDXGISwapChainNew::Present(UINT SyncInterval,UINT Flags)
     if(GetKeyState('P') < 0)
       D3DX10SaveTextureToFile(newbb10, D3DX10_IFF_JPG, "d:\\pelit\\_newbb.jpg");*/
 
-    // Copy & Present secondary heads
+    /*// Copy & Present secondary heads
     for(int i=0;i<numDevs;i++)
     {
       OUTDEVICE10 *o = &outDevs10[i];
       D3D10_BOX sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
-      dev10->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
-      dev10->Flush();
+      dev10_1->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+      dev10_1->Flush();
 
+      o->output->present();
+    }*/
+
+    // Copy and Present Secondary Heads
+    for(int i=0;i<numDevs;i++)
+    {
+      OUTDEVICE10 *o  = &outDevs10[i];
+      STAGINGOUT10 *so = &stagingOuts10[i];
+
+      o->localSurf->GetDesc(&dt);
+      dbg("dxgi_sc: Secondary Head %d : %dx%d ms%d %s", i+1, dt.Width, dt.Height, dt.SampleDesc.Count, getFormatDXGI(dt.Format));
+      sb = {o->cfg->sourceRect.left, o->cfg->sourceRect.top, 0, o->cfg->sourceRect.right, o->cfg->sourceRect.bottom, 1};
+
+      // Check if the head is local and copy accordingly
+      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+        // Local head (on the primary video adapter)
+        // - just copy the region directly to the head's localSurf
+        dbg("dxgi_sc: Local head: CopySubresourceRegion");
+        dev10->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+      } else {
+        // Non-local head (on a secondary adapter
+        dbg("dxgi_sc: Non-local head: Map/Unmap");
+        // Copy from the main backbuffer to the main staged texture
+        dev10->CopySubresourceRegion(so->stagingSurf, 0, 0, 0, 0, newbb10, 0, &sb);
+        // Map the main staged texture
+        D3D10_MAPPED_TEXTURE2D submain;
+        if (so->stagingSurf->Map(0, D3D10_MAP_READ, 0, &submain) != S_OK)
+          dbg("Mapping Main staging surface failed!");
+        // Map the head's staged texture
+        D3D10_MAPPED_TEXTURE2D subhead;
+        if (o->output->stagingSurface->Map(0, D3D10_MAP_WRITE, 0, &subhead) != S_OK)
+          dbg("Mapping Head %d staging surface failed!",i+1);
+        // Copy from the main staged texture to the head's staged texture
+        memcpy(subhead.pData, submain.pData, dt.Width*dt.Height*4);
+        // Unmap the head's staged texture
+        o->output->stagingSurface->Unmap(0);
+        // Unmap the main staged texture
+        so->stagingSurf->Unmap(0);
+        // Copy from head's staged texture to the head's localSurf
+        o->output->dev1->CopyResource(o->localSurf, o->output->stagingSurface);
+        //o->output->devContext->CopySubresourceRegion(o->localSurf, 0, 0, 0, 0, o->output->stagingSurface, 0, NULL);
+        // Release the main staged texture
+        //so->stagingSurf->Release();
+      }
+
+      /*if (has_nonlocal) {
+        // Unmap the main staged texture
+        dev11context->Unmap(newbb11staged, 0);
+      }*/
+
+      // Flush the main render pipeline (full SoftTH buffer)
+      dev10->Flush(); // DOESN'T APPEAR TO BE A NEED TO DO THIS MANUALLY!!!
+
+      // Draw each secondary output
       o->output->present();
     }
   }
@@ -538,16 +648,47 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
       bool fpuPreserve = true; // TODO: does this exist in d3d10?
 
       outDevs10 = new OUTDEVICE10[numDevs];
+      stagingOuts10 = new STAGINGOUT10[numDevs];
       for(int i=0;i<numDevs;i++)
       {
         OUTDEVICE10 *o = &outDevs10[i];
+        STAGINGOUT10 *so = &stagingOuts10[i];
+        so->headID = i+1;
+        so->devID = h->devID;
+        so->stagingSurf = NULL;
 
         // Create the output device
         HEAD *h = config.getHead(i);
-        bool local = h->transportMethod==OUTMETHOD_LOCAL;
-        dbg("dxgi_sc: Initializing head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
+        dbg("dxgi_sc: Initializing Head %d (DevID: %d)",i+1,h->devID);
         o->output = new outDirect3D10(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
         o->cfg = h;
+        bool local = h->transportMethod==OUTMETHOD_LOCAL;
+        if (!local) has_nonlocal = true;
+        dbg("dxgi_sc: Head %d is %s", i+1, local?"local":"non-local");
+
+        // Create a main staging buffer sized for this head if non-local
+        if (!local) {
+          dbg("dxgi_sc: Creating a main non-local staging buffer for Head %d (DevID %d)", i + 1, h->devID);
+          CD3D10_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, h->transportRes.x, h->transportRes.y, 1, 1, 0, D3D10_USAGE_STAGING, D3D10_CPU_ACCESS_READ | D3D10_CPU_ACCESS_WRITE, 1, 0, 0);
+          /*DWORD32 *fillbuf = new DWORD32[h->transportRes.x*h->transportRes.y];
+          for (int ii = 0; ii < h->transportRes.y; ii++)
+            for (int jj = 0; jj < h->transportRes.x; jj++)
+            {
+              if ((ii&32)==(jj&32))
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0x0000ff00;
+              else
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0xffffffff;
+            }
+          D3D11_SUBRESOURCE_DATA fillsr;
+          ZeroMemory(&fillsr, sizeof(fillsr));
+          fillsr.pSysMem = (void *)fillbuf;
+          fillsr.SysMemPitch = h->transportRes.x * 4;
+          fillsr.SysMemSlicePitch = h->transportRes.x * h->transportRes.y * 4;
+          if (dev11->CreateTexture2D(&dss, &fillsr, &so->stagingSurf) != S_OK) {*/
+          if (dev10_1->CreateTexture2D(&dss, NULL, &so->stagingSurf) != S_OK) {
+            dbg("dxgi_sc: CreateTexture2D staged for Head %d (DevID %d) failed :(",i+1,h->devID), exit(0);
+          }
+        }
 
         // Create shared surfaces
         HANDLE sha = o->output->GetShareHandle();
@@ -556,8 +697,17 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 
           { // Open surfA share handle
             ID3D10Resource *tr;
-            if(dev10_1->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
-              dbg("dxgi_sc: OpenSharedResource A failed!"), exit(0);
+			      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+              // Local output
+			        if (dev10_1->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
+				        dbg("dxgi_sc: Local OpenSharedResource A failed!"), exit(0);
+			      }
+			      else
+			      {
+              // Non-local output
+				      if (o->output->dev1->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
+					      dbg("dxgi_sc: Non-local OpenSharedResource A failed!"), exit(0);
+			      }
             if(tr->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&o->localSurf)) != S_OK)
               dbg("dxgi_sc: Shared surface QueryInterface failed!"), exit(0);
             tr->Release();
@@ -572,9 +722,9 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
     else
     #endif
     #if defined(SOFTTHMAIN) || defined(D3D10)
-    if(dev10)
+    if (dev10)
     {
-      dbg("dxgi_sc: Creating backbuffer for D3D10 Device");
+      dbg("dxgi_sc: Creating backbuffer for D3D10.1 Device");
       CD3D10_TEXTURE2D_DESC d(DXGI_FORMAT_R8G8B8A8_UNORM, rrx, rry, 1, 1, D3D10_BIND_RENDER_TARGET, D3D10_USAGE_DEFAULT, NULL);
       newbbDesc10 = d;
       if(dev10->CreateTexture2D(&newbbDesc10, NULL, &newbb10) != S_OK)
@@ -588,16 +738,47 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
       bool fpuPreserve = true; // TODO: does this exist in d3d10?
 
       outDevs10 = new OUTDEVICE10[numDevs];
+      stagingOuts10 = new STAGINGOUT10[numDevs];
       for(int i=0;i<numDevs;i++)
       {
         OUTDEVICE10 *o = &outDevs10[i];
+        STAGINGOUT10 *so = &stagingOuts10[i];
+        so->headID = i+1;
+        so->devID = h->devID;
+        so->stagingSurf = NULL;
 
         // Create the output device
         HEAD *h = config.getHead(i);
-        bool local = h->transportMethod==OUTMETHOD_LOCAL;
-        dbg("dxgi_sc: Initializing head %d (DevID: %d, %s)...", i+1, h->devID, local?"local":"non-local");
+        dbg("dxgi_sc: Initializing Head %d (DevID: %d)",i+1,h->devID);
         o->output = new outDirect3D10(h->devID, h->screenMode.x, h->screenMode.y, h->transportRes.x, h->transportRes.y, win);
         o->cfg = h;
+        bool local = h->transportMethod==OUTMETHOD_LOCAL;
+        if (!local) has_nonlocal = true;
+        dbg("dxgi_sc: Head %d is %s", i+1, local?"local":"non-local");
+
+        // Create a main staging buffer sized for this head if non-local
+        if (!local) {
+          dbg("dxgi_sc: Creating a main non-local staging buffer for Head %d (DevID %d)", i + 1, h->devID);
+          CD3D10_TEXTURE2D_DESC dss(DXGI_FORMAT_R8G8B8A8_UNORM, h->transportRes.x, h->transportRes.y, 1, 1, 0, D3D10_USAGE_STAGING, D3D10_CPU_ACCESS_READ | D3D10_CPU_ACCESS_WRITE, 1, 0, 0);
+          /*DWORD32 *fillbuf = new DWORD32[h->transportRes.x*h->transportRes.y];
+          for (int ii = 0; ii < h->transportRes.y; ii++)
+            for (int jj = 0; jj < h->transportRes.x; jj++)
+            {
+              if ((ii&32)==(jj&32))
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0x0000ff00;
+              else
+                fillbuf[ii*h->transportRes.x + jj] = (DWORD32) 0xffffffff;
+            }
+          D3D11_SUBRESOURCE_DATA fillsr;
+          ZeroMemory(&fillsr, sizeof(fillsr));
+          fillsr.pSysMem = (void *)fillbuf;
+          fillsr.SysMemPitch = h->transportRes.x * 4;
+          fillsr.SysMemSlicePitch = h->transportRes.x * h->transportRes.y * 4;
+          if (dev11->CreateTexture2D(&dss, &fillsr, &so->stagingSurf) != S_OK) {*/
+          if (dev10->CreateTexture2D(&dss, NULL, &so->stagingSurf) != S_OK) {
+            dbg("dxgi_sc: CreateTexture2D staged for Head %d (DevID %d) failed :(",i+1,h->devID), exit(0);
+          }
+        }
 
         // Create shared surfaces
         HANDLE sha = o->output->GetShareHandle();
@@ -606,8 +787,17 @@ void IDXGISwapChainNew::preUpdateBB(UINT *width, UINT *height)
 
           { // Open surfA share handle
             ID3D10Resource *tr;
-            if(dev10->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
-              dbg("dxgi_sc: OpenSharedResource A failed!"), exit(0);
+			      if (o->cfg->transportMethod == OUTMETHOD_LOCAL) {
+              // Local output
+			        if (dev10->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
+				        dbg("dxgi_sc: Local OpenSharedResource A failed!"), exit(0);
+			      }
+			      else
+			      {
+              // Non-local output
+				      if (o->output->dev1->OpenSharedResource(sha, __uuidof(ID3D10Resource), (void**)(&tr)) != S_OK)
+					      dbg("dxgi_sc: Non-local OpenSharedResource A failed!"), exit(0);
+			      }
             if(tr->QueryInterface(__uuidof(ID3D10Texture2D), (void**)(&o->localSurf)) != S_OK)
               dbg("dxgi_sc: Shared surface QueryInterface failed!"), exit(0);
             tr->Release();
