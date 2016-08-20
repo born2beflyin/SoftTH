@@ -833,6 +833,10 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDevice(IDXGIAdapter
   //dbg("d3d11: D3D11CreateDevice 0x%08X 0x%08X", adapter, *adapter);
   dbg("d3d11: D3D11CreateDevice");
 
+#ifdef DEBUG
+  Flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif // DEBUG
+
   HRESULT ret = dllD3D11CreateDevice(adapter,
                                      DriverType,
                                      Software,
@@ -870,6 +874,10 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
 {
   //dbg("d3d11: D3D11CreateDeviceAndSwapChain 0x%08X 0x%08X", adapter, *adapter);
   dbg("d3d11: D3D11CreateDeviceAndSwapChain");
+
+#ifdef DEBUG
+  Flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif // DEBUG
 
   //D3D_FEATURE_LEVEL pFeatureLevelsUpdated[1] = { D3D_FEATURE_LEVEL_11_0 };
 

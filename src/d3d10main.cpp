@@ -307,6 +307,7 @@ DEXPORTD(hLibD3D10, D3D10CompileEffectFromMemory         );
 DEXPORTD(hLibD3D10, D3D10CreateBlob                      );
 //DEXPORTD(hLibD3D10, D3D10CreateDevice                    );
 //DEXPORTD(hLibD3D10, D3D10CreateDeviceAndSwapChain        );
+DEXPORTD(hLibSoftTH, D3D10CreateDevice                    );
 DEXPORTD(hLibSoftTH, D3D10CreateDeviceAndSwapChain        );
 DEXPORTD(hLibD3D10, D3D10CreateEffectFromMemory          );
 DEXPORTD(hLibD3D10, D3D10CreateEffectPoolFromMemory      );
