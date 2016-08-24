@@ -149,7 +149,7 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
   sd.OutputWindow = outWin;
   sd.SampleDesc.Count = 1;
   sd.SampleDesc.Quality = 0;
-  sd.Windowed = TRUE;
+  sd.Windowed = true;
 
   //D3D10_RESOURCE_MISC_SHARED
 

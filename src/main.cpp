@@ -187,7 +187,11 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       // This will hook GetModuleHandle to fool other hook apps such as steam overlay
       // Callin anything else (even dbg) will often trigger other hooks so it must be done first here
       setHooks(InitHooks);
-#endif
+#endif // PREHOOKING
+
+#ifdef DEBUG
+      MessageBox(NULL,"Attach your debugger now","Debugger",MB_OK|MB_ICONINFORMATION);
+#endif // DEBUG
 
       dbg(CLEAR_LOG);
       dbg("%s (%s, %s)", SOFTTH_VERSION, processName(), lpReserved?"static link":"dynamic link");
@@ -214,7 +218,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 
         // List modules that should not have their code hooked
         addNoHookModule(hModule);
-        addNoHookModule(GetModuleHandle("kernel32.dll"));
+        addNoHookModule(GetModuleHandle("kernel32.dll")); // TODO - do i need this??
         addNoHookModule(GetModuleHandle("user32.dll"));
 
         setHooks(SoftTHHooks);
@@ -834,7 +838,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDevice(IDXGIAdapter
   dbg("d3d11: D3D11CreateDevice");
 
 #ifdef DEBUG
-  Flags |= D3D11_CREATE_DEVICE_DEBUG;
+  Flags &= D3D11_CREATE_DEVICE_DEBUG;
 #endif // DEBUG
 
   HRESULT ret = dllD3D11CreateDevice(adapter,
@@ -876,7 +880,7 @@ extern "C" _declspec(dllexport) HRESULT WINAPI newD3D11CreateDeviceAndSwapChain(
   dbg("d3d11: D3D11CreateDeviceAndSwapChain");
 
 #ifdef DEBUG
-  Flags |= D3D11_CREATE_DEVICE_DEBUG;
+  Flags &= D3D11_CREATE_DEVICE_DEBUG;
 #endif // DEBUG
 
   //D3D_FEATURE_LEVEL pFeatureLevelsUpdated[1] = { D3D_FEATURE_LEVEL_11_0 };

@@ -162,7 +162,7 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   sd.OutputWindow = outWin;
   sd.SampleDesc.Count = 1;
   sd.SampleDesc.Quality = 0;
-  sd.Windowed = TRUE;
+  sd.Windowed = true;
 
   //D3D10_RESOURCE_MISC_SHARED
 
@@ -379,7 +379,19 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
 outDirect3D11::~outDirect3D11()
 {
   dbg("outD3D11: destroy");
-  DestroyWindow(outWin);
+
+
+  SAFE_RELEASE_LAST(bb);
+  SAFE_RELEASE_LAST(sharedSurface);
+  SAFE_RELEASE_LAST(stagingSurface);
+  SAFE_RELEASE_LAST(swapChain);
+  SAFE_RELEASE_LAST(rttView);
+  SAFE_RELEASE_LAST(dev);
+  SAFE_RELEASE_LAST(devContext);
+  SAFE_RELEASE_LAST(dxgf);
+  //DestroyWindow(outWin);
+
+  SendMessage(outWin, WM_CLOSE, 0, 0);
 }
 
 void outDirect3D11::present()
