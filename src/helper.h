@@ -21,8 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <stdio.h>
+#include <d3d11_1.h>
+#include <dxgi1_2.h>
 #include <d3d9.h>
-#include <dxgi.h>
 
 #include "common.h"
 
@@ -47,7 +48,7 @@ extern bool *SoftTHActiveSquashed;  // Pointer to latest SoftTH device squash va
     dbgf("%s: Release...", #type);\
     ULONG r = type->Release();\
     if(r == 0)\
-      dbg("%s destroyed", #type), delete(this);\
+      dbg("%s 0x%08X destroyed", #type, this), delete(this);\
     dbg("%s 0x%08X: Release: %d", #type, this, r);\
     return r;\
   }\
@@ -94,6 +95,7 @@ extern bool emergencyRelease;
 
 extern "C"  __declspec(dllexport) void ShowMessage(char *first, ...);
 extern "C"  __declspec(dllexport) void dbg(char *first, ...);
+extern "C"  __declspec(dllexport) void dbg1(char *first, ...);
 void    __cdecl odprintf(const char *format, ...);
 void    dbgSimple(char *first, ...);
 //void    dbgf(char *first, ...);

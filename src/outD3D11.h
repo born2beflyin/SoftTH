@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __OUTD3D11_H__
 #define __OUTD3D11_H__
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include <windows.h>
 #include "helper.h"
 

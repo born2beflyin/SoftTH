@@ -1,4 +1,3 @@
 LIBRARY d3d10_1
 EXPORTS
-	D3D10CreateDevice1=_newD3D10CreateDevice1@28
 	D3D10CreateDeviceAndSwapChain1=_newD3D10CreateDeviceAndSwapChain1@36

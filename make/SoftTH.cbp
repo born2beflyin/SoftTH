@@ -13,7 +13,7 @@
 				<Option working_dir="../../SoftTHtester" />
 				<Option object_output="../obj/win/x86/d3d9/debug/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Samples/C++/Direct3D/Bin/x86/HDRCubeMap.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -44,6 +44,7 @@
 					<Add directory="$(#dxsdk.include)" />
 				</ResourceCompiler>
 				<Linker>
+					<Add option="/debug" />
 					<Add option="/DEBUG" />
 					<Add option="/NODEFAULTLIB:libcmt" />
 					<Add option="/DEF:..\make\dll_D3D9_x86.def" />
@@ -85,7 +86,7 @@
 				<Option working_dir="../../SoftTHtester" />
 				<Option object_output="../obj/win/x86/d3d9/release/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Samples/C++/Direct3D/Bin/x86/HDRCubeMap.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -158,7 +159,7 @@
 				<Option working_dir="../../SoftTHtester" />
 				<Option object_output="../obj/win/x86/dxgi/debug/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="D:/Steam/steamapps/common/Assassin&apos;s Creed 3/AC3SP.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -186,7 +187,7 @@
 					<Add directory="src" />
 				</Compiler>
 				<Linker>
-					<Add option="/DEBUG" />
+					<Add option="/debug" />
 					<Add option="/NODEFAULTLIB:libcmt" />
 					<Add option="/DEF:..\make\dll_DXGI_x86.def" />
 					<Add option="/INCREMENTAL:NO" />
@@ -202,11 +203,11 @@
 					<Add library="zlibstat.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
-					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
 					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
 					<Add library="Gdi32.lib" />
@@ -232,7 +233,7 @@
 				<Option working_dir="D:/Steam/steamapps/common/Assassin&apos;s Creed 3" />
 				<Option object_output="../obj/win/x86/dxgi/release/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="D:/Steam/steamapps/common/Assassin&apos;s Creed 3/AC3SP.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -277,11 +278,11 @@
 					<Add library="zlibstat.lib" />
 					<Add library="Dwmapi.lib" />
 					<Add library="Winmm.lib" />
-					<Add library="DXGUID.lib" />
 					<Add library="d3d11.lib" />
 					<Add library="d3d10_1.lib" />
 					<Add library="d3d10.lib" />
 					<Add library="d3d9.lib" />
+					<Add library="DXGUID.lib" />
 					<Add library="DXGI.lib" />
 					<Add library="Advapi32.lib" />
 					<Add library="Gdi32.lib" />

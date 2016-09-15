@@ -47,4 +47,6 @@ typedef struct {
 } GAMMARAMP;
 extern std::list<GAMMARAMP*> restoreGammaRamps;
 
+//char libfn[256];
+
 #endif

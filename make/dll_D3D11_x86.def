@@ -1,4 +1,3 @@
 LIBRARY d3d11
 EXPORTS
-	D3D11CreateDevice=_newD3D11CreateDevice@40
 	D3D11CreateDeviceAndSwapChain=_newD3D11CreateDeviceAndSwapChain@48

@@ -243,7 +243,7 @@ static HEAD* findHead(HWND win)
     if(h->hwnd && h->hwnd == win)
     {
       head = h;
-      dbg("findHead: SecondaryHead");
+      dbg("findHead: SecondaryHead 0x%08X", win);
       break;
     }
   }
@@ -252,11 +252,11 @@ static HEAD* findHead(HWND win)
     if(h->hwnd && h->hwnd == win)
     {
       head = h;
-      dbg("findHead: PrimaryHead");
+      dbg("findHead: PrimaryHead 0x%08X", win);
     }
     else
     {
-      dbg("findHead: Head not found");
+      dbg("findHead: Head not found 0x%08X", win);
       return NULL; // Head not found
     }
   }

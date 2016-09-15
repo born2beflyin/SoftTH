@@ -29,14 +29,14 @@ public:
   Module(Module &);
   ~Module();
 
-  bool    SetHandle(char*);
+  bool    SetHandle(const char*);
   HMODULE GetHandle();
-  char*    GetPath();
+  const char*    GetPath();
 
   void    Release();
 private:
   HMODULE hMod;
-  char*   path;
+  const char*   path;
 };
 
 #endif // _MODULE_H_

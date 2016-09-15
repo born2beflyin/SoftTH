@@ -689,29 +689,32 @@ BOOL WINAPI NewEnumDisplayDevicesW(LPCWSTR lpDevice, DWORD iDevNum, PDISPLAY_DEV
 
   if (iDevNum == 0) RealDisplayCount = 99;
 
+  // Pretend SoftTH is the only monitor
+  if (iDevNum > 0) return false;
+
   BOOL ret = origFunc(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
 
   SOURCE_MODULE(srcMod);
   if(isHooked(srcMod)) {
     // TODO: CJR - Add SoftTH as a display device once all other displays have been enumerated
-    if (!ret && iDevNum < RealDisplayCount)
+    //if (!ret && iDevNum < RealDisplayCount)
+    if (ret && iDevNum == 0) //< RealDisplayCount)
     {
       dbg("NewEnumDisplayDevicesW");
-      dbg("Adding SoftTH as a display device");
+      dbg("-- Adding SoftTH as a display device");
 
-      RealDisplayCount = iDevNum - 1;
+      RealDisplayCount = 1; //iDevNum - 1;
 
       WCHAR             dname[32] = L"SoftTH";
       WCHAR             dstr[128] = SOFTTH_VERSIONW;
       WCHAR             did[128]  = SOFTTHDEVIDW;
       WCHAR             dkey[128] = L"";
 
-
-      *lpDisplayDevice->DeviceName = *dname;
-      *lpDisplayDevice->DeviceString = *dstr;
-      lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ACTIVE;// | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
-      *lpDisplayDevice->DeviceID = *did;
-      *lpDisplayDevice->DeviceKey = *dkey;
+      strncpy(lpDisplayDevice->DeviceName,dname,32);
+      strncpy(lpDisplayDevice->DeviceString,dstr,128);
+      lpDisplayDevice->StateFlags |= DISPLAY_DEVICE_ACTIVE | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
+      strncpy(lpDisplayDevice->DeviceID,did,128);
+      strncpy(lpDisplayDevice->DeviceKey,dkey,128);
 
       //memcpy(&lpDisplayDevice, &dd, sizeof(DISPLAY_DEVICE));
 
@@ -730,29 +733,32 @@ BOOL WINAPI NewEnumDisplayDevicesA(LPCTSTR lpDevice, DWORD iDevNum, PDISPLAY_DEV
 
   if (iDevNum == 0) RealDisplayCount = 99;
 
+  // Pretend SoftTH is the only monitor
+  if (iDevNum > 0) return false;
+
   BOOL ret = origFunc(lpDevice, iDevNum, lpDisplayDevice, dwFlags);
 
   SOURCE_MODULE(srcMod);
   if(isHooked(srcMod)) {
-    // TODO: CJR - Add SoftTH as a display device once all other displays have been enumerated
-    if (!ret && iDevNum < RealDisplayCount)
+    // XXXXX Remove --- TODO: CJR - Add SoftTH as a display device once all other displays have been enumerated
+    //if (!ret && iDevNum < RealDisplayCount)
+    if (ret && iDevNum == 0) //< RealDisplayCount)
     {
       dbg("NewEnumDisplayDevicesA");
-      dbg("Adding SoftTH as a display device");
+      dbg("-- Adding SoftTH as a display device");
 
-      RealDisplayCount = iDevNum - 1;
+      RealDisplayCount = 1; //iDevNum - 1;
 
       CHAR             dname[32] = "SoftTH";
       CHAR             dstr[128] = SOFTTH_VERSION;
       CHAR             did[128]  = SOFTTHDEVID;
       CHAR             dkey[128] = "";
 
-
-      *lpDisplayDevice->DeviceName = *dname;
-      *lpDisplayDevice->DeviceString = *dstr;
-      lpDisplayDevice->StateFlags = DISPLAY_DEVICE_ACTIVE;// | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
-      *lpDisplayDevice->DeviceID = *did;
-      *lpDisplayDevice->DeviceKey = *dkey;
+      strncpy(lpDisplayDevice->DeviceName,dname,32);
+      strncpy(lpDisplayDevice->DeviceString,dstr,128);
+      lpDisplayDevice->StateFlags |= DISPLAY_DEVICE_ACTIVE | DISPLAY_DEVICE_ATTACHED_TO_DESKTOP;
+      strncpy(lpDisplayDevice->DeviceID,did,128);
+      strncpy(lpDisplayDevice->DeviceKey,dkey,128);
 
       //memcpy(&lpDisplayDevice, &dd, sizeof(DISPLAY_DEVICE));
 

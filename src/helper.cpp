@@ -30,6 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Shlobj.h"
 
+#include "dxgiSwapChain.h"
+#include "dxgiFactory.h"
+#include "dxgiAdapterOutput.h"
+
 //#define WINDOW_FLAGS    WS_EX_TOPMOST
 #define WINDOW_FLAGS    NULL
 
@@ -120,6 +124,8 @@ void __cdecl odprintf(const char *format, ...)
 
   OutputDebugString(buf);
 }
+
+extern "C"  __declspec(dllexport) void dbg1(char *first, ...) { return; };
 
 // Output debug string
 extern "C" __declspec(dllexport) void dbg(char *first, ...) {
@@ -228,7 +234,7 @@ extern "C" __declspec(dllexport) void dbg(char *first, ...) {
 				}
 
         char t[64];
-        sprintf(t, "%d:%8.3f ", GetCurrentThreadId(), (GetTickCount()-initTime)/1000.0f);
+        sprintf(t, "%6d:%8.3f ", GetCurrentThreadId(), (GetTickCount()-initTime)/1000.0f);
 
 				if(repeatCount) {
 					char tmp[1024];
@@ -256,53 +262,64 @@ extern "C" __declspec(dllexport) void dbg(char *first, ...) {
 	}
 }
 
-#include <d3d11.h>
-#include <d3d10_1.h>
-#include <dxgi.h>
-
-#include "dxgiSwapChain.h"
-#include "dxgiFactory.h"
-#include "dxgiAdapterOutput.h"
-
 char* matchRiid(REFIID riid)
 {
-  if(riid == IID_IDirect3DDevice9Ex) return "IID_IDirect3DDevice9Ex";
-  if(riid == IID_IDirect3DDevice9) return "IID_IDirect3DDevice9";
+  if(riid == IID_IDirect3DDevice9Ex)        return "IID_IDirect3DDevice9Ex";
+  if(riid == IID_IDirect3DDevice9)          return "IID_IDirect3DDevice9";
 
-  if(riid == IID_IDXGIObject) return "IID_IDXGIObject";
-  if(riid == IID_IDXGIFactory) return "IID_IDXGIFactory";
-  if(riid == IID_IDXGIFactory1) return "IID_IDXGIFactory1";
-  if(riid == IID_IDXGIFactory2) return "IID_IDXGIFactory2";
-  if(riid == IID_IDXGISwapChain) return "IID_IDXGISwapChain";
-  if(riid == IID_IDXGIAdapter) return "IID_IDXGIAdapter";
-  if(riid == IID_IDXGIAdapter1) return "IID_IDXGIAdapter1";
-  if(riid == IID_IDXGIOutput) return "IID_IDXGIOutput";
-  if(riid == IID_IDXGIDevice) return "IID_IDXGIDevice";
-  if(riid == IID_IDXGIDevice1) return "IID_IDXGIDevice1";
-  if(riid == IID_IDXGIDeviceSubObject) return "IID_IDXGIDeviceSubObject";
-  if(riid == IID_IDXGIKeyedMutex) return "IID_IDXGIKeyedMutex";
-  if(riid == IID_IDXGIResource) return "IID_IDXGIResource";
-  if(riid == IID_IDXGISurface) return "IID_IDXGISurface";
-  if(riid == IID_IDXGISurface1) return "IID_IDXGISurface1";
+  if(riid == IID_IDXGIObject)               return "IID_IDXGIObject";
+  if(riid == IID_IDXGIFactory)              return "IID_IDXGIFactory";
+  if(riid == IID_IDXGIFactory1)             return "IID_IDXGIFactory1";
+  if(riid == IID_IDXGIFactory2)             return "IID_IDXGIFactory2";
+  //if(riid == IID_IDXGIFactory3)             return "IID_IDXGIFactory3";
+  if(riid == IID_IDXGISwapChain)            return "IID_IDXGISwapChain";
+  if(riid == IID_IDXGISwapChain1)           return "IID_IDXGISwapChain1";
+  //if(riid == IID_IDXGISwapChain2)           return "IID_IDXGISwapChain2";
+  //if(riid == IID_IDXGIDecodeSwapChain)      return "IID_IDXGIDecodeSwapChain";
+  if(riid == IID_IDXGIAdapter)              return "IID_IDXGIAdapter";
+  if(riid == IID_IDXGIAdapter1)             return "IID_IDXGIAdapter1";
+  if(riid == IID_IDXGIAdapter2)             return "IID_IDXGIAdapter2";
+  if(riid == IID_IDXGIOutput)               return "IID_IDXGIOutput";
+  if(riid == IID_IDXGIOutput1)              return "IID_IDXGIOutput1";
+  //if(riid == IID_IDXGIOutput2)              return "IID_IDXGIOutput2";
+  //if(riid == IID_IDXGIOutput3)              return "IID_IDXGIOutput3";
+  if(riid == IID_IDXGIDevice)               return "IID_IDXGIDevice";
+  if(riid == IID_IDXGIDevice1)              return "IID_IDXGIDevice1";
+  if(riid == IID_IDXGIDevice2)              return "IID_IDXGIDevice2";
+  //if(riid == IID_IDXGIDevice3)              return "IID_IDXGIDevice3";
+  if(riid == IID_IDXGIDeviceSubObject)      return "IID_IDXGIDeviceSubObject";
+  if(riid == IID_IDXGIKeyedMutex)           return "IID_IDXGIKeyedMutex";
+  if(riid == IID_IDXGIResource)             return "IID_IDXGIResource";
+  if(riid == IID_IDXGISurface)              return "IID_IDXGISurface";
+  if(riid == IID_IDXGISurface1)             return "IID_IDXGISurface1";
 
-  if(riid == IID_ID3D10Texture1D) return "IID_ID3D10Texture2D";
-  if(riid == IID_ID3D10Texture2D) return "IID_ID3D10Texture2D";
-  if(riid == IID_ID3D10Texture3D) return "IID_ID3D10Texture2D";
-  if(riid == IID_ID3D10Device) return "IID_ID3D10Device";
-  if(riid == IID_ID3D10Device1) return "IID_ID3D10Device1";
-  if(riid == IID_ID3D11Device) return "IID_ID3D11Device";
-  if(riid == IID_ID3D11DeviceContext) return "IID_ID3D11DeviceContext";
+  if(riid == IID_ID3D10Texture1D)           return "IID_ID3D10Texture2D";
+  if(riid == IID_ID3D10Texture2D)           return "IID_ID3D10Texture2D";
+  if(riid == IID_ID3D10Texture3D)           return "IID_ID3D10Texture2D";
+  if(riid == IID_ID3D10Device)              return "IID_ID3D10Device";
+  if(riid == IID_ID3D10Device1)             return "IID_ID3D10Device1";
+  if(riid == IID_ID3D11Device)              return "IID_ID3D11Device";
+  if(riid == IID_ID3D11Device1)             return "IID_ID3D11Device1";
+  //if(riid == IID_ID3D11Device2)             return "IID_ID3D11Device2";
+  if(riid == IID_ID3D11DeviceContext)       return "IID_ID3D11DeviceContext";
+  if(riid == IID_ID3D11DeviceContext1)      return "IID_ID3D11DeviceContext1";
+  //if(riid == IID_ID3D11DeviceContext2)      return "IID_ID3D11DeviceContext2";
 
-  if(riid == IID_IDXGISwapChainNew) return "IID_IDXGISwapChainNew";
-  if(riid == IID_IDXGIFactoryNew) return "IID_IDXGIFactoryNew";
-  if(riid == IID_IDXGIFactory1New) return "IID_IDXGIFactory1New";
-  if(riid == IID_IDXGIFactory2New) return "IID_IDXGIFactory2New";
-  if(riid == IID_IDXGIAdapterNew) return "IID_IDXGIAdapterNew";
-  if(riid == IID_IDXGIAdapter1New) return "IID_IDXGIAdapter1New";
-  if(riid == IID_IDXGIOutputNew) return "IID_IDXGIOutputNew";
+  if(riid == IID_IDXGISwapChainNew)         return "IID_IDXGISwapChainNew";
+  if(riid == IID_IDXGIFactoryNew)           return "IID_IDXGIFactoryNew";
+  if(riid == IID_IDXGIAdapterNew)           return "IID_IDXGIAdapterNew";
+  if(riid == IID_IDXGIOutputNew)            return "IID_IDXGIOutputNew";
 
-  if(riid == IID_IDirect3DBaseTexture9) return "IID_IDirect3DBaseTexture9";
-  if(riid == IID_IDirect3DTexture9) return "IID_IDirect3DTexture9";
+  if(riid == IID_IDirect3DBaseTexture9)     return "IID_IDirect3DBaseTexture9";
+  if(riid == IID_IDirect3DTexture9)         return "IID_IDirect3DTexture9";
+
+  if(riid == IID_ID3D10Texture1D)           return "IID_ID3D10Texture1D";
+  if(riid == IID_ID3D10Texture2D)           return "IID_ID3D10Texture2D";
+  if(riid == IID_ID3D10Texture3D)           return "IID_ID3D10Texture3D";
+
+  if(riid == IID_ID3D11Texture1D)           return "IID_ID3D11Texture1D";
+  if(riid == IID_ID3D11Texture2D)           return "IID_ID3D11Texture2D";
+  if(riid == IID_ID3D11Texture3D)           return "IID_ID3D11Texture3D";
 
   static char foo[256];
   sprintf(foo, "Unknown: {%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", riid.Data1, riid.Data2, riid.Data3, riid.Data4[0],
@@ -484,13 +501,13 @@ char* getUsageDXGI(DXGI_USAGE usage)
   static char ret[512];
   ret[0] = 0x00;
   DWORD u = usage;
-  if(u & DXGI_USAGE_BACK_BUFFER) strcat(ret, "BACK_BUFFER "), u-=DXGI_USAGE_BACK_BUFFER;
-  if(u & DXGI_USAGE_DISCARD_ON_PRESENT) strcat(ret, "DISCARD_ON_PRESENT "), u-=DXGI_USAGE_DISCARD_ON_PRESENT;
-  if(u & DXGI_USAGE_READ_ONLY) strcat(ret, "READ_ONLY "), u-=DXGI_USAGE_READ_ONLY;
+  if(u & DXGI_USAGE_BACK_BUFFER)          strcat(ret, "BACK_BUFFER "),          u-=DXGI_USAGE_BACK_BUFFER;
+  if(u & DXGI_USAGE_DISCARD_ON_PRESENT)   strcat(ret, "DISCARD_ON_PRESENT "),   u-=DXGI_USAGE_DISCARD_ON_PRESENT;
+  if(u & DXGI_USAGE_READ_ONLY)            strcat(ret, "READ_ONLY "),            u-=DXGI_USAGE_READ_ONLY;
   if(u & DXGI_USAGE_RENDER_TARGET_OUTPUT) strcat(ret, "RENDER_TARGET_OUTPUT "), u-=DXGI_USAGE_RENDER_TARGET_OUTPUT;
-  if(u & DXGI_USAGE_SHADER_INPUT) strcat(ret, "SHADER_INPUT "), u-=DXGI_USAGE_SHADER_INPUT;
-  if(u & DXGI_USAGE_SHARED) strcat(ret, "SHARED "), u-=DXGI_USAGE_SHARED;
-  if(u & DXGI_USAGE_UNORDERED_ACCESS) strcat(ret, "UNORDERED_ACCESS "), u-=DXGI_USAGE_UNORDERED_ACCESS;
+  if(u & DXGI_USAGE_SHADER_INPUT)         strcat(ret, "SHADER_INPUT "),         u-=DXGI_USAGE_SHADER_INPUT;
+  if(u & DXGI_USAGE_SHARED)               strcat(ret, "SHARED "),               u-=DXGI_USAGE_SHARED;
+  if(u & DXGI_USAGE_UNORDERED_ACCESS)     strcat(ret, "UNORDERED_ACCESS "),     u-=DXGI_USAGE_UNORDERED_ACCESS;
   return ret;
 }
 

@@ -100,8 +100,8 @@ outDirect3D10::outDirect3D10(int devID, int w, int h, int transX, int transY, HW
 
   // Create factory, then get the actual factory
   CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&dxgf));
-  IDXGIFactory1New *fnew;
-  if(dxgf->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
+  IDXGIFactoryNew *fnew;
+  if(dxgf->QueryInterface(IID_IDXGIFactoryNew, (void**) &fnew) == S_OK) {
     dxgf = fnew->getReal();
     fnew->Release();
   }

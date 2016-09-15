@@ -37,10 +37,10 @@ Module::~Module()
 
 }
 
-bool Module::SetHandle(char* path)
+bool Module::SetHandle(const char* path)
 {
   Module::path = path;
-  Module::hMod = LoadLibrary(path);
+  Module::hMod = GetModuleHandle(path); //LoadLibrary(path);
   if(Module::hMod) return true; else return false;
 }
 
@@ -49,14 +49,14 @@ HMODULE Module::GetHandle()
   if(Module::hMod) return Module::hMod; else return NULL;
 }
 
-char* Module::GetPath()
+const char* Module::GetPath()
 {
   if (Module::path) return Module::path; else return NULL;
 }
 
 void Module::Release()
 {
-  FreeLibrary(Module::hMod);
+  //FreeLibrary(Module::hMod);
   Module::hMod = NULL;
 }
 

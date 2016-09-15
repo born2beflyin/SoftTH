@@ -23,8 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <stdio.h>
-//#include <d3d10_1.h>
+#include <string>
 #include "d3d10main.h"
+
+using namespace std;
 
 
 // SoftTH main dll import function/variable prototypes
@@ -32,7 +34,7 @@ void (__stdcall * dbg)(char *first, ...) = NULL;
 void (__stdcall * ShowMessage)(char *first, ...) = NULL;
 //void (__stdcall * addNoHookModule)(HMODULE mod) = NULL;
 DLL configFile config; // Main configuration
-DLL HINSTANCE hLibD3D11;
+DLL HINSTANCE hLibD3D10;
 
 
 /* D3D 10 real function prototypes */
@@ -74,17 +76,24 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
       {
         // Load the library
         SoftTHMod = new Module;
-        if(SoftTHMod->SetHandle(".\\dxgi.dll"))
+        char appath[256];
+        GetModuleFileName(hModule, appath, 256);
+        string path(appath);
+        size_t lpos = path.find_last_of("\\");
+        path = path.substr(0,lpos);
+        path += "\\dxgi.dll";
+        const char *mypath = path.c_str();
+        if(SoftTHMod->SetHandle(path.c_str()))
           hLibSoftTH = SoftTHMod->GetHandle();
-        else
-          ShowMessage("Main SoftTH library not found (dxgi.dll)!"), exit(0);
+        //else
+        //  ShowMessage("Main SoftTH library not found (dxgi.dll)!"), exit(0);
 
         // Capture functions from main SoftTH library
         dbg = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"dbg");
         ShowMessage = (void(__stdcall *)(char*,...)) GetProcAddress(hLibSoftTH,"ShowMessage");
         //addNoHookModule = (void(__stdcall *)(HMODULE)) GetProcAddress(hLibSoftTH,"addNoHookModule");
 
-        dbg("d3d10: Main SoftTH functions captured.");
+        //dbg("d3d10: Main SoftTH functions captured.");
       }
 
       /* Load D3D10 Library */
@@ -136,8 +145,8 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
         HRESULT ret = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, fn, &foo);
         if(!ret)
           dbg("Failed to pin DLL: error %d", GetLastError());
-        else
-          dbg("Pinned DLL: <%s>", fn);
+        //else
+        //  dbg("Pinned DLL: <%s>", fn);
 
         /*if(hLibSoftTH) addNoHookModule(hLibSoftTH);*/
         /*if(hLibD3D10) addNoHookModule(hLibD3D10);*/
@@ -154,7 +163,7 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 				hLibD3D10 = NULL;
 			}*/
       if(hLibSoftTH) {
-        FreeLibrary(hLibSoftTH);
+        //FreeLibrary(hLibSoftTH);
         hLibSoftTH = NULL;
       }
 
@@ -305,9 +314,9 @@ extern "C" {
 /* Direct3D 10 */
 DEXPORTD(hLibD3D10, D3D10CompileEffectFromMemory         );
 DEXPORTD(hLibD3D10, D3D10CreateBlob                      );
-//DEXPORTD(hLibD3D10, D3D10CreateDevice                    );
+DEXPORTD(hLibD3D10, D3D10CreateDevice                    );
 //DEXPORTD(hLibD3D10, D3D10CreateDeviceAndSwapChain        );
-DEXPORTD(hLibSoftTH, D3D10CreateDevice                    );
+//DEXPORTD(hLibSoftTH, D3D10CreateDevice                    );
 DEXPORTD(hLibSoftTH, D3D10CreateDeviceAndSwapChain        );
 DEXPORTD(hLibD3D10, D3D10CreateEffectFromMemory          );
 DEXPORTD(hLibD3D10, D3D10CreateEffectPoolFromMemory      );

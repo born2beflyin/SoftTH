@@ -5,7 +5,15 @@
 		<Option title="SoftTH_D3D10_1" />
 		<Option platforms="Windows;" />
 		<Option pch_mode="2" />
-		<Option compiler="microsoft_visual_c_2013_express_x86" />
+		<Option compiler="microsoft_visual_c_2015_community_x86" />
+		<MakeCommands>
+			<Build command="" />
+			<CompileFile command="" />
+			<Clean command="" />
+			<DistClean command="" />
+			<AskRebuildNeeded command="" />
+			<SilentBuild command=" &gt; $(CMD_NULL)" />
+		</MakeCommands>
 		<Build>
 			<Target title="D3D10.1 Debug Win x86">
 				<Option platforms="Windows;" />
@@ -13,7 +21,7 @@
 				<Option working_dir="../../SoftTHtester" />
 				<Option object_output="../obj/win/x86/d3d10_1/debug/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="D:/Development/SoftTHtester/bin/debug/SoftTHtester.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -28,15 +36,6 @@
 					<Add option="/Zc:wchar_t" />
 					<Add option="/Zc:forScope" />
 					<Add option="/Zi" />
-					<Add option="/DxUSE_NEW_CUDA" />
-					<Add option="/DxUSE_CUDA" />
-					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
-					<Add option="/DWIN32" />
-					<Add option="/DDEBUG" />
-					<Add option="/D_WINDOWS" />
-					<Add option="/D_USRDLL" />
-					<Add option="/DZLIB_WINAPI" />
-					<Add option="/D_WINDLL" />
 					<Add directory="$(#psdk.include)" />
 					<Add directory="../include" />
 				</Compiler>
@@ -44,7 +43,7 @@
 					<Add directory="$(#psdk.include)" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="/DEBUG" />
+					<Add option="/debug" />
 					<Add option="/NODEFAULTLIB:libcmt" />
 					<Add option="/DEF:..\make\dll_D3D10_1_x86.def" />
 					<Add option="/INCREMENTAL:NO" />
@@ -83,7 +82,7 @@
 				<Option working_dir="../../SoftTHtester" />
 				<Option object_output="../obj/win/x86/d3d10_1/release/" />
 				<Option type="3" />
-				<Option compiler="microsoft_visual_c_2013_express_x86" />
+				<Option compiler="microsoft_visual_c_2015_community_x86" />
 				<Option host_application="D:/Development/SoftTHtester/bin/release/SoftTHtester.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Compiler>
@@ -95,20 +94,10 @@
 					<Add option="/EHc" />
 					<Add option="/EHs" />
 					<Add option="/GS" />
-					<Add option="/Oy" />
 					<Add option="/Oi" />
 					<Add option="/Ot" />
 					<Add option="/Zc:wchar_t" />
 					<Add option="/Zc:forScope" />
-					<Add option="/DxUSE_NEW_CUDA" />
-					<Add option="/DxUSE_CUDA" />
-					<Add option="/D_CRT_SECURE_NO_WARNINGS" />
-					<Add option="/DWIN32" />
-					<Add option="/DNDEBUG" />
-					<Add option="/D_WINDOWS" />
-					<Add option="/D_USRDLL" />
-					<Add option="/DZLIB_WINAPI" />
-					<Add option="/D_WINDLL" />
 					<Add directory="$(#psdk.include)" />
 					<Add directory="../include" />
 				</Compiler>

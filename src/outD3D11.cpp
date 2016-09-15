@@ -111,9 +111,9 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   ShowWindow(outWin, SW_SHOWNA);
 
   // Create factory, then get the actual factory
-  CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&dxgf));
-  IDXGIFactory1New *fnew;
-  if(dxgf->QueryInterface(IID_IDXGIFactory1New, (void**) &fnew) == S_OK) {
+  CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)(&dxgf));
+  IDXGIFactoryNew *fnew;
+  if(dxgf->QueryInterface(IID_IDXGIFactoryNew, (void**) &fnew) == S_OK) {
     dxgf = fnew->getReal();
     fnew->Release();
   }
@@ -159,6 +159,7 @@ outDirect3D11::outDirect3D11(int devID, int w, int h, int transX, int transY, HW
   sd.BufferDesc.RefreshRate.Numerator = 0;
   sd.BufferDesc.RefreshRate.Denominator = 0;
   sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+  //sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
   sd.OutputWindow = outWin;
   sd.SampleDesc.Count = 1;
   sd.SampleDesc.Quality = 0;

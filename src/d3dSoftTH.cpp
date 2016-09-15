@@ -43,7 +43,7 @@ DEFINE_GUID(IID_SoftTHInvalidRTT, 0x12345542, 0x2134, 0x4545, 0xff, 0xff, 0xba, 
 
 #undef dbgf
 #define dbgf if(0)
-//#define dbgf dbg
+#define dbgf dbg
 
 #define YIELD_CPU  YieldProcessor()
 // #define YIELD_CPU SwitchToThread()
